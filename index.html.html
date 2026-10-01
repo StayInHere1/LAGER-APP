@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light" data-fontsize="normal" data-contrastbooster="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warenerfassung & Bestandsprüfung</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --whatsapp: #25d366;
+            --whatsapp-dark: #128c7e;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --base-font: 16px;
+            --btn-height: 52px;
+            --font-weight-normal: 400;
+            --font-weight-bold: 600;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        [data-theme="grey"] {
+            --bg: #334155;
+            --surface: #475569;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #64748b;
+        }
+
+        [data-theme="oled"] {
+            --bg: #000000;
+            --surface: #000000;
+            --text: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+            --primary: #3b82f6;
+        }
+
+        [data-theme="contrast"] {
+            --bg: #000000;
+            --surface: #121212;
+            --text: #ffffff;
+            --text-secondary: #facc15;
+            --border: #ffffff;
+            --primary: #facc15;
+            --danger: #ff0000;
+        }
+
+        [data-contrastbooster="true"] {
+            --font-weight-normal: 600;
+            --font-weight-bold: 900;
+        }
+
+        [data-fontsize="small"] { --base-font: 14px; }
+        [data-fontsize="normal"] { --base-font: 16px; }
+        [data-fontsize="large"] { --base-font: 18px; }
+        [data-fontsize="xlarge"] { --base-font: 20px; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-weight: var(--font-weight-normal);
+        }
+
+        strong, b, h1, h2, h3, h4, label, .btn {
+            font-weight: var(--font-weight-bold);
+        }
+
+        html {
+            font-size: var(--base-font);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 90px;
+            max-width: 600px;
+            margin: 0 auto;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        /* LOCK SCREEN OVERLAY */
+        #lockScreenOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .lock-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            border: 2px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        header {
+            background: var(--surface);
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.35rem;
+            color: var(--text);
+        }
+
+        .container {
+            padding: 1rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            border: 2px solid var(--border);
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            min-height: var(--btn-height);
+            padding: 0.85rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        textarea {
+            resize: none;
+            min-height: 90px;
+        }
+
+        .dictate-wrapper {
+            position: relative;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dictate-btn {
+            width: 55px;
+            min-height: var(--btn-height);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .photo-picker {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 1.2rem;
+            text-align: center;
+            background: var(--bg);
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+        }
+
+        .photo-preview-grid {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            margin-top: 12px;
+            padding: 4px;
+        }
+
+        .photo-thumb-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .photo-thumb-wrapper img {
+            width: 85px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            display: block;
+        }
+
+        .remove-photo-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .btn {
+            width: 100%;
+            min-height: var(--btn-height);
+            padding: 0.85rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-theme="contrast"] .btn {
+            color: #000000;
+        }
+
+        .btn-whatsapp {
+            background: var(--whatsapp);
+            color: white !important;
+            margin-top: 12px;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white !important;
+            margin-top: 12px;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white !important;
+            margin-top: 8px;
+        }
+
+        .btn-sm {
+            min-height: 36px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: var(--surface);
+            display: flex;
+            border-top: 2px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 0.85rem 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .item-card {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            padding: 0.85rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .item-card img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: var(--primary);
+            color: white;
+            margin-right: 6px;
+        }
+
+        [data-theme="contrast"] .badge {
+            color: #000000;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .badge-full {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-old {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        .user-list-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .user-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 18px;
+            max-width: 500px;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid var(--border);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .modal-gallery {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            margin-bottom: 14px;
+        }
+
+        .modal-gallery img {
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ANMELDE-OVERLAY (LOCKSCREEN) -->
+    <div id="lockScreenOverlay">
+        <div class="lock-card">
+            <h2 style="margin-bottom:6px; text-align:center;">🔒 LagerDoku Login</h2>
+            <p style="text-align:center; color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
+                Bitte melde dich mit deiner Mitarbeiter-PIN und deinem Passwort an.
+            </p>
+
+            <form id="lockForm" onsubmit="handleLockLogin(event)">
+                <div class="form-group">
+                    <label>Mitarbeiter-PIN</label>
+                    <input type="password" id="lockPinInput" placeholder="PIN z. B. 21201" required>
+                </div>
+                <div class="form-group">
+                    <label>Passwort</label>
+                    <input type="password" id="lockPasswordInput" placeholder="Passwort eingeben" required>
+                </div>
+                <button type="submit" class="btn">Entsperren & Anmelden</button>
+            </form>
+            <p id="lockErrorMsg" style="color:var(--danger); font-size:0.85rem; text-align:center; margin-top:12px; display:none;"></p>
+        </div>
+    </div>
+
+    <header>
+        <h1 id="pageTitle">Erfassung</h1>
+    </header>
+
+    <div class="container">
+        <!-- TAB 1: ERFASSUNG -->
+        <div id="tab-erfassen" class="tab-content active">
+            <div class="card">
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label>Fotos der Ware / Palette (Mehrere Aufnahmen nacheinander möglich)</label>
+                        <input type="file" id="photoInput" accept="image/*" multiple capture="environment" style="display: none;" onchange="handleFileSelect(event)">
+                        <div class="photo-picker" onclick="document.getElementById('photoInput').click()">
+                            <span>📷 Fotos aufnehmen / hinzufügen</span>
+                        </div>
+                        <div class="photo-preview-grid" id="previewGrid"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="atNummer">AT-Nummer</label>
+                        <input type="text" id="atNummer" placeholder="z. B. AT-998877" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bereich">Bereich</label>
+                        <select id="bereich">
+                            <option value="LB">LB – Lagerbüro</option>
+                            <option value="KZ">KZ – Kommissionszaun</option>
+                            <option value="KT">KT – Kommissionstür</option>
+                            <option value="KF">KF – Kommissionsfliesen</option>
+                            <option value="TB">TB – Tiefbau</option>
+                            <option value="HR3">HR3 – Holzregal 3</option>
+                            <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                            <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                            <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                            <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                            <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Lieferstatus</label>
+                        <select id="status">
+                            <option value="Vollständig" selected>🟢 Vollständig</option>
+                            <option value="Teillieferung">🟠 Teillieferung</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hinweis">Anmerkungen / Zustand (Per Sprache einsprechen möglich)</label>
+                        <div class="dictate-wrapper">
+                            <textarea id="hinweis" rows="3" placeholder="Zustand, Mängel, Bemerkungen..."></textarea>
+                            <button type="button" class="dictate-btn" onclick="startDictation()" title="Einsprechen">🎙️️</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">Ware einsenden & Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 2: AT-PRÜFUNG -->
+        <div id="tab-at" class="tab-content">
+            <div class="form-group">
+                <input type="text" id="atSearchInput" placeholder="AT-Nummer (z. B. 9988 eingeben)" oninput="checkAT()">
+            </div>
+            <div id="atResult">
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">
+                    Gib eine AT-Nummer ein, um den Bestand zu prüfen.
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 3: BESTAND -->
+        <div id="tab-bestand" class="tab-content">
+            <div class="card" style="padding:0.8rem; margin-bottom:10px;">
+                <div class="filter-grid">
+                    <div>
+                        <label style="font-size:0.75rem;">Bereich</label>
+                        <select id="filterLager" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                            <option value="ALL">Alle Bereiche</option>
+                            <option value="LB">LB – Lagerbüro</option>
+                            <option value="KZ">KZ – Kommissionszaun</option>
+                            <option value="KT">KT – Kommissionstür</option>
+                            <option value="KF">KF – Kommissionsfliesen</option>
+                            <option value="TB">TB – Tiefbau</option>
+                            <option value="HR3">HR3 – Holzregal 3</option>
+                            <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                            <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                            <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                            <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                            <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;">Status Filter</label>
+                        <select id="filterStatus" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                            <option value="ALL">Alle Status</option>
+                            <option value="Vollständig">🟢 Vollständig</option>
+                            <option value="Teillieferung">🟠 Teillieferung</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;">Sortierung</label>
+                    <select id="sortOrder" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                        <option value="newest">Neueste zuerst</option>
+                        <option value="oldest">Älteste zuerst</option>
+                    </select>
+                </div>
+            </div>
+            <div id="bestandList"></div>
+        </div>
+
+        <!-- TAB 4: PROFIL, RECHTE & EINSTELLUNGEN -->
+        <div id="tab-settings" class="tab-content">
+            
+            <!-- 1. OPTIONEN -->
+            <div class="card">
+                <h3>Optionen</h3>
+                <div class="form-group">
+                    <label>Erscheinungsbild / Design</label>
+                    <select id="themeSelect" onchange="changeTheme(this.value)">
+                        <option value="light">☀️ Helles Design (Light Mode)</option>
+                        <option value="dark">🌙 Dunkles Design (Dark Mode)</option>
+                        <option value="grey">⚙️ Graumodus (Grey Mode)</option>
+                        <option value="oled">🖤 OLED Tiefschwarz (OLED Mode)</option>
+                        <option value="contrast">⚡ Sehr hoher Kontrast (Sonne & Sehschärfe)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftgröße</label>
+                    <select id="fontSelect" onchange="changeFontSize(this.value)">
+                        <option value="small">Stufe 1: Klein</option>
+                        <option value="normal" selected>Stufe 2: Normal</option>
+                        <option value="large">Stufe 3: Groß</option>
+                        <option value="xlarge">Stufe 4: Sehr groß</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftkontrast-Booster (Fettschrift)</label>
+                    <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
+                        <option value="false" selected>Aus (Standard)</option>
+                        <option value="true">An (Fette Leseschrift)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Spürbares Feedback (Vibration bei Eingabe)</label>
+                    <select id="vibeSelect" onchange="toggleVibration(this.value)">
+                        <option value="true" selected>An (Handy vibriert bei Speichern)</option>
+                        <option value="false">Aus</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. KONTO & SITZUNG -->
+            <div class="card">
+                <h3>Konto & Sitzung</h3>
+                <div id="loginSection">
+                    <p id="currentLoginStatus" style="margin-bottom: 12px; font-size: 0.95rem;">Status: <strong>Nicht angemeldet</strong></p>
+                    <button type="button" class="btn btn-secondary" onclick="logoutCurrentUser()" style="margin-top:8px;">🚪 Abmelden / Sitzung sperren</button>
+                </div>
+            </div>
+
+            <!-- 3. QR-CODE SCANNER -->
+            <div class="card">
+                <h3>QR-Code / Barcode Scanner</h3>
+                <p style="font-size:0.9rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Hier wird später die automatische Kamera-Erkennung für Barcodes und QR-Codes auf Lieferscheinen integriert.
+                </p>
+                <button type="button" class="btn" style="background:#94a3b8; cursor:not-allowed;" disabled>📷 Kamera-Scanner vorbereitet</button>
+            </div>
+
+            <!-- 4. ADMIN-BEREICH -->
+            <div class="card">
+                <h3>Admin-Bereich</h3>
+                <div class="form-group">
+                    <label>Haupt-Admin Kennwort</label>
+                    <input type="password" id="superAdminCodeInput" placeholder="Kennwort eingeben">
+                </div>
+                <button type="button" class="btn" onclick="verifySuperAdmin()">Als Haupt-Admin freischalten</button>
+                <p id="superAdminStatusText" style="margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: var(--text-secondary);"></p>
+
+                <div id="roleManagementArea" style="display: none; margin-top: 15px;">
+                    <!-- ADMIN KENNWORTSCHUTZ ÄNDERN -->
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                        <label style="font-weight:bold;">🔑 Admin-Kennwort ändern</label>
+                        <div style="display:flex; gap:8px; margin-top:6px;">
+                            <input type="password" id="newAdminMasterPass" placeholder="Neues Admin-Kennwort" style="min-height:42px;">
+                            <button type="button" class="btn btn-sm" onclick="changeAdminMasterPassword()" style="width:auto;">Speichern</button>
+                        </div>
+                    </div>
+
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <h4>Mitarbeiter-Zugänge & Einmal-Passwörter:</h4>
+                    <div id="userRoleList" style="margin-top: 10px;"></div>
+                    
+                    <hr style="margin: 15px 0; border-color: var(--border);">
+                    <h4>📊 Mitarbeiter-Statistik (Erfassungen):</h4>
+                    <div id="adminStatsArea" style="margin-top:8px; font-size:0.9rem;"></div>
+
+                    <hr style="margin: 15px 0; border-color: var(--border);">
+                    <h4>🗑️ Papierkorb (Gelöschte Artikel):</h4>
+                    <div id="trashList" style="margin-top:8px; font-size:0.85rem;"></div>
+
+                    <button type="button" class="btn" style="margin-top:15px; background:#475569; color:white;" onclick="sendDailyReport()">📧 Tagesbericht an Florian Nienberg senden</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL / GROSSANSICHT & BEARBEITEN -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalAT" style="margin-bottom: 8px;"></h2>
+            <div id="modalGallery" class="modal-gallery"></div>
+            
+            <div id="modalViewMode">
+                <p><strong>Bereich:</strong> <span id="modalBereich"></span></p>
+                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                <p><strong>Angenommen von:</strong> <span id="modalUser"></span></p>
+                <p><strong>Datum:</strong> <span id="modalDatum"></span></p>
+                <p><strong>Anmerkungen:</strong></p>
+                <p id="modalHinweis" style="color: var(--text-secondary); background: var(--bg); padding: 10px; border-radius: 8px; margin-top: 6px; border: 1px solid var(--border);"></p>
+                
+                <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Per WhatsApp teilen</button>
+                <div id="userEditArea"></div>
+                <div id="adminDeleteArea"></div>
+            </div>
+
+            <!-- BEARBEITEN-MODUS -->
+            <div id="modalEditMode" style="display:none;">
+                <h3>Eintrag bearbeiten</h3>
+                <br>
+                <div class="form-group">
+                    <label>AT-Nummer</label>
+                    <input type="text" id="editATNummer">
+                </div>
+                <div class="form-group">
+                    <label>Bereich</label>
+                    <select id="editBereich">
+                        <option value="LB">LB – Lagerbüro</option>
+                        <option value="KZ">KZ – Kommissionszaun</option>
+                        <option value="KT">KT – Kommissionstür</option>
+                        <option value="KF">KF – Kommissionsfliesen</option>
+                        <option value="TB">TB – Tiefbau</option>
+                        <option value="HR3">HR3 – Holzregal 3</option>
+                        <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                        <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                        <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                        <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                        <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lieferstatus</label>
+                    <select id="editStatus">
+                        <option value="Vollständig">🟢 Vollständig</option>
+                        <option value="Teillieferung">🟠 Teillieferung</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Anmerkungen</label>
+                    <textarea id="editHinweis" rows="3"></textarea>
+                </div>
+                <button type="button" class="btn" onclick="saveEditedItem()">Änderungen speichern</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('erfassen', 'Erfassung', this)">📥<br>Erfassung</div>
+        <div class="nav-item" onclick="switchTab('at', 'AT-Bestandsprüfung', this)">🔍<br>AT-Prüfung</div>
+        <div class="nav-item" onclick="switchTab('bestand', 'Gesamter Bestand', this)">📦<br>Bestand</div>
+        <div class="nav-item" onclick="switchTab('settings', 'Profil & Rechte', this)">⚙️<br>Profil & Rechte</div>
+    </nav>
+
+    <script>
+        let currentPhotos = [];
+        let isSuperAdmin = false;
+        let currentUser = null;
+        let selectedItem = null;
+        let enableVibration = true;
+
+        let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
+
+        // Benutzer-Datenbank
+        let users = JSON.parse(localStorage.getItem('waren_users_v6')) || [
+            { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false },
+            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
+            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
+            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
+            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
+            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false }
+        ];
+
+        const dayMs = 24 * 60 * 60 * 1000;
+        const nowTime = Date.now();
+
+        let db = JSON.parse(localStorage.getItem('waren_db_v10')) || [
+            {
+                id: 1,
+                atNummer: 'AT-998877',
+                bereich: 'LB',
+                status: 'Vollständig',
+                user: 'Florian Nienberg',
+                hinweis: 'Lieferung unbeschädigt, 3 Paletten.',
+                datum: '01.10.2026, 14:20',
+                timestamp: nowTime - (2 * dayMs),
+                fotos: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500&q=80']
+            },
+            {
+                id: 2,
+                atNummer: 'AT-445522',
+                bereich: 'TB',
+                status: 'Teillieferung',
+                user: 'Jan Zocher',
+                hinweis: '2 von 5 Rohren geliefert. Rest kommt Dienstag.',
+                datum: '28.09.2026, 09:15',
+                timestamp: nowTime - (5 * dayMs),
+                fotos: ['https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=500&q=80']
+            },
+            {
+                id: 3,
+                atNummer: 'AT-112233',
+                bereich: 'KPR1',
+                status: 'Vollständig',
+                user: 'Manny Huppert',
+                hinweis: 'Holzelemente gelagert, bitte trocken halten.',
+                datum: '15.07.2026, 11:30',
+                timestamp: nowTime - (78 * dayMs),
+                fotos: ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500&q=80']
+            },
+            {
+                id: 4,
+                atNummer: 'AT-776655',
+                bereich: 'KZ',
+                status: 'Vollständig',
+                user: 'Tommy Böckenhauer',
+                hinweis: 'Zaunelemente auf Palette verpackt.',
+                datum: '02.06.2026, 16:45',
+                timestamp: nowTime - (121 * dayMs),
+                fotos: ['https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500&q=80']
+            }
+        ];
+
+        let trashDb = JSON.parse(localStorage.getItem('waren_trash_db')) || [];
+
+        function triggerVibe() {
+            if(enableVibration && navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // PRÜFUNG DES ANMELDE-STATUS beim Start
+        const savedUserId = localStorage.getItem('logged_user_id');
+        if(savedUserId) {
+            const found = users.find(u => u.id == savedUserId);
+            if(found && !found.isLocked) {
+                currentUser = found;
+                document.getElementById('lockScreenOverlay').style.display = 'none';
+                updateLoginUI();
+            } else {
+                document.getElementById('lockScreenOverlay').style.display = 'flex';
+            }
+        } else {
+            document.getElementById('lockScreenOverlay').style.display = 'flex';
+        }
+
+        function handleLockLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('lockPinInput').value.trim();
+            const pass = document.getElementById('lockPasswordInput').value.trim();
+            const errDiv = document.getElementById('lockErrorMsg');
+            errDiv.style.display = 'none';
+
+            const user = users.find(u => u.pin === pin);
+            if(!user) {
+                errDiv.textContent = '❌ Falsche PIN.';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            if(user.isLocked) {
+                errDiv.textContent = '❌ Dieser Zugang wurde gesperrt.';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            const isNormalMatch = user.password && (user.password === pass);
+            const isTempMatch = user.tempPass && (user.tempPass === pass);
+
+            if(isNormalMatch || isTempMatch) {
+                triggerVibe();
+                
+                if(isTempMatch) {
+                    user.tempPass = null; // Gelöscht & verfallen
+                }
+
+                currentUser = user;
+                localStorage.setItem('waren_users_v6', JSON.stringify(users));
+                localStorage.setItem('logged_user_id', user.id);
+                document.getElementById('lockScreenOverlay').style.display = 'none';
+                document.getElementById('lockPinInput').value = '';
+                document.getElementById('lockPasswordInput').value = '';
+                updateLoginUI();
+            } else {
+                errDiv.textContent = '❌ Falsches Passwort oder Einmal-Passwort verfallen.';
+                errDiv.style.display = 'block';
+            }
+        }
+
+        function logoutCurrentUser() {
+            triggerVibe();
+            currentUser = null;
+            localStorage.removeItem('logged_user_id');
+            document.getElementById('lockScreenOverlay').style.display = 'flex';
+            updateLoginUI();
+        }
+
+        function updateLoginUI() {
+            const statusText = document.getElementById('currentLoginStatus');
+            if(currentUser) {
+                statusText.innerHTML = `Angemeldet als: <strong>${currentUser.name}</strong> (${currentUser.role === 'admin' ? 'Admin / Verwalter' : 'Lagerist'})`;
+            } else {
+                statusText.innerHTML = `Status: <strong style="color:red;">Nicht angemeldet</strong>`;
+            }
+        }
+
+        function verifySuperAdmin() {
+            const code = document.getElementById('superAdminCodeInput').value;
+            const statusText = document.getElementById('superAdminStatusText');
+            if(code === adminMasterCode || (currentUser && currentUser.isOwner)) {
+                triggerVibe();
+                isSuperAdmin = true;
+                statusText.style.color = 'var(--primary)';
+                statusText.textContent = '✅ Haupt-Admin freigeschaltet!';
+                document.getElementById('roleManagementArea').style.display = 'block';
+                renderUserRoleList();
+                renderAdminStats();
+                renderTrashList();
+            } else {
+                isSuperAdmin = false;
+                statusText.style.color = 'var(--danger)';
+                statusText.textContent = '❌ Falsches Kennwort.';
+            }
+        }
+
+        function changeAdminMasterPassword() {
+            const newCode = document.getElementById('newAdminMasterPass').value.trim();
+            if(newCode.length < 4) {
+                alert('Das Admin-Kennwort muss mindestens 4 Zeichen lang sein.');
+                return;
+            }
+            triggerVibe();
+            adminMasterCode = newCode;
+            localStorage.setItem('waren_admin_code', adminMasterCode);
+            alert('Das Haupt-Admin-Kennwort wurde erfolgreich aktualisiert!');
+            document.getElementById('newAdminMasterPass').value = '';
+        }
+
+        function renderUserRoleList() {
+            const listDiv = document.getElementById('userRoleList');
+            listDiv.innerHTML = users.map(u => `
+                <div class="user-list-item">
+                    <div class="user-list-header">
+                        <div>
+                            <strong>${u.name}</strong> (PIN: ${u.pin})<br>
+                            <small style="color: var(--text-secondary);">
+                                Status: ${u.password ? '🟢 Festes PW gesetzt' : (u.tempPass ? `🟠 Aktiv: <b>${u.tempPass}</b>` : '🔴 Kein PW (Abgemeldet)')}
+                            </small>
+                        </div>
+                        ${u.isOwner ? `
+                            <span style="font-size:0.75rem; font-weight:bold; color:var(--primary); padding: 4px 8px; background: rgba(37,99,235,0.15); border-radius:6px;">Haupt-Admin</span>
+                        ` : `
+                            <select onchange="changeUserRole(${u.id}, this.value)" style="width: auto; min-height: 36px; padding:2px 6px;">
+                                <option value="lagerist" ${u.role === 'lagerist' ? 'selected' : ''}>Lagerist</option>
+                                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        `}
+                    </div>
+                    ${!u.isOwner ? `
+                        <div class="user-controls">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="generateTempPassword(${u.id})">🔑 Einmal-PW generieren</button>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="adminLogoutUser(${u.id})">🚪 Abmelden</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function generateTempPassword(userId) {
+            const user = users.find(u => u.id === userId);
+            if(!user) return;
+            const randomPW = 'Pass' + Math.floor(1000 + Math.random() * 9000);
+            user.tempPass = randomPW;
+            user.password = null;
+            user.isLocked = false;
+            localStorage.setItem('waren_users_v6', JSON.stringify(users));
+            triggerVibe();
+            renderUserRoleList();
+            alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nDieses Passwort verfällt sofort nach der ersten Nutzung.`);
+        }
+
+        function adminLogoutUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if(!user) return;
+            user.tempPass = null;
+            user.isLocked = true;
+            localStorage.setItem('waren_users_v6', JSON.stringify(users));
+            triggerVibe();
+            alert(`${user.name} wurde abgemeldet.`);
+            renderUserRoleList();
+        }
+
+        function renderAdminStats() {
+            const statsDiv = document.getElementById('adminStatsArea');
+            let counts = {};
+            users.forEach(u => counts[u.name] = 0);
+            db.forEach(item => {
+                if(item.user) counts[item.user] = (counts[item.user] || 0) + 1;
+            });
+
+            statsDiv.innerHTML = users.map(u => `
+                <div style="display:flex; justify-content:space-between; padding:4px 0;">
+                    <span>${u.name}:</span>
+                    <strong>${counts[u.name] || 0} Erfassungen</strong>
+                </div>
+            `).join('');
+        }
+
+        function renderTrashList() {
+            const trashDiv = document.getElementById('trashList');
+            if(trashDb.length === 0) {
+                trashDiv.innerHTML = '<p style="color:var(--text-secondary);">Papierkorb ist leer.</p>';
+                return;
+            }
+            trashDiv.innerHTML = trashDb.map(item => `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:var(--bg); padding:6px; border-radius:6px;">
+                    <span>${item.atNummer} (${item.bereich})</span>
+                    <button class="btn btn-sm" onclick="restoreFromTrash(${item.id})">Wiederherstellen</button>
+                </div>
+            `).join('');
+        }
+
+        function restoreFromTrash(id) {
+            const item = trashDb.find(x => x.id === id);
+            if(!item) return;
+            trashDb = trashDb.filter(x => x.id !== id);
+            db.unshift(item);
+            localStorage.setItem('waren_db_v10', JSON.stringify(db));
+            localStorage.setItem('waren_trash_db', JSON.stringify(trashDb));
+            renderTrashList();
+            renderBestand();
+            alert('Artikel wiederhergestellt!');
+        }
+
+        function changeUserRole(userId, newRole) {
+            const user = users.find(u => u.id === userId);
+            if(user && !user.isOwner) {
+                triggerVibe();
+                user.role = newRole;
+                localStorage.setItem('waren_users_v6', JSON.stringify(users));
+                if(currentUser && currentUser.id === userId) currentUser.role = newRole;
+                updateLoginUI();
+                alert(`Rolle von ${user.name} geändert.`);
+            }
+        }
+
+        function startDictation() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Spracherkennung wird auf diesem Gerät/Browser leider nicht unterstützt.');
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'de-DE';
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                alert('🎙️ Höre zu... Jetzt sprechen.');
+            };
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                const field = document.getElementById('hinweis');
+                field.value = field.value ? field.value + ' ' + text : text;
+                triggerVibe();
+            };
+
+            recognition.onerror = function() {
+                alert('Fehler bei der Spracherkennung.');
+            };
+
+            recognition.start();
+        }
+
+        function sendDailyReport() {
+            let bodyText = `Tagesbericht Bestand (${db.length} Einträge):\n\n`;
+            db.forEach(item => {
+                bodyText += `• ${item.atNummer} | ${item.bereich} | Status: ${item.status} | Angenommen von: ${item.user}\n`;
+            });
+            window.location.href = `mailto:florian.nienberg@example.com?subject=Tagesbericht%20Lagerbestand&body=${encodeURIComponent(bodyText)}`;
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if(!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 800;
+                        let w = img.width, h = img.height;
+                        if(w > maxDim || h > maxDim) {
+                            if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        currentPhotos.push(compressed);
+                        renderPhotoPreviews();
+                    };
+                    img.src = evt.target.result;
+                }
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        }
+
+        function renderPhotoPreviews() {
+            const previewGrid = document.getElementById('previewGrid');
+            previewGrid.innerHTML = '';
+
+            currentPhotos.forEach((src, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-thumb-wrapper';
+
+                const img = document.createElement('img');
+                img.src = src;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-photo-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.type = 'button';
+                removeBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    removeSinglePhoto(index);
+                };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewGrid.appendChild(wrapper);
+            });
+        }
+
+        function removeSinglePhoto(index) {
+            triggerVibe();
+            currentPhotos.splice(index, 1);
+            renderPhotoPreviews();
+        }
+
+        function switchTab(tabId, title, element) {
+            triggerVibe();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+            document.getElementById('pageTitle').textContent = title;
+            if(tabId === 'bestand') renderBestand();
+        }
+
+        document.getElementById('entryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if(!currentUser) {
+                alert('Bitte melde dich zuerst an!');
+                document.getElementById('lockScreenOverlay').style.display = 'flex';
+                return;
+            }
+
+            triggerVibe();
+            const now = Date.now();
+            const newEntry = {
+                id: now,
+                atNummer: document.getElementById('atNummer').value,
+                bereich: document.getElementById('bereich').value,
+                status: document.getElementById('status').value,
+                user: currentUser.name,
+                hinweis: document.getElementById('hinweis').value || 'Keine Anmerkungen',
+                datum: new Date().toLocaleString('de-DE'),
+                timestamp: now,
+                fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
+            };
+
+            db.unshift(newEntry);
+            localStorage.setItem('waren_db_v10', JSON.stringify(db));
+            alert('Ware erfolgreich gespeichert!');
+            this.reset();
+            document.getElementById('previewGrid').innerHTML = '';
+            currentPhotos = [];
+            document.getElementById('status').value = 'Vollständig';
+        });
+
+        function checkAT() {
+            const query = document.getElementById('atSearchInput').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('atResult');
+
+            if(!query) {
+                resultDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">Gib eine AT-Nummer ein.</p>';
+                return;
+            }
+
+            const matches = db.filter(item => item.atNummer.toLowerCase().includes(query));
+            if(matches.length === 0) {
+                resultDiv.innerHTML = '<div class="card" style="text-align:center; color: #dc2626;">❌ Keine Ware gefunden.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = matches.map(item => `
+                <div class="item-card" onclick="openModal(${item.id}, 'at')">
+                    <img src="${item.fotos[0]}" alt="Foto">
+                    <div style="flex:1;">
+                        <span class="badge">${item.bereich}</span>
+                        <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span><br>
+                        <strong>${item.atNummer}</strong><br>
+                        <small style="color: var(--text-secondary);">${item.user} • ${item.hinweis.substring(0, 30)}...</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBestand() {
+            const filterArea = document.getElementById('filterLager').value;
+            const filterStat = document.getElementById('filterStatus').value;
+            const sortOrd = document.getElementById('sortOrder').value;
+            const listDiv = document.getElementById('bestandList');
+
+            let filtered = db.filter(item => {
+                const matchArea = (filterArea === 'ALL' || item.bereich === filterArea);
+                const matchStat = (filterStat === 'ALL' || item.status === filterStat);
+                return matchArea && matchStat;
+            });
+
+            filtered.sort((a,b) => {
+                const timeA = a.timestamp || a.id;
+                const timeB = b.timestamp || b.id;
+                return sortOrd === 'newest' ? timeB - timeA : timeA - timeB;
+            });
+
+            if(filtered.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; padding:20px;">Keine Einträge für diese Filter.</p>';
+                return;
+            }
+
+            const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+
+            listDiv.innerHTML = filtered.map(item => {
+                const isOld = item.timestamp && (now - item.timestamp > sixtyDaysMs);
+                return `
+                    <div class="item-card" onclick="openModal(${item.id}, 'bestand')">
+                        <img src="${item.fotos[0]}" alt="Foto">
+                        <div style="flex:1;">
+                            <span class="badge">${item.bereich}</span>
+                            <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span>
+                            ${isOld ? `<span class="badge-old">⚠️ 60T+</span>` : ''}
+                            <br>
+                            <strong>${item.atNummer}</strong><br>
+                            <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openModal(id, origin) {
+            triggerVibe();
+            selectedItem = db.find(x => x.id === id);
+            if(!selectedItem) return;
+
+            document.getElementById('modalAT').textContent = selectedItem.atNummer;
+            document.getElementById('modalBereich').textContent = selectedItem.bereich;
+            document.getElementById('modalStatus').textContent = selectedItem.status;
+            document.getElementById('modalUser').textContent = selectedItem.user || 'Unbekannt';
+            document.getElementById('modalDatum').textContent = selectedItem.datum;
+            document.getElementById('modalHinweis').textContent = selectedItem.hinweis;
+
+            const gallery = document.getElementById('modalGallery');
+            gallery.innerHTML = selectedItem.fotos.map(src => `<img src="${src}">`).join('');
+
+            const userEditArea = document.getElementById('userEditArea');
+            const deleteArea = document.getElementById('adminDeleteArea');
+
+            const isOwnEntry = currentUser && (currentUser.name === selectedItem.user);
+            const isAdminUser = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
+
+            if(isOwnEntry || isAdminUser) {
+                userEditArea.innerHTML = `<button class="btn btn-secondary" onclick="enableEditMode()">✏️ Eintrag bearbeiten</button>`;
+            } else {
+                userEditArea.innerHTML = '';
+            }
+
+            if(origin === 'bestand' && isAdminUser) {
+                deleteArea.innerHTML = `<button class="btn btn-danger" onclick="deleteItem(${selectedItem.id})">🗑️ Artikel aus Bestand löschen</button>`;
+            } else {
+                deleteArea.innerHTML = '';
+            }
+
+            cancelEditMode();
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function enableEditMode() {
+            if(!selectedItem) return;
+            document.getElementById('editATNummer').value = selectedItem.atNummer;
+            document.getElementById('editBereich').value = selectedItem.bereich;
+            document.getElementById('editStatus').value = selectedItem.status;
+            document.getElementById('editHinweis').value = selectedItem.hinweis;
+
+            document.getElementById('modalViewMode').style.display = 'none';
+            document.getElementById('modalEditMode').style.display = 'block';
+        }
+
+        function cancelEditMode() {
+            document.getElementById('modalViewMode').style.display = 'block';
+            document.getElementById('modalEditMode').style.display = 'none';
+        }
+
+        function saveEditedItem() {
+            if(!selectedItem) return;
+            triggerVibe();
+
+            selectedItem.atNummer = document.getElementById('editATNummer').value;
+            selectedItem.bereich = document.getElementById('editBereich').value;
+            selectedItem.status = document.getElementById('editStatus').value;
+            selectedItem.hinweis = document.getElementById('editHinweis').value;
+
+            localStorage.setItem('waren_db_v10', JSON.stringify(db));
+            alert('Eintrag erfolgreich aktualisiert!');
+            closeModal();
+            renderBestand();
+            checkAT();
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            selectedItem = null;
+        }
+
+        function shareWhatsApp() {
+            if(!selectedItem) return;
+            const text = `📦 Wareneingang:\n*AT-Nummer:* ${selectedItem.atNummer}\n*Bereich:* ${selectedItem.bereich}\n*Status:* ${selectedItem.status}\n*Angenommen von:* ${selectedItem.user || 'Unbekannt'}\n*Hinweis:* ${selectedItem.hinweis}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function deleteItem(id) {
+            const item = db.find(x => x.id === id);
+            const atName = item ? item.atNummer : '';
+            
+            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich in den Papierkorb verschieben?`)) return;
+            
+            triggerVibe();
+            if(item) trashDb.unshift(item);
+            db = db.filter(x => x.id !== id);
+            
+            localStorage.setItem('waren_db_v10', JSON.stringify(db));
+            localStorage.setItem('waren_trash_db', JSON.stringify(trashDb));
+            
+            closeModal();
+            renderBestand();
+            alert('Artikel wurde in den Papierkorb verschoben.');
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        function changeFontSize(size) {
+            document.documentElement.setAttribute('data-fontsize', size);
+        }
+
+        function toggleContrastBooster(val) {
+            document.documentElement.setAttribute('data-contrastbooster', val);
+        }
+
+        function toggleVibration(val) {
+            enableVibration = (val === 'true');
+        }
+    </script>
+</body>
+</html>
