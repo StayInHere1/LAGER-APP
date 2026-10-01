@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warenerfassung & Bestandsprüfung</title>
+    
+    <!-- FIREBASE SDKs (Web / Cloud) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -451,6 +456,16 @@
             gap: 8px;
             margin-bottom: 12px;
         }
+
+        .cloud-badge {
+            font-size: 0.75rem;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -479,7 +494,7 @@
     </div>
 
     <header>
-        <h1 id="pageTitle">Erfassung</h1>
+        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️ Live Cloud verknüpft</span></h1>
     </header>
 
     <div class="container">
@@ -530,11 +545,11 @@
                         <label for="hinweis">Anmerkungen / Zustand (Per Sprache einsprechen möglich)</label>
                         <div class="dictate-wrapper">
                             <textarea id="hinweis" rows="3" placeholder="Zustand, Mängel, Bemerkungen..."></textarea>
-                            <button type="button" class="dictate-btn" onclick="startDictation()" title="Einsprechen">🎙️️</button>
+                            <button type="button" class="dictate-btn" onclick="startDictation()" title="Einsprechen">🎙</button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn">Ware einsenden & Speichern</button>
+                    <button type="submit" class="btn" id="saveSubmitBtn">Ware einsenden & Speichern</button>
                 </form>
             </div>
         </div>
@@ -761,6 +776,20 @@
     </nav>
 
     <script>
+        // FIREBASE INITIALISIERUNG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOGEf-5ia3AM6ZxnVI4CUc_l0wZAVyteI",
+            authDomain: "lager-app-8410c.firebaseapp.com",
+            projectId: "lager-app-8410c",
+            storageBucket: "lager-app-8410c.firebasestorage.app",
+            messagingSenderId: "258552990939",
+            appId: "1:258552990939:web:e68e4bc244ca7b38a010fe",
+            measurementId: "G-4C6EHP60XF"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const cloudDb = firebase.firestore();
+
         let currentPhotos = [];
         let isSuperAdmin = false;
         let currentUser = null;
@@ -769,8 +798,7 @@
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
 
-        // Benutzer-Datenbank
-        let users = JSON.parse(localStorage.getItem('waren_users_v6')) || [
+        const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false },
             { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
             { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
@@ -779,65 +807,50 @@
             { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false }
         ];
 
-        const dayMs = 24 * 60 * 60 * 1000;
-        const nowTime = Date.now();
+        let users = [...defaultUsers];
+        let db = [];
+        let trashDb = [];
 
-        let db = JSON.parse(localStorage.getItem('waren_db_v10')) || [
-            {
-                id: 1,
-                atNummer: 'AT-998877',
-                bereich: 'LB',
-                status: 'Vollständig',
-                user: 'Florian Nienberg',
-                hinweis: 'Lieferung unbeschädigt, 3 Paletten.',
-                datum: '01.10.2026, 14:20',
-                timestamp: nowTime - (2 * dayMs),
-                fotos: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=500&q=80']
-            },
-            {
-                id: 2,
-                atNummer: 'AT-445522',
-                bereich: 'TB',
-                status: 'Teillieferung',
-                user: 'Jan Zocher',
-                hinweis: '2 von 5 Rohren geliefert. Rest kommt Dienstag.',
-                datum: '28.09.2026, 09:15',
-                timestamp: nowTime - (5 * dayMs),
-                fotos: ['https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=500&q=80']
-            },
-            {
-                id: 3,
-                atNummer: 'AT-112233',
-                bereich: 'KPR1',
-                status: 'Vollständig',
-                user: 'Manny Huppert',
-                hinweis: 'Holzelemente gelagert, bitte trocken halten.',
-                datum: '15.07.2026, 11:30',
-                timestamp: nowTime - (78 * dayMs),
-                fotos: ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=500&q=80']
-            },
-            {
-                id: 4,
-                atNummer: 'AT-776655',
-                bereich: 'KZ',
-                status: 'Vollständig',
-                user: 'Tommy Böckenhauer',
-                hinweis: 'Zaunelemente auf Palette verpackt.',
-                datum: '02.06.2026, 16:45',
-                timestamp: nowTime - (121 * dayMs),
-                fotos: ['https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500&q=80']
+        // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER CLOUD
+        cloudDb.collection("users").onSnapshot((snapshot) => {
+            if(snapshot.empty) {
+                // Initial in Cloud ablegen falls leer
+                defaultUsers.forEach(u => cloudDb.collection("users").doc(String(u.id)).set(u));
+            } else {
+                let cloudUsers = [];
+                snapshot.forEach(doc => cloudUsers.push(doc.data()));
+                users = cloudUsers;
+                if(isSuperAdmin) renderUserRoleList();
+                
+                // Falls angemeldeter User geändert wurde, aktualisieren
+                const savedUserId = localStorage.getItem('logged_user_id');
+                if(savedUserId) {
+                    const found = users.find(u => u.id == savedUserId);
+                    if(found && !found.isLocked) {
+                        currentUser = found;
+                        updateLoginUI();
+                    }
+                }
             }
-        ];
+        });
 
-        let trashDb = JSON.parse(localStorage.getItem('waren_trash_db')) || [];
+        // 2. ECHTZEIT-SYNCHRONISATION BESTAND CLOUD
+        cloudDb.collection("bestand").onSnapshot((snapshot) => {
+            let cloudItems = [];
+            snapshot.forEach((doc) => cloudItems.push(doc.data()));
+            db = cloudItems;
+            renderBestand();
+            checkAT();
+        });
 
-        function triggerVibe() {
-            if(enableVibration && navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+        function saveUserToCloud(user) {
+            cloudDb.collection("users").doc(String(user.id)).set(user);
         }
 
-        // PRÜFUNG DES ANMELDE-STATUS beim Start
+        function triggerVibe() {
+            if(enableVibration && navigator.vibrate) navigator.vibrate(50);
+        }
+
         const savedUserId = localStorage.getItem('logged_user_id');
         if(savedUserId) {
             const found = users.find(u => u.id == savedUserId);
@@ -879,11 +892,11 @@
                 triggerVibe();
                 
                 if(isTempMatch) {
-                    user.tempPass = null; // Gelöscht & verfallen
+                    user.tempPass = null;
+                    saveUserToCloud(user);
                 }
 
                 currentUser = user;
-                localStorage.setItem('waren_users_v6', JSON.stringify(users));
                 localStorage.setItem('logged_user_id', user.id);
                 document.getElementById('lockScreenOverlay').style.display = 'none';
                 document.getElementById('lockPinInput').value = '';
@@ -981,10 +994,9 @@
             user.tempPass = randomPW;
             user.password = null;
             user.isLocked = false;
-            localStorage.setItem('waren_users_v6', JSON.stringify(users));
+            saveUserToCloud(user);
             triggerVibe();
-            renderUserRoleList();
-            alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nDieses Passwort verfällt sofort nach der ersten Nutzung.`);
+            alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nEs ist JETZT auf allen Handys gültig!`);
         }
 
         function adminLogoutUser(userId) {
@@ -992,10 +1004,9 @@
             if(!user) return;
             user.tempPass = null;
             user.isLocked = true;
-            localStorage.setItem('waren_users_v6', JSON.stringify(users));
+            saveUserToCloud(user);
             triggerVibe();
             alert(`${user.name} wurde abgemeldet.`);
-            renderUserRoleList();
         }
 
         function renderAdminStats() {
@@ -1032,11 +1043,8 @@
             const item = trashDb.find(x => x.id === id);
             if(!item) return;
             trashDb = trashDb.filter(x => x.id !== id);
-            db.unshift(item);
-            localStorage.setItem('waren_db_v10', JSON.stringify(db));
-            localStorage.setItem('waren_trash_db', JSON.stringify(trashDb));
+            cloudDb.collection("bestand").doc(String(item.id)).set(item);
             renderTrashList();
-            renderBestand();
             alert('Artikel wiederhergestellt!');
         }
 
@@ -1045,16 +1053,14 @@
             if(user && !user.isOwner) {
                 triggerVibe();
                 user.role = newRole;
-                localStorage.setItem('waren_users_v6', JSON.stringify(users));
-                if(currentUser && currentUser.id === userId) currentUser.role = newRole;
-                updateLoginUI();
+                saveUserToCloud(user);
                 alert(`Rolle von ${user.name} geändert.`);
             }
         }
 
         function startDictation() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert('Spracherkennung wird auf diesem Gerät/Browser leider nicht unterstützt.');
+                alert('Spracherkennung wird auf diesem Gerät leider nicht unterstützt.');
                 return;
             }
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1088,6 +1094,7 @@
             window.location.href = `mailto:florian.nienberg@example.com?subject=Tagesbericht%20Lagerbestand&body=${encodeURIComponent(bodyText)}`;
         }
 
+        // FOTO STARK KOMPRIMIEREN FÜR BLITZSCHNELLEN CLOUD-UPLOAD
         function handleFileSelect(e) {
             const files = e.target.files;
             if(!files || files.length === 0) return;
@@ -1098,7 +1105,7 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const maxDim = 800;
+                        const maxDim = 600; // Kompakte Größe
                         let w = img.width, h = img.height;
                         if(w > maxDim || h > maxDim) {
                             if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -1107,7 +1114,7 @@
                         canvas.width = w; canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                        const compressed = canvas.toDataURL('image/jpeg', 0.5);
                         
                         currentPhotos.push(compressed);
                         renderPhotoPreviews();
@@ -1157,7 +1164,6 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
             element.classList.add('active');
-            document.getElementById('pageTitle').textContent = title;
             if(tabId === 'bestand') renderBestand();
         }
 
@@ -1169,6 +1175,10 @@
                 document.getElementById('lockScreenOverlay').style.display = 'flex';
                 return;
             }
+
+            const submitBtn = document.getElementById('saveSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Speichere in Cloud...';
 
             triggerVibe();
             const now = Date.now();
@@ -1184,13 +1194,19 @@
                 fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
             };
 
-            db.unshift(newEntry);
-            localStorage.setItem('waren_db_v10', JSON.stringify(db));
-            alert('Ware erfolgreich gespeichert!');
-            this.reset();
-            document.getElementById('previewGrid').innerHTML = '';
-            currentPhotos = [];
-            document.getElementById('status').value = 'Vollständig';
+            // IN FIREBASE CLOUD SPEICHERN
+            cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
+                alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
+                document.getElementById('entryForm').reset();
+                document.getElementById('previewGrid').innerHTML = '';
+                currentPhotos = [];
+                document.getElementById('status').value = 'Vollständig';
+            }).catch(err => {
+                alert('❌ Fehler beim Cloud-Upload: ' + err.message);
+            }).finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Ware einsenden & Speichern';
+            });
         });
 
         function checkAT() {
@@ -1327,11 +1343,10 @@
             selectedItem.status = document.getElementById('editStatus').value;
             selectedItem.hinweis = document.getElementById('editHinweis').value;
 
-            localStorage.setItem('waren_db_v10', JSON.stringify(db));
-            alert('Eintrag erfolgreich aktualisiert!');
-            closeModal();
-            renderBestand();
-            checkAT();
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                alert('Eintrag erfolgreich in Cloud aktualisiert!');
+                closeModal();
+            });
         }
 
         function closeModal() {
@@ -1350,18 +1365,15 @@
             const item = db.find(x => x.id === id);
             const atName = item ? item.atNummer : '';
             
-            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich in den Papierkorb verschieben?`)) return;
+            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich aus der Cloud löschen?`)) return;
             
             triggerVibe();
             if(item) trashDb.unshift(item);
-            db = db.filter(x => x.id !== id);
             
-            localStorage.setItem('waren_db_v10', JSON.stringify(db));
-            localStorage.setItem('waren_trash_db', JSON.stringify(trashDb));
-            
-            closeModal();
-            renderBestand();
-            alert('Artikel wurde in den Papierkorb verschoben.');
+            cloudDb.collection("bestand").doc(String(id)).delete().then(() => {
+                closeModal();
+                alert('Artikel wurde aus der Cloud gelöscht.');
+            });
         }
 
         function changeTheme(theme) {
