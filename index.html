@@ -73,7 +73,7 @@
             --danger: #ff0000;
         }
 
-        /* VERRÜCKTES GALAXY DESIGN */
+        /* GALAXY DESIGN */
         [data-theme="galaxy"] {
             --bg: #090514;
             --surface: #130a2a;
@@ -97,7 +97,35 @@
             background: linear-gradient(135deg, #d946ef, #06b6d4);
             box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
             color: #ffffff;
-            font-weight: bold;
+        }
+
+        /* CAMOUFLAGE DESIGN */
+        [data-theme="camouflage"] {
+            --bg: #1a2419;
+            --surface: #283526;
+            --text: #f0fdf4;
+            --text-secondary: #86efac;
+            --border: #3b4e38;
+            --primary: #15803d;
+            --primary-dark: #166534;
+        }
+
+        /* SUNSET CYBERPUNK DESIGN */
+        [data-theme="sunset"] {
+            --bg: #180828;
+            --surface: #2a0e44;
+            --text: #fff1f2;
+            --text-secondary: #f472b6;
+            --border: #701a75;
+            --primary: #ea580c;
+            --primary-dark: #c2410c;
+            background: radial-gradient(circle at bottom right, #831843, #180828 70%);
+            background-attachment: fixed;
+        }
+
+        [data-theme="sunset"] .btn {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: #ffffff;
         }
 
         /* SCHRIFTFARBEN AUSWAHL */
@@ -112,6 +140,14 @@
         [data-textcolor="yellow"] {
             --text: #facc15 !important;
             --text-secondary: #fde047 !important;
+        }
+        [data-textcolor="matrixgreen"] {
+            --text: #22c55e !important;
+            --text-secondary: #4ade80 !important;
+        }
+        [data-textcolor="signalorange"] {
+            --text: #f97316 !important;
+            --text-secondary: #fb923c !important;
         }
 
         [data-contrastbooster="true"] {
@@ -228,6 +264,35 @@
         textarea {
             resize: none;
             min-height: 90px;
+        }
+
+        /* DYNAMISCHER AT-NUMMER INPUT MIT FESTEM AT- PREFIX */
+        .at-input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            overflow: hidden;
+        }
+
+        .at-prefix {
+            padding: 0 0.85rem;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+            min-height: var(--btn-height);
+            display: flex;
+            align-items: center;
+            border-right: 2px solid var(--border);
+            user-select: none;
+        }
+
+        .at-input-wrapper input {
+            border: none !important;
+            border-radius: 0 !important;
+            background: transparent !important;
         }
 
         .dictate-wrapper {
@@ -417,6 +482,17 @@
             color: #92400e;
         }
 
+        .badge-30d {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #f97316;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
         .badge-old {
             background: #fee2e2;
             color: #991b1b;
@@ -425,6 +501,7 @@
             border-radius: 4px;
             font-size: 0.7rem;
             margin-left: 4px;
+            font-weight: bold;
         }
 
         .user-list-item {
@@ -555,7 +632,7 @@
     </div>
 
     <header>
-        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️ Live Cloud verknüpft</span></h1>
+        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️️ Live Cloud verknüpft</span></h1>
     </header>
 
     <div class="container">
@@ -573,8 +650,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="atNummer">AT-Nummer</label>
-                        <input type="text" id="atNummer" placeholder="z. B. AT-998877" required>
+                        <label for="atNummer">AT-Nummer (Nur Zahlen eingeben)</label>
+                        <div class="at-input-wrapper">
+                            <span class="at-prefix">AT-</span>
+                            <input type="number" id="atNummer" pattern="[0-9]*" inputmode="numeric" placeholder="z. B. 998877" required oninput="filterNumbersOnly(this)">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -677,21 +757,25 @@
                 <div class="form-group">
                     <label>Erscheinungsbild</label>
                     <select id="themeSelect" onchange="changeTheme(this.value)">
-                        <option value="light">☀️ Helles Design (Light Mode)</option>
-                        <option value="dark" selected>🌙 Dunkles Design (Dark Mode)</option>
-                        <option value="grey">⚙️ Graumodus (Grey Mode)</option>
-                        <option value="oled">🖤 OLED Tiefschwarz (OLED Mode)</option>
-                        <option value="contrast">⚡ Sehr hoher Kontrast (Sonne & Sehschärfe)</option>
-                        <option value="galaxy">🌌 Galaxy Mode (Verrückter Weltraum)</option>
+                        <option value="light">☀️ Helles Design</option>
+                        <option value="dark" selected>🌙 Dunkles Design</option>
+                        <option value="grey">⚙️ Graumodus</option>
+                        <option value="oled">🖤 OLED Tiefschwarz</option>
+                        <option value="contrast">⚡ Sehr hoher Kontrast</option>
+                        <option value="galaxy">🌌 Galaxy Design</option>
+                        <option value="camouflage">🌲 Camouflage Design</option>
+                        <option value="sunset">🌅 Sunset Cyberpunk Design</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Schriftfarbe</label>
                     <select id="textColorSelect" onchange="changeTextColor(this.value)">
-                        <option value="auto" selected>✨ Automatisch (Empfohlen)</option>
+                        <option value="auto" selected>✨ Automatisch</option>
                         <option value="white">⚪ Weiß</option>
                         <option value="lightblue">🩵 Hellblau</option>
                         <option value="yellow">💛 Gelb</option>
+                        <option value="matrixgreen">🟢 Matrix-Grün</option>
+                        <option value="signalorange">🟠 Signal-Orange</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -706,8 +790,8 @@
                 <div class="form-group">
                     <label>Schriftkontrast-Booster (Fettschrift)</label>
                     <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
-                        <option value="false" selected>Aus (Standard)</option>
-                        <option value="true">An (Fette Leseschrift)</option>
+                        <option value="false" selected>Aus</option>
+                        <option value="true">An</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -715,6 +799,20 @@
                     <select id="vibeSelect" onchange="toggleVibration(this.value)">
                         <option value="true" selected>An</option>
                         <option value="false">Aus</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sound</label>
+                    <select id="soundSelect" onchange="toggleSound(this.value)">
+                        <option value="true" selected>An</option>
+                        <option value="false">Aus</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schnelleingabemodus</label>
+                    <select id="turboSelect" onchange="toggleTurboMode(this.value)">
+                        <option value="false" selected>Aus</option>
+                        <option value="true">An</option>
                     </select>
                 </div>
             </div>
@@ -763,7 +861,7 @@
                     <div id="userRoleList" style="margin-top: 10px;"></div>
                     
                     <hr style="margin: 15px 0; border-color: var(--border);">
-                    <h4>📊 Mitarbeiter-Statistik (Erfassungen):</h4>
+                    <h4>📊 Mitarbeiter-Statistik:</h4>
                     <div id="adminStatsArea" style="margin-top:8px; font-size:0.9rem;"></div>
 
                     <hr style="margin: 15px 0; border-color: var(--border);">
@@ -802,8 +900,11 @@
                 <h3>Eintrag bearbeiten</h3>
                 <br>
                 <div class="form-group">
-                    <label>AT-Nummer</label>
-                    <input type="text" id="editATNummer">
+                    <label>AT-Nummer (Nur Zahlen)</label>
+                    <div class="at-input-wrapper">
+                        <span class="at-prefix">AT-</span>
+                        <input type="number" id="editATNummer" pattern="[0-9]*" inputmode="numeric" oninput="filterNumbersOnly(this)">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Bereich</label>
@@ -873,16 +974,18 @@
         let currentUser = null;
         let selectedItem = null;
         let enableVibration = true;
+        let enableSound = true;
+        let enableTurboMode = false;
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
 
         const defaultUsers = [
-            { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
-            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] }
+            { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [], activeMinutes: 0 },
+            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [], activeMinutes: 0 },
+            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [], activeMinutes: 0 },
+            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [], activeMinutes: 0 },
+            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [], activeMinutes: 0 },
+            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [], activeMinutes: 0 }
         ];
 
         let users = [...defaultUsers];
@@ -895,6 +998,10 @@
             document.getElementById('lockScreenOverlay').style.display = 'flex';
         }
 
+        function filterNumbersOnly(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
         // BENUTZER-EINSTELLUNGEN GELADEN
         function loadSavedAppSettings() {
             const savedTheme = localStorage.getItem('app_theme') || 'dark';
@@ -902,12 +1009,12 @@
             const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
             const savedVibe = localStorage.getItem('app_vibration');
+            const savedSound = localStorage.getItem('app_sound');
+            const savedTurbo = localStorage.getItem('app_turbomode');
 
-            if (savedVibe !== null) {
-                enableVibration = (savedVibe === 'true');
-            } else {
-                enableVibration = true;
-            }
+            enableVibration = (savedVibe !== null) ? (savedVibe === 'true') : true;
+            enableSound = (savedSound !== null) ? (savedSound === 'true') : true;
+            enableTurboMode = (savedTurbo !== null) ? (savedTurbo === 'true') : false;
 
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-textcolor', savedColor);
@@ -919,15 +1026,32 @@
             const fontSel = document.getElementById('fontSelect');
             const boosterSel = document.getElementById('boosterSelect');
             const vibeSel = document.getElementById('vibeSelect');
+            const soundSel = document.getElementById('soundSelect');
+            const turboSel = document.getElementById('turboSelect');
 
             if(themeSel) themeSel.value = savedTheme;
             if(colorSel) colorSel.value = savedColor;
             if(fontSel) fontSel.value = savedFontSize;
             if(boosterSel) boosterSel.value = savedBooster;
             if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
+            if(soundSel) soundSel.value = enableSound ? 'true' : 'false';
+            if(turboSel) turboSel.value = enableTurboMode ? 'true' : 'false';
         }
 
         loadSavedAppSettings();
+
+        // ZEIT-TRACKING: NUR WENN SEITE AKTIV IST
+        let secondsInApp = 0;
+        setInterval(() => {
+            if (currentUser && document.visibilityState === 'visible') {
+                secondsInApp += 10;
+                if (secondsInApp >= 60) {
+                    secondsInApp = 0;
+                    currentUser.activeMinutes = (currentUser.activeMinutes || 0) + 1;
+                    saveUserToCloud(currentUser);
+                }
+            }
+        }, 10000);
 
         // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER & GERÄTE CLOUD
         cloudDb.collection("users").onSnapshot((snapshot) => {
@@ -938,7 +1062,10 @@
                 snapshot.forEach(doc => cloudUsers.push(doc.data()));
                 users = cloudUsers;
                 
-                if(isSuperAdmin) renderUserRoleList();
+                if(isSuperAdmin) {
+                    renderUserRoleList();
+                    renderAdminStats();
+                }
                 
                 const savedId = localStorage.getItem('logged_user_id');
                 if(savedId) {
@@ -969,6 +1096,7 @@
             db = cloudItems;
             renderBestand();
             checkAT();
+            if(isSuperAdmin) renderAdminStats();
         });
 
         function saveUserToCloud(user) {
@@ -977,6 +1105,24 @@
 
         function triggerVibe() {
             if(enableVibration && navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function playSuccessSound() {
+            if(!enableSound) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch(e){}
         }
 
         function handleLockLogin(e) {
@@ -1022,6 +1168,10 @@
                 document.getElementById('lockPinInput').value = '';
                 document.getElementById('lockPasswordInput').value = '';
                 updateLoginUI();
+
+                if(enableTurboMode) {
+                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
+                }
             } else {
                 errDiv.textContent = '❌ Falsches Passwort oder Einmal-Passwort verfallen.';
                 errDiv.style.display = 'block';
@@ -1151,9 +1301,9 @@
             });
 
             statsDiv.innerHTML = users.map(u => `
-                <div style="display:flex; justify-content:space-between; padding:4px 0;">
-                    <span>${u.name}:</span>
-                    <strong>${counts[u.name] || 0} Erfassungen</strong>
+                <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom: 1px dashed var(--border);">
+                    <span><strong>${u.name}</strong></span>
+                    <span>${counts[u.name] || 0} Erfassungen | ⏱️ <strong>${u.activeMinutes || 0} Min.</strong> aktiv</span>
                 </div>
             `).join('');
         }
@@ -1296,6 +1446,10 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
             element.classList.add('active');
+            
+            if(tabId === 'erfassen' && enableTurboMode) {
+                setTimeout(() => document.getElementById('atNummer').focus(), 150);
+            }
             if(tabId === 'bestand') renderBestand();
         }
 
@@ -1308,6 +1462,9 @@
                 return;
             }
 
+            const rawNum = document.getElementById('atNummer').value.trim();
+            const fullAT = 'AT-' + rawNum;
+
             const submitBtn = document.getElementById('saveSubmitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Speichere in Cloud...';
@@ -1316,7 +1473,7 @@
             const now = Date.now();
             const newEntry = {
                 id: now,
-                atNummer: document.getElementById('atNummer').value,
+                atNummer: fullAT,
                 bereich: document.getElementById('bereich').value,
                 status: document.getElementById('status').value,
                 user: currentUser.name,
@@ -1327,11 +1484,16 @@
             };
 
             cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
+                playSuccessSound();
                 alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
                 document.getElementById('entryForm').reset();
                 document.getElementById('previewGrid').innerHTML = '';
                 currentPhotos = [];
                 document.getElementById('status').value = 'Vollständig';
+
+                if(enableTurboMode) {
+                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
+                }
             }).catch(err => {
                 alert('❌ Fehler beim Cloud-Upload: ' + err.message);
             }).finally(() => {
@@ -1391,18 +1553,22 @@
                 return;
             }
 
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
             const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
             const now = Date.now();
 
             listDiv.innerHTML = filtered.map(item => {
-                const isOld = item.timestamp && (now - item.timestamp > sixtyDaysMs);
+                const itemAge = item.timestamp ? (now - item.timestamp) : 0;
+                const is60Old = itemAge > sixtyDaysMs;
+                const is30Old = !is60Old && (itemAge > thirtyDaysMs);
+
                 return `
                     <div class="item-card" onclick="openModal(${item.id}, 'bestand')">
                         <img src="${item.fotos[0]}" alt="Foto">
                         <div style="flex:1;">
                             <span class="badge">${item.bereich}</span>
                             <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span>
-                            ${isOld ? `<span class="badge-old">⚠️ 60T+</span>` : ''}
+                            ${is60Old ? `<span class="badge-old">⚠️ 60T+</span>` : (is30Old ? `<span class="badge-30d">⚠️ 30T+</span>` : '')}
                             <br>
                             <strong>${item.atNummer}</strong><br>
                             <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
@@ -1451,7 +1617,9 @@
 
         function enableEditMode() {
             if(!selectedItem) return;
-            document.getElementById('editATNummer').value = selectedItem.atNummer;
+            
+            const cleanNum = selectedItem.atNummer.replace(/^AT-?/i, '');
+            document.getElementById('editATNummer').value = cleanNum;
             document.getElementById('editBereich').value = selectedItem.bereich;
             document.getElementById('editStatus').value = selectedItem.status;
             document.getElementById('editHinweis').value = selectedItem.hinweis;
@@ -1469,7 +1637,8 @@
             if(!selectedItem) return;
             triggerVibe();
 
-            selectedItem.atNummer = document.getElementById('editATNummer').value;
+            const rawNum = document.getElementById('editATNummer').value.trim();
+            selectedItem.atNummer = 'AT-' + rawNum;
             selectedItem.bereich = document.getElementById('editBereich').value;
             selectedItem.status = document.getElementById('editStatus').value;
             selectedItem.hinweis = document.getElementById('editHinweis').value;
@@ -1531,6 +1700,16 @@
         function toggleVibration(val) {
             enableVibration = (val === 'true');
             localStorage.setItem('app_vibration', val);
+        }
+
+        function toggleSound(val) {
+            enableSound = (val === 'true');
+            localStorage.setItem('app_sound', val);
+        }
+
+        function toggleTurboMode(val) {
+            enableTurboMode = (val === 'true');
+            localStorage.setItem('app_turbomode', val);
         }
     </script>
 </body>
