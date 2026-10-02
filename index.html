@@ -733,7 +733,7 @@
             background: rgba(22, 163, 74, 0.15);
         }
 
-        /* AUTO-VERSCHWINDENDER TOAST-HINWEIS (OHNE OK BESTÄTIGUNG) */
+        /* AUTO-VERSCHWINDENDER TOAST-HINWEIS */
         #toastNotification {
             position: fixed;
             bottom: 95px;
@@ -761,8 +761,8 @@
 </head>
 <body>
 
-    <!-- TOAST BENACHRICHTIGUNG (VERSCHWINDET VON ALLEIN) -->
-    <div id="toastNotification">✅ Retoure als abgeholt markiert!</div>
+    <!-- TOAST BENACHRICHTIGUNG -->
+    <div id="toastNotification">Aktion erfolgreich ausgeführt!</div>
 
     <!-- ANMELDE-OVERLAY (LOCKSCREEN) -->
     <div id="lockScreenOverlay">
@@ -787,7 +787,7 @@
         </div>
     </div>
 
-    <!-- HEADER MIT ZÄHLER OBEN RECHTS -->
+    <!-- HEADER -->
     <header>
         <h1>Lagerratten-App</h1>
         <div class="header-done-badge">
@@ -1361,7 +1361,6 @@
             document.getElementById('lockScreenOverlay').style.display = 'flex';
         }
 
-        // HINWEIS OHNE OK BESTÄTIGUNG ANZEIGEN (Verschwindet nach 3.5 Sekunden)
         function showToast(message) {
             const toast = document.getElementById('toastNotification');
             if(!toast) return;
@@ -2065,32 +2064,79 @@
             }
         }
 
+        // SCHNELLE & OPTIMIERTE OCR-ERKENNUNG MIT CANVAS-VORVERARBEITUNG
         function scanATNumberFromPhoto(e) {
             const file = e.target.files[0];
             if(!file) return;
 
             const inputField = document.getElementById('atNummer');
-            inputField.placeholder = "Scanne Text vom Foto...";
+            inputField.placeholder = "Optimiere Bild & lese aus...";
+            showToast('📷 Bild wird verarbeitet...');
 
-            Tesseract.recognize(
-                file,
-                'eng',
-                { logger: m => console.log(m) }
-            ).then(({ data: { text } }) => {
-                const match = text.match(/\b\d{4,8}\b/);
-                if(match) {
-                    inputField.value = match[0];
-                    playSuccessSound();
-                    triggerVibe();
-                } else {
-                    showToast('Keine AT-Nummer auf dem Foto erkannt.');
-                }
-            }).catch(err => {
-                showToast('Fehler bei der Foto-Texterkennung.');
-            }).finally(() => {
-                inputField.placeholder = "z. B. 998877";
-                e.target.value = '';
-            });
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    // Canvas zur Bildoptimierung (Schwarz-Weiß & Kontrast / Verkleinerung für Speed)
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 800; // Optimaler Kompromiss aus Schärfe und Geschwindigkeit
+                    let w = img.width, h = img.height;
+                    if(w > maxDim || h > maxDim) {
+                        if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
+                    canvas.width = w; 
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Bild zeichnen
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    // Kontrast & Graustufen simulieren per Pixelmanipulation für Tesseract
+                    const imgData = ctx.getImageData(0, 0, w, h);
+                    const data = imgData.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Graustufen-Formel
+                        let avg = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+                        // Schwellenwert / Kontrast-Booster (macht helle Töne weiß, dunkle schwarz)
+                        let thresh = avg < 140 ? 0 : 255; 
+                        data[i] = thresh;     // R
+                        data[i + 1] = thresh; // G
+                        data[i + 2] = thresh; // B
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    const processedImageUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+                    // Tesseract OCR starten mit striktem Ziffern-Filter
+                    Tesseract.recognize(
+                        processedImageUrl,
+                        'eng',
+                        { 
+                            logger: m => console.log(m),
+                            tessedit_char_whitelist: '0123456789' // NUR Ziffern erlauben! Keine Buchstaben (O, I etc.)
+                        }
+                    ).then(({ data: { text } }) => {
+                        console.log("Erkannter OCR Text:", text);
+                        // Regex: Suche nach einer geschlossenen Zahlenfolge von 4 bis 8 Ziffern
+                        const matches = text.match(/\b\d{4,8}\b/);
+                        if(matches) {
+                            inputField.value = matches[0];
+                            playSuccessSound();
+                            triggerVibe();
+                            showToast(`✅ AT-Nummer ${matches[0]} erkannt!`);
+                        } else {
+                            showToast('⚠️ Keine klare Nummer erkannt. Bitte manuell eingeben.');
+                        }
+                    }).catch(err => {
+                        showToast('❌ Fehler bei der Texterkennung.');
+                    }).finally(() => {
+                        inputField.placeholder = "z. B. 998877";
+                        e.target.value = '';
+                    });
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function startDictation() {
