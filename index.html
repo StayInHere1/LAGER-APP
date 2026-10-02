@@ -33,7 +33,7 @@
             --font-weight-bold: 600;
         }
 
-        /* ERSCHEINUNGSBILD / THEMES */
+        /* ERSCHEINUNGSBILD / THEMES (Nur noch Helles, Dunkles, OLED & Galaxy) */
         [data-theme="light"] {
             --bg: #f8fafc;
             --surface: #ffffff;
@@ -50,14 +50,6 @@
             --border: #334155;
         }
 
-        [data-theme="grey"] {
-            --bg: #334155;
-            --surface: #475569;
-            --text: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border: #64748b;
-        }
-
         [data-theme="oled"] {
             --bg: #000000;
             --surface: #000000;
@@ -65,16 +57,6 @@
             --text-secondary: #a1a1aa;
             --border: #27272a;
             --primary: #3b82f6;
-        }
-
-        [data-theme="contrast"] {
-            --bg: #000000;
-            --surface: #121212;
-            --text: #ffffff;
-            --text-secondary: #facc15;
-            --border: #ffffff;
-            --primary: #facc15;
-            --danger: #ff0000;
         }
 
         [data-theme="galaxy"] {
@@ -99,33 +81,6 @@
         [data-theme="galaxy"] .btn {
             background: linear-gradient(135deg, #d946ef, #06b6d4);
             box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
-            color: #ffffff;
-        }
-
-        [data-theme="camouflage"] {
-            --bg: #1a2419;
-            --surface: #283526;
-            --text: #f0fdf4;
-            --text-secondary: #86efac;
-            --border: #3b4e38;
-            --primary: #15803d;
-            --primary-dark: #166534;
-        }
-
-        [data-theme="sunset"] {
-            --bg: #180828;
-            --surface: #2a0e44;
-            --text: #fff1f2;
-            --text-secondary: #f472b6;
-            --border: #701a75;
-            --primary: #ea580c;
-            --primary-dark: #c2410c;
-            background: radial-gradient(circle at bottom right, #831843, #180828 70%);
-            background-attachment: fixed;
-        }
-
-        [data-theme="sunset"] .btn {
-            background: linear-gradient(135deg, #f97316, #ec4899);
             color: #ffffff;
         }
 
@@ -519,7 +474,6 @@
             opacity: 0.45;
         }
 
-        /* Exakt 50% Transparenz für abgeholte Retouren */
         .item-card.is-abgeholt {
             border: 2px solid var(--success) !important;
             background: rgba(22, 163, 74, 0.12) !important;
@@ -733,7 +687,7 @@
             background: rgba(22, 163, 74, 0.15);
         }
 
-        /* AUTO-VERSCHWINDENDER TOAST-HINWEIS */
+        /* TOAST-HINWEIS */
         #toastNotification {
             position: fixed;
             bottom: 95px;
@@ -761,10 +715,9 @@
 </head>
 <body>
 
-    <!-- TOAST BENACHRICHTIGUNG -->
     <div id="toastNotification">Aktion erfolgreich ausgeführt!</div>
 
-    <!-- ANMELDE-OVERLAY (LOCKSCREEN) -->
+    <!-- ANMELDE-OVERLAY -->
     <div id="lockScreenOverlay">
         <div class="lock-card">
             <h2 style="margin-bottom:6px; text-align:center;">🔒 Lagerratten-App Login</h2>
@@ -800,7 +753,6 @@
         <div id="tab-erfassen" class="tab-content active">
             <div class="card">
                 <form id="entryForm">
-                    <!-- 1. FOTO -->
                     <div class="form-group">
                         <label>Fotos der Ware / Palette (Mehrere Aufnahmen nacheinander möglich)</label>
                         <input type="file" id="photoInput" accept="image/*" multiple capture="environment" style="display: none;" onchange="handleFileSelect(event)">
@@ -810,7 +762,6 @@
                         <div class="photo-preview-grid" id="previewGrid"></div>
                     </div>
 
-                    <!-- 2. AT-NUMMER -->
                     <div class="form-group" id="atGroupWrapper">
                         <label for="atNummer">AT-Nummer (Nur Zahlen eingeben)</label>
                         <div class="at-input-container">
@@ -823,7 +774,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. BEREICH -->
                     <div class="form-group">
                         <label for="bereich">Bereich</label>
                         <select id="bereich">
@@ -842,7 +792,6 @@
                         </select>
                     </div>
 
-                    <!-- 4. LIEFERSTATUS -->
                     <div class="form-group">
                         <label for="status">Lieferstatus</label>
                         <select id="status" onchange="toggleATRequirementByStatus(this.value)">
@@ -853,7 +802,6 @@
                         </select>
                     </div>
 
-                    <!-- DYNAMISCHE RETOUREN-FELDER -->
                     <div id="retoureExtrasArea" style="display:none; background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--border); margin-bottom:1.1rem;">
                         <div class="form-group" style="margin-bottom:0.8rem;">
                             <label style="color:#facc15;">Anlass / Retourengrund</label>
@@ -872,7 +820,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. ANMERKUNGEN -->
                     <div class="form-group">
                         <label for="hinweis">Anmerkungen / Zustand (Per Sprache einsprechen möglich)</label>
                         <div class="dictate-wrapper">
@@ -978,12 +925,8 @@
                     <select id="themeSelect" onchange="changeTheme(this.value)">
                         <option value="light">☀️ Helles Design</option>
                         <option value="dark" selected>🌙 Dunkles Design</option>
-                        <option value="grey">⚙ Graumodus</option>
                         <option value="oled">🖤 OLED Tiefschwarz</option>
-                        <option value="contrast">⚡ Sehr hoher Kontrast</option>
                         <option value="galaxy">🌌 Galaxy Design</option>
-                        <option value="camouflage">🌲 Camouflage Design</option>
-                        <option value="sunset">🌅 Sunset Cyberpunk Design</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1085,10 +1028,10 @@
 
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
-                        <label style="font-weight:bold;">✉️ Automatische E-Mail-Adresse für 30+ Tage Ware</label>
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Hier deine persönliche E-Mail eintragen:</p>
+                        <label style="font-weight:bold;">✉️ Automatische E-Mail-Adresse für Berichte</label>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Deine E-Mail:</p>
                         <div style="display:flex; gap:8px; margin-top:6px;">
-                            <input type="email" id="ownerEmailInput" placeholder="deine-email@beispiel.de" style="min-height:42px;">
+                            <input type="email" id="ownerEmailInput" placeholder="flori.msi03@gmail.com" style="min-height:42px;">
                             <button type="button" class="btn btn-sm" onclick="saveOwnerEmail()" style="width:auto;">Speichern</button>
                         </div>
                         <button type="button" class="btn btn-sm btn-secondary" style="margin-top:10px; width:100%;" onclick="send30DaysEmailNow()">📨 30+ Tage Bericht JETZT per E-Mail senden</button>
@@ -1112,6 +1055,7 @@
                     <hr style="margin: 15px 0; border-color: var(--border);">
                     <h4>📜 Protokoll für gelöschte Retouren:</h4>
                     <div id="retoureAuditLog" style="margin-top:8px; font-size:0.85rem; max-height:150px; overflow-y:auto; background:var(--bg); padding:8px; border-radius:6px; border:1px solid var(--border);"></div>
+                    <button type="button" class="btn btn-sm btn-danger" style="margin-top:8px; width:100%;" onclick="resetAndEmailRetoureLogs()">🗑️ Protokoll zurücksetzen & per E-Mail senden</button>
 
                     <hr style="margin: 15px 0; border-color: var(--border);">
                     <h4>🗑 Papierkorb (Gelöschte Artikel):</h4>
@@ -1334,7 +1278,7 @@
         let enableSound = true;
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
-        let ownerEmail = localStorage.getItem('owner_email') || 'florian.nienberg@example.com';
+        let ownerEmail = localStorage.getItem('owner_email') || 'flori.msi03@gmail.com';
 
         const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
@@ -1663,7 +1607,7 @@
             triggerVibe();
             ownerEmail = email;
             localStorage.setItem('owner_email', ownerEmail);
-            alert('Deine Benachrichtigungs-E-Mail wurde erfolgreich gespeichert!');
+            showToast('E-Mail-Adresse erfolgreich gespeichert!');
         }
 
         function send30DaysEmailNow() {
@@ -1683,6 +1627,39 @@
             bodyText += `\nViele Grüße,\nDeine Lagerratten-App`;
 
             window.location.href = `mailto:${ownerEmail}?subject=⚠ Lagerratten-App: ${oldItems.length} Artikel seit 30+ Tagen auf Lager&body=${encodeURIComponent(bodyText)}`;
+        }
+
+        function resetAndEmailRetoureLogs() {
+            if(retoureLogs.length === 0) {
+                showToast('Keine gelöschten Retouren im Protokoll vorhanden.');
+                return;
+            }
+            if(!confirm('Möchtest du das Protokoll zurücksetzen und die gelöschten Retouren per E-Mail an dich senden?')) return;
+
+            triggerVibe();
+            let bodyText = `Protokoll gelöschter Retouren (${retoureLogs.length} Einträge):\n\n`;
+            retoureLogs.forEach(l => {
+                bodyText += `• Bereich: ${l.bereich} | Gelöscht von: ${l.deletedBy} am ${l.date}\n`;
+            });
+
+            // E-Mail öffnen
+            window.location.href = `mailto:${ownerEmail}?subject=📜 Protokoll gelöschter Retouren&body=${encodeURIComponent(bodyText)}`;
+
+            // Sauber per Batch aus Firebase löschen
+            let batch = cloudDb.batch();
+            retoureLogs.forEach(l => {
+                let docRef = cloudDb.collection("retoure_logs").doc(String(l.id));
+                batch.delete(docRef);
+            });
+
+            batch.commit().then(() => {
+                retoureLogs = [];
+                renderRetoureLogs();
+                showToast('Protokoll gesendet und erfolgreich zurückgesetzt!');
+            }).catch(err => {
+                console.error("Fehler beim Löschen der Logs:", err);
+                showToast('❌ Fehler beim Zurücksetzen in der Cloud.');
+            });
         }
 
         function testWhatsAppTemplate() {
@@ -2064,7 +2041,6 @@
             }
         }
 
-        // SCHNELLE & OPTIMIERTE OCR-ERKENNUNG MIT CANVAS-VORVERARBEITUNG
         function scanATNumberFromPhoto(e) {
             const file = e.target.files[0];
             if(!file) return;
@@ -2077,9 +2053,8 @@
             reader.onload = function(evt) {
                 const img = new Image();
                 img.onload = function() {
-                    // Canvas zur Bildoptimierung (Schwarz-Weiß & Kontrast / Verkleinerung für Speed)
                     const canvas = document.createElement('canvas');
-                    const maxDim = 800; // Optimaler Kompromiss aus Schärfe und Geschwindigkeit
+                    const maxDim = 800;
                     let w = img.width, h = img.height;
                     if(w > maxDim || h > maxDim) {
                         if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -2089,35 +2064,28 @@
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     
-                    // Bild zeichnen
                     ctx.drawImage(img, 0, 0, w, h);
                     
-                    // Kontrast & Graustufen simulieren per Pixelmanipulation für Tesseract
                     const imgData = ctx.getImageData(0, 0, w, h);
                     const data = imgData.data;
                     for (let i = 0; i < data.length; i += 4) {
-                        // Graustufen-Formel
                         let avg = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
-                        // Schwellenwert / Kontrast-Booster (macht helle Töne weiß, dunkle schwarz)
                         let thresh = avg < 140 ? 0 : 255; 
-                        data[i] = thresh;     // R
-                        data[i + 1] = thresh; // G
-                        data[i + 2] = thresh; // B
+                        data[i] = thresh;
+                        data[i + 1] = thresh;
+                        data[i + 2] = thresh;
                     }
                     ctx.putImageData(imgData, 0, 0);
                     const processedImageUrl = canvas.toDataURL('image/jpeg', 0.8);
 
-                    // Tesseract OCR starten mit striktem Ziffern-Filter
                     Tesseract.recognize(
                         processedImageUrl,
                         'eng',
                         { 
                             logger: m => console.log(m),
-                            tessedit_char_whitelist: '0123456789' // NUR Ziffern erlauben! Keine Buchstaben (O, I etc.)
+                            tessedit_char_whitelist: '0123456789'
                         }
                     ).then(({ data: { text } }) => {
-                        console.log("Erkannter OCR Text:", text);
-                        // Regex: Suche nach einer geschlossenen Zahlenfolge von 4 bis 8 Ziffern
                         const matches = text.match(/\b\d{4,8}\b/);
                         if(matches) {
                             inputField.value = matches[0];
