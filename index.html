@@ -627,7 +627,7 @@
                     <label>Schriftgröße</label>
                     <select id="fontSelect" onchange="changeFontSize(this.value)">
                         <option value="small">Stufe 1: Klein</option>
-                        <option value="normal" selected>Stufe 2: Normal</option>
+                        <option value="normal">Stufe 2: Normal</option>
                         <option value="large">Stufe 3: Groß</option>
                         <option value="xlarge">Stufe 4: Sehr groß</option>
                     </select>
@@ -635,14 +635,14 @@
                 <div class="form-group">
                     <label>Schriftkontrast-Booster (Fettschrift)</label>
                     <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
-                        <option value="false" selected>Aus (Standard)</option>
+                        <option value="false">Aus (Standard)</option>
                         <option value="true">An (Fette Leseschrift)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Spürbares Feedback (Vibration bei Eingabe)</label>
                     <select id="vibeSelect" onchange="toggleVibration(this.value)">
-                        <option value="true" selected>An (Handy vibriert bei Speichern)</option>
+                        <option value="true">An (Handy vibriert bei Speichern)</option>
                         <option value="false">Aus</option>
                     </select>
                 </div>
@@ -811,10 +811,41 @@
         let db = [];
         let trashDb = [];
 
+        // FUNKTION ZUM LADEN GESPEICHERTER BENUTZER-EINSTELLUNGEN
+        function loadSavedAppSettings() {
+            const savedTheme = localStorage.getItem('app_theme') || 'light';
+            const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
+            const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
+            const savedVibe = localStorage.getItem('app_vibration');
+
+            if (savedVibe !== null) {
+                enableVibration = (savedVibe === 'true');
+            } else {
+                enableVibration = true;
+            }
+
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.documentElement.setAttribute('data-fontsize', savedFontSize);
+            document.documentElement.setAttribute('data-contrastbooster', savedBooster);
+
+            // Select-Dropdowns auf die gespeicherten Werte setzen
+            const themeSel = document.getElementById('themeSelect');
+            const fontSel = document.getElementById('fontSelect');
+            const boosterSel = document.getElementById('boosterSelect');
+            const vibeSel = document.getElementById('vibeSelect');
+
+            if(themeSel) themeSel.value = savedTheme;
+            if(fontSel) fontSel.value = savedFontSize;
+            if(boosterSel) boosterSel.value = savedBooster;
+            if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
+        }
+
+        // Einstellungen direkt beim Start aufrufen
+        loadSavedAppSettings();
+
         // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER CLOUD
         cloudDb.collection("users").onSnapshot((snapshot) => {
             if(snapshot.empty) {
-                // Initial in Cloud ablegen falls leer
                 defaultUsers.forEach(u => cloudDb.collection("users").doc(String(u.id)).set(u));
             } else {
                 let cloudUsers = [];
@@ -822,7 +853,6 @@
                 users = cloudUsers;
                 if(isSuperAdmin) renderUserRoleList();
                 
-                // Falls angemeldeter User geändert wurde, aktualisieren
                 const savedUserId = localStorage.getItem('logged_user_id');
                 if(savedUserId) {
                     const found = users.find(u => u.id == savedUserId);
@@ -1069,7 +1099,7 @@
             recognition.interimResults = false;
 
             recognition.onstart = function() {
-                alert('🎙️ Höre zu... Jetzt sprechen.');
+                alert('🎙️️ Höre zu... Jetzt sprechen.');
             };
 
             recognition.onresult = function(event) {
@@ -1094,7 +1124,6 @@
             window.location.href = `mailto:florian.nienberg@example.com?subject=Tagesbericht%20Lagerbestand&body=${encodeURIComponent(bodyText)}`;
         }
 
-        // FOTO STARK KOMPRIMIEREN FÜR BLITZSCHNELLEN CLOUD-UPLOAD
         function handleFileSelect(e) {
             const files = e.target.files;
             if(!files || files.length === 0) return;
@@ -1105,7 +1134,7 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const maxDim = 600; // Kompakte Größe
+                        const maxDim = 600;
                         let w = img.width, h = img.height;
                         if(w > maxDim || h > maxDim) {
                             if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -1194,7 +1223,6 @@
                 fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
             };
 
-            // IN FIREBASE CLOUD SPEICHERN
             cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
                 alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
                 document.getElementById('entryForm').reset();
@@ -1376,20 +1404,25 @@
             });
         }
 
+        // DESIGN- UND OPTIONEN-SPEICHERUNG FÜR JEDEN NUTZER INDIVIDUELL
         function changeTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('app_theme', theme);
         }
 
         function changeFontSize(size) {
             document.documentElement.setAttribute('data-fontsize', size);
+            localStorage.setItem('app_fontsize', size);
         }
 
         function toggleContrastBooster(val) {
             document.documentElement.setAttribute('data-contrastbooster', val);
+            localStorage.setItem('app_contrastbooster', val);
         }
 
         function toggleVibration(val) {
             enableVibration = (val === 'true');
+            localStorage.setItem('app_vibration', val);
         }
     </script>
 </body>
