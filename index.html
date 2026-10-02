@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light" data-fontsize="normal" data-contrastbooster="false">
+<html lang="de" data-theme="dark" data-textcolor="white" data-fontsize="normal" data-contrastbooster="false">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,11 +17,11 @@
             --warning: #d97706;
             --whatsapp: #25d366;
             --whatsapp-dark: #128c7e;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #ffffff;
+            --text-secondary: #94a3b8;
+            --border: #334155;
             --radius: 12px;
             --base-font: 16px;
             --btn-height: 52px;
@@ -29,39 +29,18 @@
             --font-weight-bold: 600;
         }
 
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --text: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border: #334155;
-        }
-
-        [data-theme="grey"] {
-            --bg: #334155;
-            --surface: #475569;
-            --text: #f1f5f9;
+        /* SCHRIFTFARBEN AUSWAHL */
+        [data-textcolor="white"] {
+            --text: #ffffff;
             --text-secondary: #cbd5e1;
-            --border: #64748b;
         }
-
-        [data-theme="oled"] {
-            --bg: #000000;
-            --surface: #000000;
-            --text: #ffffff;
-            --text-secondary: #a1a1aa;
-            --border: #27272a;
-            --primary: #3b82f6;
+        [data-textcolor="lightblue"] {
+            --text: #38bdf8;
+            --text-secondary: #7dd3fc;
         }
-
-        [data-theme="contrast"] {
-            --bg: #000000;
-            --surface: #121212;
-            --text: #ffffff;
-            --text-secondary: #facc15;
-            --border: #ffffff;
-            --primary: #facc15;
-            --danger: #ff0000;
+        [data-textcolor="yellow"] {
+            --text: #facc15;
+            --text-secondary: #fde047;
         }
 
         [data-contrastbooster="true"] {
@@ -267,10 +246,6 @@
             justify-content: center;
         }
 
-        [data-theme="contrast"] .btn {
-            color: #000000;
-        }
-
         .btn-whatsapp {
             background: var(--whatsapp);
             color: white !important;
@@ -353,10 +328,6 @@
             background: var(--primary);
             color: white;
             margin-right: 6px;
-        }
-
-        [data-theme="contrast"] .badge {
-            color: #000000;
         }
 
         .badge-status {
@@ -465,6 +436,25 @@
             border-radius: 12px;
             display: inline-block;
             margin-left: 8px;
+        }
+
+        .device-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .device-badge-online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .device-badge-offline {
+            background: #fee2e2;
+            color: #991b1b;
         }
     </style>
 </head>
@@ -607,27 +597,25 @@
             <div id="bestandList"></div>
         </div>
 
-        <!-- TAB 4: PROFIL, RECHTE & EINSTELLUNGEN -->
+        <!-- TAB 4: EINSTELLUNGEN -->
         <div id="tab-settings" class="tab-content">
             
-            <!-- 1. OPTIONEN -->
+            <!-- 1. ERSCHEINUNGSBILD / OPTIONEN -->
             <div class="card">
-                <h3>Optionen</h3>
+                <h3>Erscheinungsbild</h3>
                 <div class="form-group">
-                    <label>Erscheinungsbild / Design</label>
-                    <select id="themeSelect" onchange="changeTheme(this.value)">
-                        <option value="light">☀️ Helles Design (Light Mode)</option>
-                        <option value="dark">🌙 Dunkles Design (Dark Mode)</option>
-                        <option value="grey">⚙️ Graumodus (Grey Mode)</option>
-                        <option value="oled">🖤 OLED Tiefschwarz (OLED Mode)</option>
-                        <option value="contrast">⚡ Sehr hoher Kontrast (Sonne & Sehschärfe)</option>
+                    <label>Schriftfarbe</label>
+                    <select id="textColorSelect" onchange="changeTextColor(this.value)">
+                        <option value="white" selected>⚪ Weiß (Standard)</option>
+                        <option value="lightblue">🩵 Hellblau</option>
+                        <option value="yellow">💛 Gelb</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Schriftgröße</label>
                     <select id="fontSelect" onchange="changeFontSize(this.value)">
                         <option value="small">Stufe 1: Klein</option>
-                        <option value="normal">Stufe 2: Normal</option>
+                        <option value="normal" selected>Stufe 2: Normal</option>
                         <option value="large">Stufe 3: Groß</option>
                         <option value="xlarge">Stufe 4: Sehr groß</option>
                     </select>
@@ -635,14 +623,14 @@
                 <div class="form-group">
                     <label>Schriftkontrast-Booster (Fettschrift)</label>
                     <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
-                        <option value="false">Aus (Standard)</option>
+                        <option value="false" selected>Aus (Standard)</option>
                         <option value="true">An (Fette Leseschrift)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Spürbares Feedback (Vibration bei Eingabe)</label>
+                    <label>Vibration</label>
                     <select id="vibeSelect" onchange="toggleVibration(this.value)">
-                        <option value="true">An (Handy vibriert bei Speichern)</option>
+                        <option value="true" selected>An</option>
                         <option value="false">Aus</option>
                     </select>
                 </div>
@@ -688,7 +676,7 @@
                     </div>
 
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
-                    <h4>Mitarbeiter-Zugänge & Einmal-Passwörter:</h4>
+                    <h4>Mitarbeiter-Zugänge, Geräte & Live-Status:</h4>
                     <div id="userRoleList" style="margin-top: 10px;"></div>
                     
                     <hr style="margin: 15px 0; border-color: var(--border);">
@@ -696,7 +684,7 @@
                     <div id="adminStatsArea" style="margin-top:8px; font-size:0.9rem;"></div>
 
                     <hr style="margin: 15px 0; border-color: var(--border);">
-                    <h4>🗑️ Papierkorb (Gelöschte Artikel):</h4>
+                    <h4>🗑 Papierkorb (Gelöschte Artikel):</h4>
                     <div id="trashList" style="margin-top:8px; font-size:0.85rem;"></div>
 
                     <button type="button" class="btn" style="margin-top:15px; background:#475569; color:white;" onclick="sendDailyReport()">📧 Tagesbericht an Florian Nienberg senden</button>
@@ -772,7 +760,7 @@
         <div class="nav-item active" onclick="switchTab('erfassen', 'Erfassung', this)">📥<br>Erfassung</div>
         <div class="nav-item" onclick="switchTab('at', 'AT-Bestandsprüfung', this)">🔍<br>AT-Prüfung</div>
         <div class="nav-item" onclick="switchTab('bestand', 'Gesamter Bestand', this)">📦<br>Bestand</div>
-        <div class="nav-item" onclick="switchTab('settings', 'Profil & Rechte', this)">⚙️<br>Profil & Rechte</div>
+        <div class="nav-item" onclick="switchTab('settings', 'Einstellungen', this)">⚙️<br>Einstellungen</div>
     </nav>
 
     <script>
@@ -790,6 +778,13 @@
         firebase.initializeApp(firebaseConfig);
         const cloudDb = firebase.firestore();
 
+        // EINDEUTIGE GERÄTE-ID FÜR LIVE-GERÄTEZÄHLUNG
+        let myDeviceId = localStorage.getItem('app_device_id');
+        if (!myDeviceId) {
+            myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+            localStorage.setItem('app_device_id', myDeviceId);
+        }
+
         let currentPhotos = [];
         let isSuperAdmin = false;
         let currentUser = null;
@@ -799,21 +794,21 @@
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
 
         const defaultUsers = [
-            { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false },
-            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
-            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
-            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
-            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false },
-            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false }
+            { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
+            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] }
         ];
 
         let users = [...defaultUsers];
         let db = [];
         let trashDb = [];
 
-        // FUNKTION ZUM LADEN GESPEICHERTER BENUTZER-EINSTELLUNGEN
+        // BENUTZER-EINSTELLUNGEN GELADEN
         function loadSavedAppSettings() {
-            const savedTheme = localStorage.getItem('app_theme') || 'light';
+            const savedColor = localStorage.getItem('app_textcolor') || 'white';
             const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
             const savedVibe = localStorage.getItem('app_vibration');
@@ -824,26 +819,24 @@
                 enableVibration = true;
             }
 
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.documentElement.setAttribute('data-textcolor', savedColor);
             document.documentElement.setAttribute('data-fontsize', savedFontSize);
             document.documentElement.setAttribute('data-contrastbooster', savedBooster);
 
-            // Select-Dropdowns auf die gespeicherten Werte setzen
-            const themeSel = document.getElementById('themeSelect');
+            const colorSel = document.getElementById('textColorSelect');
             const fontSel = document.getElementById('fontSelect');
             const boosterSel = document.getElementById('boosterSelect');
             const vibeSel = document.getElementById('vibeSelect');
 
-            if(themeSel) themeSel.value = savedTheme;
+            if(colorSel) colorSel.value = savedColor;
             if(fontSel) fontSel.value = savedFontSize;
             if(boosterSel) boosterSel.value = savedBooster;
             if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
         }
 
-        // Einstellungen direkt beim Start aufrufen
         loadSavedAppSettings();
 
-        // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER CLOUD
+        // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER & GERÄTE CLOUD
         cloudDb.collection("users").onSnapshot((snapshot) => {
             if(snapshot.empty) {
                 defaultUsers.forEach(u => cloudDb.collection("users").doc(String(u.id)).set(u));
@@ -851,13 +844,26 @@
                 let cloudUsers = [];
                 snapshot.forEach(doc => cloudUsers.push(doc.data()));
                 users = cloudUsers;
+                
                 if(isSuperAdmin) renderUserRoleList();
                 
                 const savedUserId = localStorage.getItem('logged_user_id');
                 if(savedUserId) {
                     const found = users.find(u => u.id == savedUserId);
-                    if(found && !found.isLocked) {
+                    
+                    // LIVE-ABMELDUNG PRÜFEN: Falls User gesperrt/abgemeldet wurde oder Gerät entfernt wurde
+                    const devList = found ? (found.devices || []) : [];
+                    const isDeviceActive = devList.includes(myDeviceId);
+
+                    if(found && !found.isLocked && isDeviceActive) {
                         currentUser = found;
+                        document.getElementById('lockScreenOverlay').style.display = 'none';
+                        updateLoginUI();
+                    } else {
+                        // SOFORT LIVE AUF LOCKSCREEN SPRINGEN!
+                        currentUser = null;
+                        localStorage.removeItem('logged_user_id');
+                        document.getElementById('lockScreenOverlay').style.display = 'flex';
                         updateLoginUI();
                     }
                 }
@@ -879,20 +885,6 @@
 
         function triggerVibe() {
             if(enableVibration && navigator.vibrate) navigator.vibrate(50);
-        }
-
-        const savedUserId = localStorage.getItem('logged_user_id');
-        if(savedUserId) {
-            const found = users.find(u => u.id == savedUserId);
-            if(found && !found.isLocked) {
-                currentUser = found;
-                document.getElementById('lockScreenOverlay').style.display = 'none';
-                updateLoginUI();
-            } else {
-                document.getElementById('lockScreenOverlay').style.display = 'flex';
-            }
-        } else {
-            document.getElementById('lockScreenOverlay').style.display = 'flex';
         }
 
         function handleLockLogin(e) {
@@ -923,8 +915,15 @@
                 
                 if(isTempMatch) {
                     user.tempPass = null;
-                    saveUserToCloud(user);
                 }
+
+                // EIGENES GERÄT IN DIE GERÄTELISTE EINTRAGEN
+                if(!user.devices) user.devices = [];
+                if(!user.devices.includes(myDeviceId)) {
+                    user.devices.push(myDeviceId);
+                }
+
+                saveUserToCloud(user);
 
                 currentUser = user;
                 localStorage.setItem('logged_user_id', user.id);
@@ -940,6 +939,12 @@
 
         function logoutCurrentUser() {
             triggerVibe();
+            if(currentUser) {
+                // EIGENES GERÄT AUS DER CLOUD-LISTE ENTFERNEN
+                let devList = currentUser.devices || [];
+                currentUser.devices = devList.filter(id => id !== myDeviceId);
+                saveUserToCloud(currentUser);
+            }
             currentUser = null;
             localStorage.removeItem('logged_user_id');
             document.getElementById('lockScreenOverlay').style.display = 'flex';
@@ -989,13 +994,21 @@
 
         function renderUserRoleList() {
             const listDiv = document.getElementById('userRoleList');
-            listDiv.innerHTML = users.map(u => `
+            listDiv.innerHTML = users.map(u => {
+                const devCount = (u.devices || []).length;
+                const isOnline = devCount > 0;
+                
+                return `
                 <div class="user-list-item">
                     <div class="user-list-header">
                         <div>
                             <strong>${u.name}</strong> (PIN: ${u.pin})<br>
+                            <span class="device-badge ${isOnline ? 'device-badge-online' : 'device-badge-offline'}">
+                                ${isOnline ? `🟢 Angemeldet (${devCount}${devCount === 1 ? 'Gerät' : 'Geräte'})` : '🔴 Abgemeldet'}
+                            </span>
+                            <br>
                             <small style="color: var(--text-secondary);">
-                                Status: ${u.password ? '🟢 Festes PW gesetzt' : (u.tempPass ? `🟠 Aktiv: <b>${u.tempPass}</b>` : '🔴 Kein PW (Abgemeldet)')}
+                                ${u.password ? '🟢 Festes PW' : (u.tempPass ? `🟠 Aktiv: <b>${u.tempPass}</b>` : '🔴 Kein PW')}
                             </small>
                         </div>
                         ${u.isOwner ? `
@@ -1010,11 +1023,11 @@
                     ${!u.isOwner ? `
                         <div class="user-controls">
                             <button type="button" class="btn btn-sm btn-secondary" onclick="generateTempPassword(${u.id})">🔑 Einmal-PW generieren</button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="adminLogoutUser(${u.id})">🚪 Abmelden</button>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="adminLogoutUser(${u.id})">🚪 Live-Abmelden (${devCount})</button>
                         </div>
                     ` : ''}
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function generateTempPassword(userId) {
@@ -1029,14 +1042,15 @@
             alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nEs ist JETZT auf allen Handys gültig!`);
         }
 
+        // LIVE-ABMELDUNG DURCH ADMIN
         function adminLogoutUser(userId) {
             const user = users.find(u => u.id === userId);
             if(!user) return;
             user.tempPass = null;
-            user.isLocked = true;
+            user.devices = []; // LÖSCHT ALLE ANGEMELDETEN GERÄTE IN DER CLOUD
             saveUserToCloud(user);
             triggerVibe();
-            alert(`${user.name} wurde abgemeldet.`);
+            alert(`${user.name} wurde live auf allen Geräten abgemeldet!`);
         }
 
         function renderAdminStats() {
@@ -1099,7 +1113,7 @@
             recognition.interimResults = false;
 
             recognition.onstart = function() {
-                alert('🎙️️ Höre zu... Jetzt sprechen.');
+                alert('🎙 Höre zu... Jetzt sprechen.');
             };
 
             recognition.onresult = function(event) {
@@ -1404,10 +1418,10 @@
             });
         }
 
-        // DESIGN- UND OPTIONEN-SPEICHERUNG FÜR JEDEN NUTZER INDIVIDUELL
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('app_theme', theme);
+        // SPEICHERN DER EINSTELLUNGEN
+        function changeTextColor(color) {
+            document.documentElement.setAttribute('data-textcolor', color);
+            localStorage.setItem('app_textcolor', color);
         }
 
         function changeFontSize(size) {
