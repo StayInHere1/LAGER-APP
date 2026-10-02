@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-textcolor="white" data-fontsize="normal" data-contrastbooster="false">
+<html lang="de" data-theme="dark" data-textcolor="auto" data-fontsize="normal" data-contrastbooster="false">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,18 +73,45 @@
             --danger: #ff0000;
         }
 
+        /* VERRÜCKTES GALAXY DESIGN */
+        [data-theme="galaxy"] {
+            --bg: #090514;
+            --surface: #130a2a;
+            --text: #e0e7ff;
+            --text-secondary: #a5b4fc;
+            --border: #3b1d82;
+            --primary: #d946ef;
+            --primary-dark: #c026d3;
+            background: radial-gradient(circle at top left, #2e1065, #090514 60%, #1e1b4b);
+            background-attachment: fixed;
+        }
+
+        [data-theme="galaxy"] .card, [data-theme="galaxy"] header, [data-theme="galaxy"] .nav-bar {
+            background: rgba(19, 10, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid #6366f1;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.25);
+        }
+
+        [data-theme="galaxy"] .btn {
+            background: linear-gradient(135deg, #d946ef, #06b6d4);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+            color: #ffffff;
+            font-weight: bold;
+        }
+
         /* SCHRIFTFARBEN AUSWAHL */
         [data-textcolor="white"] {
-            --text: #ffffff;
-            --text-secondary: #cbd5e1;
+            --text: #ffffff !important;
+            --text-secondary: #cbd5e1 !important;
         }
         [data-textcolor="lightblue"] {
-            --text: #38bdf8;
-            --text-secondary: #7dd3fc;
+            --text: #38bdf8 !important;
+            --text-secondary: #7dd3fc !important;
         }
         [data-textcolor="yellow"] {
-            --text: #facc15;
-            --text-secondary: #fde047;
+            --text: #facc15 !important;
+            --text-secondary: #fde047 !important;
         }
 
         [data-contrastbooster="true"] {
@@ -122,7 +149,7 @@
             transition: background-color 0.2s, color 0.2s;
         }
 
-        /* LOCK SCREEN OVERLAY - STANDARDMÄSSIG AUSGEBLENDET ZUM VERMEIDEN VON AUFBLINKEN */
+        /* LOCK SCREEN OVERLAY */
         #lockScreenOverlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -528,7 +555,7 @@
     </div>
 
     <header>
-        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️️ Live Cloud verknüpft</span></h1>
+        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️ Live Cloud verknüpft</span></h1>
     </header>
 
     <div class="container">
@@ -655,12 +682,14 @@
                         <option value="grey">⚙️ Graumodus (Grey Mode)</option>
                         <option value="oled">🖤 OLED Tiefschwarz (OLED Mode)</option>
                         <option value="contrast">⚡ Sehr hoher Kontrast (Sonne & Sehschärfe)</option>
+                        <option value="galaxy">🌌 Galaxy Mode (Verrückter Weltraum)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Schriftfarbe</label>
                     <select id="textColorSelect" onchange="changeTextColor(this.value)">
-                        <option value="white" selected>⚪ Weiß (Standard)</option>
+                        <option value="auto" selected>✨ Automatisch (Empfohlen)</option>
+                        <option value="white">⚪ Weiß</option>
                         <option value="lightblue">🩵 Hellblau</option>
                         <option value="yellow">💛 Gelb</option>
                     </select>
@@ -860,7 +889,7 @@
         let db = [];
         let trashDb = [];
 
-        // INITIALE PRÜFUNG DES ANMELDESTATUS VOR DEM ANZEIGEN DES LOCKSCREENS
+        // INITIALE PRÜFUNG DES ANMELDESTATUS
         const savedUserId = localStorage.getItem('logged_user_id');
         if (!savedUserId) {
             document.getElementById('lockScreenOverlay').style.display = 'flex';
@@ -869,7 +898,7 @@
         // BENUTZER-EINSTELLUNGEN GELADEN
         function loadSavedAppSettings() {
             const savedTheme = localStorage.getItem('app_theme') || 'dark';
-            const savedColor = localStorage.getItem('app_textcolor') || 'white';
+            const savedColor = localStorage.getItem('app_textcolor') || 'auto';
             const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
             const savedVibe = localStorage.getItem('app_vibration');
@@ -922,7 +951,6 @@
                         document.getElementById('lockScreenOverlay').style.display = 'none';
                         updateLoginUI();
                     } else {
-                        // NUR ANZEIGEN, WENN WIRKLICH ABGEMELDET/GESPERRT!
                         currentUser = null;
                         localStorage.removeItem('logged_user_id');
                         document.getElementById('lockScreenOverlay').style.display = 'flex';
