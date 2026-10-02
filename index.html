@@ -29,6 +29,50 @@
             --font-weight-bold: 600;
         }
 
+        /* ERSCHEINUNGSBILD / THEMES */
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #ffffff;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+
+        [data-theme="grey"] {
+            --bg: #334155;
+            --surface: #475569;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #64748b;
+        }
+
+        [data-theme="oled"] {
+            --bg: #000000;
+            --surface: #000000;
+            --text: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+            --primary: #3b82f6;
+        }
+
+        [data-theme="contrast"] {
+            --bg: #000000;
+            --surface: #121212;
+            --text: #ffffff;
+            --text-secondary: #facc15;
+            --border: #ffffff;
+            --primary: #facc15;
+            --danger: #ff0000;
+        }
+
         /* SCHRIFTFARBEN AUSWAHL */
         [data-textcolor="white"] {
             --text: #ffffff;
@@ -78,13 +122,13 @@
             transition: background-color 0.2s, color 0.2s;
         }
 
-        /* LOCK SCREEN OVERLAY */
+        /* LOCK SCREEN OVERLAY - STANDARDMÄSSIG AUSGEBLENDET ZUM VERMEIDEN VON AUFBLINKEN */
         #lockScreenOverlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg);
             z-index: 1000;
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -484,7 +528,7 @@
     </div>
 
     <header>
-        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️ Live Cloud verknüpft</span></h1>
+        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️️ Live Cloud verknüpft</span></h1>
     </header>
 
     <div class="container">
@@ -600,9 +644,19 @@
         <!-- TAB 4: EINSTELLUNGEN -->
         <div id="tab-settings" class="tab-content">
             
-            <!-- 1. ERSCHEINUNGSBILD / OPTIONEN -->
+            <!-- 1. OPTIONEN -->
             <div class="card">
-                <h3>Erscheinungsbild</h3>
+                <h3>Optionen</h3>
+                <div class="form-group">
+                    <label>Erscheinungsbild</label>
+                    <select id="themeSelect" onchange="changeTheme(this.value)">
+                        <option value="light">☀️ Helles Design (Light Mode)</option>
+                        <option value="dark" selected>🌙 Dunkles Design (Dark Mode)</option>
+                        <option value="grey">⚙️ Graumodus (Grey Mode)</option>
+                        <option value="oled">🖤 OLED Tiefschwarz (OLED Mode)</option>
+                        <option value="contrast">⚡ Sehr hoher Kontrast (Sonne & Sehschärfe)</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Schriftfarbe</label>
                     <select id="textColorSelect" onchange="changeTextColor(this.value)">
@@ -778,7 +832,7 @@
         firebase.initializeApp(firebaseConfig);
         const cloudDb = firebase.firestore();
 
-        // EINDEUTIGE GERÄTE-ID FÜR LIVE-GERÄTEZÄHLUNG
+        // GERÄTE-ID FÜR LIVE-STATUS
         let myDeviceId = localStorage.getItem('app_device_id');
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
@@ -806,8 +860,15 @@
         let db = [];
         let trashDb = [];
 
+        // INITIALE PRÜFUNG DES ANMELDESTATUS VOR DEM ANZEIGEN DES LOCKSCREENS
+        const savedUserId = localStorage.getItem('logged_user_id');
+        if (!savedUserId) {
+            document.getElementById('lockScreenOverlay').style.display = 'flex';
+        }
+
         // BENUTZER-EINSTELLUNGEN GELADEN
         function loadSavedAppSettings() {
+            const savedTheme = localStorage.getItem('app_theme') || 'dark';
             const savedColor = localStorage.getItem('app_textcolor') || 'white';
             const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
@@ -819,15 +880,18 @@
                 enableVibration = true;
             }
 
+            document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-textcolor', savedColor);
             document.documentElement.setAttribute('data-fontsize', savedFontSize);
             document.documentElement.setAttribute('data-contrastbooster', savedBooster);
 
+            const themeSel = document.getElementById('themeSelect');
             const colorSel = document.getElementById('textColorSelect');
             const fontSel = document.getElementById('fontSelect');
             const boosterSel = document.getElementById('boosterSelect');
             const vibeSel = document.getElementById('vibeSelect');
 
+            if(themeSel) themeSel.value = savedTheme;
             if(colorSel) colorSel.value = savedColor;
             if(fontSel) fontSel.value = savedFontSize;
             if(boosterSel) boosterSel.value = savedBooster;
@@ -847,11 +911,9 @@
                 
                 if(isSuperAdmin) renderUserRoleList();
                 
-                const savedUserId = localStorage.getItem('logged_user_id');
-                if(savedUserId) {
-                    const found = users.find(u => u.id == savedUserId);
-                    
-                    // LIVE-ABMELDUNG PRÜFEN: Falls User gesperrt/abgemeldet wurde oder Gerät entfernt wurde
+                const savedId = localStorage.getItem('logged_user_id');
+                if(savedId) {
+                    const found = users.find(u => u.id == savedId);
                     const devList = found ? (found.devices || []) : [];
                     const isDeviceActive = devList.includes(myDeviceId);
 
@@ -860,12 +922,14 @@
                         document.getElementById('lockScreenOverlay').style.display = 'none';
                         updateLoginUI();
                     } else {
-                        // SOFORT LIVE AUF LOCKSCREEN SPRINGEN!
+                        // NUR ANZEIGEN, WENN WIRKLICH ABGEMELDET/GESPERRT!
                         currentUser = null;
                         localStorage.removeItem('logged_user_id');
                         document.getElementById('lockScreenOverlay').style.display = 'flex';
                         updateLoginUI();
                     }
+                } else {
+                    document.getElementById('lockScreenOverlay').style.display = 'flex';
                 }
             }
         });
@@ -917,7 +981,6 @@
                     user.tempPass = null;
                 }
 
-                // EIGENES GERÄT IN DIE GERÄTELISTE EINTRAGEN
                 if(!user.devices) user.devices = [];
                 if(!user.devices.includes(myDeviceId)) {
                     user.devices.push(myDeviceId);
@@ -940,7 +1003,6 @@
         function logoutCurrentUser() {
             triggerVibe();
             if(currentUser) {
-                // EIGENES GERÄT AUS DER CLOUD-LISTE ENTFERNEN
                 let devList = currentUser.devices || [];
                 currentUser.devices = devList.filter(id => id !== myDeviceId);
                 saveUserToCloud(currentUser);
@@ -1042,12 +1104,11 @@
             alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nEs ist JETZT auf allen Handys gültig!`);
         }
 
-        // LIVE-ABMELDUNG DURCH ADMIN
         function adminLogoutUser(userId) {
             const user = users.find(u => u.id === userId);
             if(!user) return;
             user.tempPass = null;
-            user.devices = []; // LÖSCHT ALLE ANGEMELDETEN GERÄTE IN DER CLOUD
+            user.devices = [];
             saveUserToCloud(user);
             triggerVibe();
             alert(`${user.name} wurde live auf allen Geräten abgemeldet!`);
@@ -1418,7 +1479,12 @@
             });
         }
 
-        // SPEICHERN DER EINSTELLUNGEN
+        // SPEICHERN DER OPTIONEN
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('app_theme', theme);
+        }
+
         function changeTextColor(color) {
             document.documentElement.setAttribute('data-textcolor', color);
             localStorage.setItem('app_textcolor', color);
