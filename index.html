@@ -1,5 +1,4 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" data-theme="dark" data-textcolor="auto" data-fontsize="normal" data-contrastbooster="false">
 <head>
     <meta charset="UTF-8">
@@ -150,7 +149,6 @@
             --text: #f97316 !important;
             --text-secondary: #fb923c !important;
         }
-
         [data-contrastbooster="true"] {
             --font-weight-normal: 600;
             --font-weight-bold: 900;
@@ -672,6 +670,254 @@
                             <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
                             <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
                             <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Lieferstatus</label>
+                        <select id="status">
+                            <option value="Vollständig" selected>🟢 Vollständig</option>
+                            <option value="Teillieferung">🟠 Teillieferung</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hinweis">Anmerkungen / Zustand (Per Sprache einsprechen möglich)</label>
+                        <div class="dictate-wrapper">
+                            <textarea id="hinweis" rows="3" placeholder="Zustand, Mängel, Bemerkungen..."></textarea>
+                            <button type="button" class="dictate-btn" onclick="startDictation()" title="Einsprechen">🎙</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="saveSubmitBtn">Ware einsenden & Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 2: AT-PRÜFUNG -->
+        <div id="tab-at" class="tab-content">
+            <div class="form-group">
+                <input type="text" id="atSearchInput" placeholder="AT-Nummer (z. B. 9988 eingeben)" oninput="checkAT()">
+            </div>
+            <div id="atResult">
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">
+                    Gib eine AT-Nummer ein, um den Bestand zu prüfen.
+                </p>
+            </div>
+        </div>
+        <!-- TAB 3: BESTAND -->
+        <div id="tab-bestand" class="tab-content">
+            <div class="card" style="padding:0.8rem; margin-bottom:10px;">
+                <div class="filter-grid">
+                    <div>
+                        <label style="font-size:0.75rem;">Bereich</label>
+                        <select id="filterLager" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                            <option value="ALL">Alle Bereiche</option>
+                            <option value="LB">LB – Lagerbüro</option>
+                            <option value="KZ">KZ – Kommissionszaun</option>
+                            <option value="KT">KT – Kommissionstür</option>
+                            <option value="KF">KF – Kommissionsfliesen</option>
+                            <option value="TB">TB – Tiefbau</option>
+                            <option value="HR3">HR3 – Holzregal 3</option>
+                            <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                            <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                            <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                            <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                            <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;">Status Filter</label>
+                        <select id="filterStatus" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                            <option value="ALL">Alle Status</option>
+                            <option value="Vollständig">🟢 Vollständig</option>
+                            <option value="Teillieferung">🟠 Teillieferung</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;">Sortierung</label>
+                    <select id="sortOrder" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
+                        <option value="newest">Neueste zuerst</option>
+                        <option value="oldest">Älteste zuerst</option>
+                    </select>
+                </div>
+            </div>
+            <div id="bestandList"></div>
+        </div>
+
+        <!-- TAB 4: EINSTELLUNGEN -->
+        <div id="tab-settings" class="tab-content">
+            
+            <!-- 1. OPTIONEN -->
+            <div class="card">
+                <h3>Optionen</h3>
+                <div class="form-group">
+                    <label>Erscheinungsbild</label>
+                    <select id="themeSelect" onchange="changeTheme(this.value)">
+                        <option value="light">☀️ Helles Design</option>
+                        <option value="dark" selected>🌙 Dunkles Design</option>
+                        <option value="grey">⚙️ Graumodus</option>
+                        <option value="oled">🖤 OLED Tiefschwarz</option>
+                        <option value="contrast">⚡ Sehr hoher Kontrast</option>
+                        <option value="galaxy">🌌 Galaxy Design</option>
+                        <option value="camouflage">🌲 Camouflage Design</option>
+                        <option value="sunset">🌅 Sunset Cyberpunk Design</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftfarbe</label>
+                    <select id="textColorSelect" onchange="changeTextColor(this.value)">
+                        <option value="auto" selected>✨ Automatisch</option>
+                        <option value="white">⚪ Weiß</option>
+                        <option value="lightblue">🩵 Hellblau</option>
+                        <option value="yellow">💛 Gelb</option>
+                        <option value="matrixgreen">🟢 Matrix-Grün</option>
+                        <option value="signalorange">🟠 Signal-Orange</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftgröße</label>
+                    <select id="fontSelect" onchange="changeFontSize(this.value)">
+                        <option value="small">Stufe 1: Klein</option>
+                        <option value="normal" selected>Stufe 2: Normal</option>
+                        <option value="large">Stufe 3: Groß</option>
+                        <option value="xlarge">Stufe 4: Sehr groß</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftkontrast-Booster (Fettschrift)</label>
+                    <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
+                        <option value="false" selected>Aus</option>
+                        <option value="true">An</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Vibration</label>
+                    <select id="vibeSelect" onchange="toggleVibration(this.value)">
+                        <option value="true" selected>An</option>
+                        <option value="false">Aus</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sound</label>
+                    <select id="soundSelect" onchange="toggleSound(this.value)">
+                        <option value="true" selected>An</option>
+                        <option value="false">Aus</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schnelleingabemodus</label>
+                    <select id="turboSelect" onchange="toggleTurboMode(this.value)">
+                        <option value="false" selected>Aus</option>
+                        <option value="true">An</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. KONTO & SITZUNG -->
+            <div class="card">
+                <h3>Konto & Sitzung</h3>
+                <div id="loginSection">
+                    <p id="currentLoginStatus" style="margin-bottom: 12px; font-size: 0.95rem;">Status: <strong>Nicht angemeldet</strong></p>
+                    <button type="button" class="btn btn-secondary" onclick="logoutCurrentUser()" style="margin-top:8px;">🚪 Abmelden / Sitzung sperren</button>
+                </div>
+            </div>
+
+            <!-- 3. QR-CODE SCANNER -->
+            <div class="card">
+                <h3>QR-Code / Barcode Scanner</h3>
+                <p style="font-size:0.9rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Hier wird später die automatische Kamera-Erkennung für Barcodes und QR-Codes auf Lieferscheinen integriert.
+                </p>
+                <button type="button" class="btn" style="background:#94a3b8; cursor:not-allowed;" disabled>📷 Kamera-Scanner vorbereitet</button>
+            </div>
+
+            <!-- 4. ADMIN-BEREICH -->
+            <div class="card">
+                <h3>Admin-Bereich</h3>
+                <div class="form-group">
+                    <label>Haupt-Admin Kennwort</label>
+                    <input type="password" id="superAdminCodeInput" placeholder="Kennwort eingeben">
+                </div>
+                <button type="button" class="btn" onclick="verifySuperAdmin()">Als Haupt-Admin freischalten</button>
+                <p id="superAdminStatusText" style="margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: var(--text-secondary);"></p>
+
+                <div id="roleManagementArea" style="display: none; margin-top: 15px;">
+                    <!-- ADMIN KENNWORTSCHUTZ ÄNDERN -->
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                        <label style="font-weight:bold;">🔑 Admin-Kennwort ändern</label>
+                        <div style="display:flex; gap:8px; margin-top:6px;">
+                            <input type="password" id="newAdminMasterPass" placeholder="Neues Admin-Kennwort" style="min-height:42px;">
+                            <button type="button" class="btn btn-sm" onclick="changeAdminMasterPassword()" style="width:auto;">Speichern</button>
+                        </div>
+                    </div>
+
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <h4>Mitarbeiter-Zugänge, Geräte & Live-Status:</h4>
+                    <div id="userRoleList" style="margin-top: 10px;"></div>
+                    
+                    <hr style="margin: 15px 0; border-color: var(--border);">
+                    <h4>📊 Mitarbeiter-Statistik:</h4>
+                    <div id="adminStatsArea" style="margin-top:8px; font-size:0.9rem;"></div>
+
+                    <hr style="margin: 15px 0; border-color: var(--border);">
+                    <h4>🗑 Papierkorb (Gelöschte Artikel):</h4>
+                    <div id="trashList" style="margin-top:8px; font-size:0.85rem;"></div>
+
+                    <button type="button" class="btn" style="margin-top:15px; background:#475569; color:white;" onclick="sendDailyReport()">📧 Tagesbericht an Florian Nienberg senden</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL / GROSSANSICHT & BEARBEITEN -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalAT" style="margin-bottom: 8px;"></h2>
+            <div id="modalGallery" class="modal-gallery"></div>
+            
+            <div id="modalViewMode">
+                <p><strong>Bereich:</strong> <span id="modalBereich"></span></p>
+                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                <p><strong>Angenommen von:</strong> <span id="modalUser"></span></p>
+                <p><strong>Datum:</strong> <span id="modalDatum"></span></p>
+                <p><strong>Anmerkungen:</strong></p>
+                <p id="modalHinweis" style="color: var(--text-secondary); background: var(--bg); padding: 10px; border-radius: 8px; margin-top: 6px; border: 1px solid var(--border);"></p>
+                
+                <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Per WhatsApp teilen</button>
+                <div id="userEditArea"></div>
+                <div id="adminDeleteArea"></div>
+            </div>
+
+            <!-- BEARBEITEN-MODUS -->
+            <div id="modalEditMode" style="display:none;">
+                <h3>Eintrag bearbeiten</h3>
+                <br>
+                <div class="form-group">
+                    <label>AT-Nummer (Nur Zahlen)</label>
+                    <div class="at-input-wrapper">
+                        <span class="at-prefix">AT-</span>
+                        <input type="number" id="editATNummer" pattern="[0-9]*" inputmode="numeric" oninput="filterNumbersOnly(this)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bereich</label>
+                    <select id="editBereich">
+                        <option value="LB">LB – Lagerbüro</option>
+                        <option value="KZ">KZ – Kommissionszaun</option>
+                        <option value="KT">KT – Kommissionstür</option>
+                        <option value="KF">KF – Kommissionsfliesen</option>
+                        <option value="TB">TB – Tiefbau</option>
+                        <option value="HR3">HR3 – Holzregal 3</option>
+                        <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                        <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                        <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                        <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                        <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -753,7 +999,6 @@
         function filterNumbersOnly(input) {
             input.value = input.value.replace(/[^0-9]/g, '');
         }
-
         // BENUTZER-EINSTELLUNGEN GELADEN
         function loadSavedAppSettings() {
             const savedTheme = localStorage.getItem('app_theme') || 'dark';
@@ -1103,7 +1348,7 @@
 
             recognition.onerror = function() {
                 alert('Fehler bei der Spracherkennung.');
-  };
+            };
 
             recognition.start();
         }
@@ -1198,257 +1443,4 @@
             if(!currentUser) {
                 alert('Bitte melde dich zuerst an!');
                 document.getElementById('lockScreenOverlay').style.display = 'flex';
-                return;
-            }
-
-            const rawNum = document.getElementById('atNummer').value.trim();
-            const fullAT = 'AT-' + rawNum;
-
-            const submitBtn = document.getElementById('saveSubmitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Speichere in Cloud...';
-
-            triggerVibe();
-            const now = Date.now();
-            const newEntry = {
-                id: now,
-                atNummer: fullAT,
-                bereich: document.getElementById('bereich').value,
-                status: document.getElementById('status').value,
-                user: currentUser.name,
-                hinweis: document.getElementById('hinweis').value || 'Keine Anmerkungen',
-                datum: new Date().toLocaleString('de-DE'),
-                timestamp: now,
-                fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
-            };
- cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
-                playSuccessSound();
-                alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
-                document.getElementById('entryForm').reset();
-                document.getElementById('previewGrid').innerHTML = '';
-                currentPhotos = [];
-                document.getElementById('status').value = 'Vollständig';
-
-                if(enableTurboMode) {
-                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
-                }
-            }).catch(err => {
-                alert('❌ Fehler beim Cloud-Upload: ' + err.message);
-            }).finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Ware einsenden & Speichern';
-            });
-        });
-
-        function checkAT() {
-            const query = document.getElementById('atSearchInput').value.trim().toLowerCase();
-            const resultDiv = document.getElementById('atResult');
-
-            if(!query) {
-                resultDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">Gib eine AT-Nummer ein.</p>';
-                return;
-            }
-
-            const matches = db.filter(item => item.atNummer.toLowerCase().includes(query));
-            if(matches.length === 0) {
-                resultDiv.innerHTML = '<div class="card" style="text-align:center; color: #dc2626;">❌ Keine Ware gefunden.</div>';
-                return;
-            }
-
-            resultDiv.innerHTML = matches.map(item => `
-                <div class="item-card" onclick="openModal(${item.id}, 'at')">
-                    <img src="${item.fotos[0]}" alt="Foto">
-                    <div style="flex:1;">
-                        <span class="badge">${item.bereich}</span>
-                        <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span><br>
-                        <strong>${item.atNummer}</strong><br>
-                        <small style="color: var(--text-secondary);">${item.user} • ${item.hinweis.substring(0, 30)}...</small>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderBestand() {
-            const filterArea = document.getElementById('filterLager').value;
-            const filterStat = document.getElementById('filterStatus').value;
-            const sortOrd = document.getElementById('sortOrder').value;
-            const listDiv = document.getElementById('bestandList');
-
-            let filtered = db.filter(item => {
-                const matchArea = (filterArea === 'ALL' || item.bereich === filterArea);
-                const matchStat = (filterStat === 'ALL' || item.status === filterStat);
-                return matchArea && matchStat;
-            });
-
-            filtered.sort((a,b) => {
-                const timeA = a.timestamp || a.id;
-                const timeB = b.timestamp || b.id;
-                return sortOrd === 'newest' ? timeB - timeA : timeA - timeB;
-            });
-
-            if(filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; padding:20px;">Keine Einträge für diese Filter.</p>';
-                return;
-            }
-
-            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-            const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
-            const now = Date.now();
-
-            listDiv.innerHTML = filtered.map(item => {
-                const itemAge = item.timestamp ? (now - item.timestamp) : 0;
-                const is60Old = itemAge > sixtyDaysMs;
-                const is30Old = !is60Old && (itemAge > thirtyDaysMs);
-
-                return `
-                    <div class="item-card" onclick="openModal(${item.id}, 'bestand')">
-                        <img src="${item.fotos[0]}" alt="Foto">
-                        <div style="flex:1;">
-                            <span class="badge">${item.bereich}</span>
-                            <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span>
-                            ${is60Old ? `<span class="badge-old">⚠️ 60T+</span>` : (is30Old ? `<span class="badge-30d">⚠️ 30T+</span>` : '')}
-                            <br>
-                            <strong>${item.atNummer}</strong><br>
-                            <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openModal(id, origin) {
-            triggerVibe();
-            selectedItem = db.find(x => x.id === id);
-            if(!selectedItem) return;
-
-            document.getElementById('modalAT').textContent = selectedItem.atNummer;
-            document.getElementById('modalBereich').textContent = selectedItem.bereich;
-            document.getElementById('modalStatus').textContent = selectedItem.status;
-            document.getElementById('modalUser').textContent = selectedItem.user || 'Unbekannt';
-            document.getElementById('modalDatum').textContent = selectedItem.datum;
-            document.getElementById('modalHinweis').textContent = selectedItem.hinweis;
-
-            const gallery = document.getElementById('modalGallery');
-            gallery.innerHTML = selectedItem.fotos.map(src => `<img src="${src}">`).join('');
-
-            const userEditArea = document.getElementById('userEditArea');
-            const deleteArea = document.getElementById('adminDeleteArea');
-
-            const isOwnEntry = currentUser && (currentUser.name === selectedItem.user);
-            const isAdminUser = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
-
-            if(isOwnEntry || isAdminUser) {
-                userEditArea.innerHTML = `<button class="btn btn-secondary" onclick="enableEditMode()">✏️ Eintrag bearbeiten</button>`;
-            } else {
-                userEditArea.innerHTML = '';
-            }
-
-            if(origin === 'bestand' && isAdminUser) {
-                deleteArea.innerHTML = `<button class="btn btn-danger" onclick="deleteItem(${selectedItem.id})">🗑️ Artikel aus Bestand löschen</button>`;
-            } else {
-                deleteArea.innerHTML = '';
-            }
-
-            cancelEditMode();
-            document.getElementById('detailModal').style.display = 'block';
-        }
-
-        function enableEditMode() {
-            if(!selectedItem) return;
-            
-            const cleanNum = selectedItem.atNummer.replace(/^AT-?/i, '');
-            document.getElementById('editATNummer').value = cleanNum;
-            document.getElementById('editBereich').value = selectedItem.bereich;
-            document.getElementById('editStatus').value = selectedItem.status;
-            document.getElementById('editHinweis').value = selectedItem.hinweis;
-
-            document.getElementById('modalViewMode').style.display = 'none';
-            document.getElementById('modalEditMode').style.display = 'block';
-        }
-
-        function cancelEditMode() {
-            document.getElementById('modalViewMode').style.display = 'block';
-            document.getElementById('modalEditMode').style.display = 'none';
-        }
-
-        function saveEditedItem() {
-            if(!selectedItem) return;
-            triggerVibe();
-
-            const rawNum = document.getElementById('editATNummer').value.trim();
-            selectedItem.atNummer = 'AT-' + rawNum;
-            selectedItem.bereich = document.getElementById('editBereich').value;
-            selectedItem.status = document.getElementById('editStatus').value;
-            selectedItem.hinweis = document.getElementById('editHinweis').value;
-
-            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
-                alert('Eintrag erfolgreich in Cloud aktualisiert!');
-                closeModal();
-            });
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').style.display = 'none';
-            selectedItem = null;
-        }
-
-        function shareWhatsApp() {
-            if(!selectedItem) return;
-            const text = `📦 Wareneingang:\n*AT-Nummer:* ${selectedItem.atNummer}\n*Bereich:* ${selectedItem.bereich}\n*Status:* ${selectedItem.status}\n*Angenommen von:* ${selectedItem.user || 'Unbekannt'}\n*Hinweis:* ${selectedItem.hinweis}`;
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
-
-        function deleteItem(id) {
-            const item = db.find(x => x.id === id);
-            const atName = item ? item.atNummer : '';
-            
-            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich aus der Cloud löschen?`)) return;
-            
-            triggerVibe();
-            if(item) trashDb.unshift(item);
-            
-            cloudDb.collection("bestand").doc(String(id)).delete().then(() => {
-                closeModal();
-                alert('Artikel wurde aus der Cloud gelöscht.');
-            });
-        }
-
-        // SPEICHERN DER OPTIONEN
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('app_theme', theme);
-        }
-
-        function changeTextColor(color) {
-            document.documentElement.setAttribute('data-textcolor', color);
-            localStorage.setItem('app_textcolor', color);
-        }
-
-        function changeFontSize(size) {
-            document.documentElement.setAttribute('data-fontsize', size);
-            localStorage.setItem('app_fontsize', size);
-        }
-
-        function toggleContrastBooster(val) {
-            document.documentElement.setAttribute('data-contrastbooster', val);
-            localStorage.setItem('app_contrastbooster', val);
-        }
-
-        function toggleVibration(val) {
-            enableVibration = (val === 'true');
-            localStorage.setItem('app_vibration', val);
-        }
-
-        function toggleSound(val) {
-            enableSound = (val === 'true');
-            localStorage.setItem('app_sound', val);
-        }
-
-        function toggleTurboMode(val) {
-            enableTurboMode = (val === 'true');
-            localStorage.setItem('app_turbomode', val);
-        }
-    </script>
-</body>
-</html>                    
+               
