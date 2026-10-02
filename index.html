@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html lang="de" data-theme="dark" data-textcolor="auto" data-fontsize="normal" data-contrastbooster="false">
 <head>
     <meta charset="UTF-8">
@@ -671,7 +672,34 @@
                             <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
                             <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
                             <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
-                      <script>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lieferstatus</label>
+                    <select id="editStatus">
+                        <option value="Vollständig">🟢 Vollständig</option>
+                        <option value="Teillieferung">🟠 Teillieferung</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Anmerkungen</label>
+                    <textarea id="editHinweis" rows="3"></textarea>
+                </div>
+                <button type="button" class="btn" onclick="saveEditedItem()">Änderungen speichern</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('erfassen', 'Erfassung', this)">📥<br>Erfassung</div>
+        <div class="nav-item" onclick="switchTab('at', 'AT-Bestandsprüfung', this)">🔍<br>AT-Prüfung</div>
+        <div class="nav-item" onclick="switchTab('bestand', 'Gesamter Bestand', this)">📦<br>Bestand</div>
+        <div class="nav-item" onclick="switchTab('settings', 'Einstellungen', this)">⚙️<br>Einstellungen</div>
+    </nav>
+
+    <script>
         // FIREBASE INITIALISIERUNG
         const firebaseConfig = {
             apiKey: "AIzaSyDOGEf-5ia3AM6ZxnVI4CUc_l0wZAVyteI",
@@ -1075,7 +1103,7 @@
 
             recognition.onerror = function() {
                 alert('Fehler bei der Spracherkennung.');
-            };
+  };
 
             recognition.start();
         }
@@ -1104,4 +1132,323 @@
                             if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
                             else { w = Math.round((w * maxDim) / h); h = maxDim; }
                         }
-                        canvas.width 
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const compressed = canvas.toDataURL('image/jpeg', 0.5);
+                        
+                        currentPhotos.push(compressed);
+                        renderPhotoPreviews();
+                    };
+                    img.src = evt.target.result;
+                }
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        }
+
+        function renderPhotoPreviews() {
+            const previewGrid = document.getElementById('previewGrid');
+            previewGrid.innerHTML = '';
+
+            currentPhotos.forEach((src, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-thumb-wrapper';
+
+                const img = document.createElement('img');
+                img.src = src;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-photo-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.type = 'button';
+                removeBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    removeSinglePhoto(index);
+                };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewGrid.appendChild(wrapper);
+            });
+        }
+
+        function removeSinglePhoto(index) {
+            triggerVibe();
+            currentPhotos.splice(index, 1);
+            renderPhotoPreviews();
+        }
+
+        function switchTab(tabId, title, element) {
+            triggerVibe();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+            
+            if(tabId === 'erfassen' && enableTurboMode) {
+                setTimeout(() => document.getElementById('atNummer').focus(), 150);
+            }
+            if(tabId === 'bestand') renderBestand();
+        }
+
+        document.getElementById('entryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if(!currentUser) {
+                alert('Bitte melde dich zuerst an!');
+                document.getElementById('lockScreenOverlay').style.display = 'flex';
+                return;
+            }
+
+            const rawNum = document.getElementById('atNummer').value.trim();
+            const fullAT = 'AT-' + rawNum;
+
+            const submitBtn = document.getElementById('saveSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Speichere in Cloud...';
+
+            triggerVibe();
+            const now = Date.now();
+            const newEntry = {
+                id: now,
+                atNummer: fullAT,
+                bereich: document.getElementById('bereich').value,
+                status: document.getElementById('status').value,
+                user: currentUser.name,
+                hinweis: document.getElementById('hinweis').value || 'Keine Anmerkungen',
+                datum: new Date().toLocaleString('de-DE'),
+                timestamp: now,
+                fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
+            };
+ cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
+                playSuccessSound();
+                alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
+                document.getElementById('entryForm').reset();
+                document.getElementById('previewGrid').innerHTML = '';
+                currentPhotos = [];
+                document.getElementById('status').value = 'Vollständig';
+
+                if(enableTurboMode) {
+                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
+                }
+            }).catch(err => {
+                alert('❌ Fehler beim Cloud-Upload: ' + err.message);
+            }).finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Ware einsenden & Speichern';
+            });
+        });
+
+        function checkAT() {
+            const query = document.getElementById('atSearchInput').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('atResult');
+
+            if(!query) {
+                resultDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">Gib eine AT-Nummer ein.</p>';
+                return;
+            }
+
+            const matches = db.filter(item => item.atNummer.toLowerCase().includes(query));
+            if(matches.length === 0) {
+                resultDiv.innerHTML = '<div class="card" style="text-align:center; color: #dc2626;">❌ Keine Ware gefunden.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = matches.map(item => `
+                <div class="item-card" onclick="openModal(${item.id}, 'at')">
+                    <img src="${item.fotos[0]}" alt="Foto">
+                    <div style="flex:1;">
+                        <span class="badge">${item.bereich}</span>
+                        <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span><br>
+                        <strong>${item.atNummer}</strong><br>
+                        <small style="color: var(--text-secondary);">${item.user} • ${item.hinweis.substring(0, 30)}...</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBestand() {
+            const filterArea = document.getElementById('filterLager').value;
+            const filterStat = document.getElementById('filterStatus').value;
+            const sortOrd = document.getElementById('sortOrder').value;
+            const listDiv = document.getElementById('bestandList');
+
+            let filtered = db.filter(item => {
+                const matchArea = (filterArea === 'ALL' || item.bereich === filterArea);
+                const matchStat = (filterStat === 'ALL' || item.status === filterStat);
+                return matchArea && matchStat;
+            });
+
+            filtered.sort((a,b) => {
+                const timeA = a.timestamp || a.id;
+                const timeB = b.timestamp || b.id;
+                return sortOrd === 'newest' ? timeB - timeA : timeA - timeB;
+            });
+
+            if(filtered.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; padding:20px;">Keine Einträge für diese Filter.</p>';
+                return;
+            }
+
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+            const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+
+            listDiv.innerHTML = filtered.map(item => {
+                const itemAge = item.timestamp ? (now - item.timestamp) : 0;
+                const is60Old = itemAge > sixtyDaysMs;
+                const is30Old = !is60Old && (itemAge > thirtyDaysMs);
+
+                return `
+                    <div class="item-card" onclick="openModal(${item.id}, 'bestand')">
+                        <img src="${item.fotos[0]}" alt="Foto">
+                        <div style="flex:1;">
+                            <span class="badge">${item.bereich}</span>
+                            <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span>
+                            ${is60Old ? `<span class="badge-old">⚠️ 60T+</span>` : (is30Old ? `<span class="badge-30d">⚠️ 30T+</span>` : '')}
+                            <br>
+                            <strong>${item.atNummer}</strong><br>
+                            <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openModal(id, origin) {
+            triggerVibe();
+            selectedItem = db.find(x => x.id === id);
+            if(!selectedItem) return;
+
+            document.getElementById('modalAT').textContent = selectedItem.atNummer;
+            document.getElementById('modalBereich').textContent = selectedItem.bereich;
+            document.getElementById('modalStatus').textContent = selectedItem.status;
+            document.getElementById('modalUser').textContent = selectedItem.user || 'Unbekannt';
+            document.getElementById('modalDatum').textContent = selectedItem.datum;
+            document.getElementById('modalHinweis').textContent = selectedItem.hinweis;
+
+            const gallery = document.getElementById('modalGallery');
+            gallery.innerHTML = selectedItem.fotos.map(src => `<img src="${src}">`).join('');
+
+            const userEditArea = document.getElementById('userEditArea');
+            const deleteArea = document.getElementById('adminDeleteArea');
+
+            const isOwnEntry = currentUser && (currentUser.name === selectedItem.user);
+            const isAdminUser = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
+
+            if(isOwnEntry || isAdminUser) {
+                userEditArea.innerHTML = `<button class="btn btn-secondary" onclick="enableEditMode()">✏️ Eintrag bearbeiten</button>`;
+            } else {
+                userEditArea.innerHTML = '';
+            }
+
+            if(origin === 'bestand' && isAdminUser) {
+                deleteArea.innerHTML = `<button class="btn btn-danger" onclick="deleteItem(${selectedItem.id})">🗑️ Artikel aus Bestand löschen</button>`;
+            } else {
+                deleteArea.innerHTML = '';
+            }
+
+            cancelEditMode();
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function enableEditMode() {
+            if(!selectedItem) return;
+            
+            const cleanNum = selectedItem.atNummer.replace(/^AT-?/i, '');
+            document.getElementById('editATNummer').value = cleanNum;
+            document.getElementById('editBereich').value = selectedItem.bereich;
+            document.getElementById('editStatus').value = selectedItem.status;
+            document.getElementById('editHinweis').value = selectedItem.hinweis;
+
+            document.getElementById('modalViewMode').style.display = 'none';
+            document.getElementById('modalEditMode').style.display = 'block';
+        }
+
+        function cancelEditMode() {
+            document.getElementById('modalViewMode').style.display = 'block';
+            document.getElementById('modalEditMode').style.display = 'none';
+        }
+
+        function saveEditedItem() {
+            if(!selectedItem) return;
+            triggerVibe();
+
+            const rawNum = document.getElementById('editATNummer').value.trim();
+            selectedItem.atNummer = 'AT-' + rawNum;
+            selectedItem.bereich = document.getElementById('editBereich').value;
+            selectedItem.status = document.getElementById('editStatus').value;
+            selectedItem.hinweis = document.getElementById('editHinweis').value;
+
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                alert('Eintrag erfolgreich in Cloud aktualisiert!');
+                closeModal();
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            selectedItem = null;
+        }
+
+        function shareWhatsApp() {
+            if(!selectedItem) return;
+            const text = `📦 Wareneingang:\n*AT-Nummer:* ${selectedItem.atNummer}\n*Bereich:* ${selectedItem.bereich}\n*Status:* ${selectedItem.status}\n*Angenommen von:* ${selectedItem.user || 'Unbekannt'}\n*Hinweis:* ${selectedItem.hinweis}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function deleteItem(id) {
+            const item = db.find(x => x.id === id);
+            const atName = item ? item.atNummer : '';
+            
+            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich aus der Cloud löschen?`)) return;
+            
+            triggerVibe();
+            if(item) trashDb.unshift(item);
+            
+            cloudDb.collection("bestand").doc(String(id)).delete().then(() => {
+                closeModal();
+                alert('Artikel wurde aus der Cloud gelöscht.');
+            });
+        }
+
+        // SPEICHERN DER OPTIONEN
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('app_theme', theme);
+        }
+
+        function changeTextColor(color) {
+            document.documentElement.setAttribute('data-textcolor', color);
+            localStorage.setItem('app_textcolor', color);
+        }
+
+        function changeFontSize(size) {
+            document.documentElement.setAttribute('data-fontsize', size);
+            localStorage.setItem('app_fontsize', size);
+        }
+
+        function toggleContrastBooster(val) {
+            document.documentElement.setAttribute('data-contrastbooster', val);
+            localStorage.setItem('app_contrastbooster', val);
+        }
+
+        function toggleVibration(val) {
+            enableVibration = (val === 'true');
+            localStorage.setItem('app_vibration', val);
+        }
+
+        function toggleSound(val) {
+            enableSound = (val === 'true');
+            localStorage.setItem('app_sound', val);
+        }
+
+        function toggleTurboMode(val) {
+            enableTurboMode = (val === 'true');
+            localStorage.setItem('app_turbomode', val);
+        }
+    </script>
+</body>
+</html>                    
