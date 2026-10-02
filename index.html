@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warenerfassung & Bestandsprüfung</title>
+    <title>Lagerratten-App</title>
     
     <!-- FIREBASE SDKs (Web / Cloud) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- TESSERACT OCR FÜR TEXTERKENNUNG VOM FOTO -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         :root {
@@ -15,6 +18,7 @@
             --primary-dark: #1d4ed8;
             --danger: #dc2626;
             --warning: #d97706;
+            --success: #16a34a;
             --whatsapp: #25d366;
             --whatsapp-dark: #128c7e;
             --bg: #0f172a;
@@ -73,7 +77,6 @@
             --danger: #ff0000;
         }
 
-        /* GALAXY DESIGN */
         [data-theme="galaxy"] {
             --bg: #090514;
             --surface: #130a2a;
@@ -99,7 +102,6 @@
             color: #ffffff;
         }
 
-        /* CAMOUFLAGE DESIGN */
         [data-theme="camouflage"] {
             --bg: #1a2419;
             --surface: #283526;
@@ -110,7 +112,6 @@
             --primary-dark: #166534;
         }
 
-        /* SUNSET CYBERPUNK DESIGN */
         [data-theme="sunset"] {
             --bg: #180828;
             --surface: #2a0e44;
@@ -129,10 +130,6 @@
         }
 
         /* SCHRIFTFARBEN AUSWAHL */
-        [data-textcolor="white"] {
-            --text: #ffffff !important;
-            --text-secondary: #cbd5e1 !important;
-        }
         [data-textcolor="lightblue"] {
             --text: #38bdf8 !important;
             --text-secondary: #7dd3fc !important;
@@ -210,16 +207,29 @@
 
         header {
             background: var(--surface);
-            padding: 1rem;
+            padding: 0.8rem 1rem;
             border-bottom: 2px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         header h1 {
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             color: var(--text);
+        }
+
+        .header-done-badge {
+            font-size: 0.8rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--text-secondary);
         }
 
         .container {
@@ -266,7 +276,11 @@
             min-height: 90px;
         }
 
-        /* DYNAMISCHER AT-NUMMER INPUT MIT FESTEM AT- PREFIX */
+        .at-input-container {
+            display: flex;
+            gap: 8px;
+        }
+
         .at-input-wrapper {
             display: flex;
             align-items: center;
@@ -274,6 +288,7 @@
             border-radius: 10px;
             background: var(--surface);
             overflow: hidden;
+            flex: 1;
         }
 
         .at-prefix {
@@ -293,6 +308,20 @@
             border: none !important;
             border-radius: 0 !important;
             background: transparent !important;
+        }
+
+        .scan-ocr-btn {
+            width: 55px;
+            min-height: var(--btn-height);
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .dictate-wrapper {
@@ -382,22 +411,24 @@
             justify-content: center;
         }
 
+        .btn-success {
+            background: var(--success);
+            color: white !important;
+        }
+
         .btn-whatsapp {
             background: var(--whatsapp);
             color: white !important;
-            margin-top: 12px;
         }
 
         .btn-danger {
             background: var(--danger);
             color: white !important;
-            margin-top: 12px;
         }
 
         .btn-secondary {
             background: #64748b;
             color: white !important;
-            margin-top: 8px;
         }
 
         .btn-sm {
@@ -424,7 +455,7 @@
             flex: 1;
             padding: 0.85rem 0;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             cursor: pointer;
         }
@@ -436,51 +467,87 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .item-card {
+        .at-list-container .item-card {
             display: flex;
             gap: 14px;
             align-items: center;
-            padding: 0.85rem;
+            padding: 1rem;
             background: var(--surface);
             border: 2px solid var(--border);
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             cursor: pointer;
             position: relative;
+            transition: opacity 0.2s;
         }
 
-        .item-card img {
-            width: 70px;
-            height: 70px;
+        .at-list-container .item-card img {
+            width: 80px;
+            height: 80px;
             object-fit: cover;
             border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .bestand-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .bestand-grid .item-card {
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: opacity 0.2s;
+        }
+
+        .bestand-grid .item-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .item-card.is-done {
+            opacity: 0.45;
+        }
+
+        /* Exakt 50% Transparenz für abgeholte Retouren */
+        .item-card.is-abgeholt {
+            border: 2px solid var(--success) !important;
+            background: rgba(22, 163, 74, 0.12) !important;
+            opacity: 0.5 !important;
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             background: var(--primary);
             color: white;
-            margin-right: 6px;
+            margin-right: 4px;
         }
 
         .badge-status {
-            font-size: 0.75rem;
-            padding: 3px 8px;
+            font-size: 0.7rem;
+            padding: 2px 6px;
             border-radius: 6px;
         }
 
-        .badge-full {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-partial {
-            background: #fef3c7;
-            color: #92400e;
-        }
+        .badge-full { background: #dcfce7; color: #166534; }
+        .badge-partial { background: #fef3c7; color: #92400e; }
+        .badge-notfull { background: #fee2e2; color: #991b1b; }
+        .badge-done { background: #e2e8f0; color: #334155; }
+        .badge-retoure { background: #fef08a; color: #854d0e; border: 1px solid #eab308; }
+        .badge-abgeholt { background: #16a34a; color: #ffffff; border: 1px solid #15803d; }
 
         .badge-30d {
             background: #ffedd5;
@@ -569,21 +636,17 @@
             background: #000;
         }
 
-        .filter-grid {
+        .filter-row-three {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 12px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-top: 8px;
         }
 
-        .cloud-badge {
-            font-size: 0.75rem;
-            background: #dcfce7;
-            color: #166534;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-left: 8px;
+        .filter-row-three select {
+            min-height: 38px;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.78rem;
         }
 
         .device-badge {
@@ -595,23 +658,116 @@
             margin-top: 4px;
         }
 
-        .device-badge-online {
-            background: #dcfce7;
-            color: #166534;
+        .device-badge-online { background: #dcfce7; color: #166534; }
+        .device-badge-offline { background: #fee2e2; color: #991b1b; }
+
+        .playground-area-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
         }
 
-        .device-badge-offline {
-            background: #fee2e2;
-            color: #991b1b;
+        .playground-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .progress-bar-bg {
+            background: var(--bg);
+            border-radius: 8px;
+            height: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-top: 4px;
+        }
+
+        .progress-bar-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .compact-action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .compact-action-grid .btn {
+            min-height: 44px;
+            padding: 6px;
+            font-size: 0.88rem;
+        }
+
+        .raster-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .raster-box {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 4px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .raster-box.is-full {
+            border-color: var(--danger);
+            background: rgba(220, 38, 38, 0.15);
+        }
+
+        .raster-box.is-ok {
+            border-color: var(--success);
+            background: rgba(22, 163, 74, 0.15);
+        }
+
+        /* AUTO-VERSCHWINDENDER TOAST-HINWEIS (OHNE OK BESTÄTIGUNG) */
+        #toastNotification {
+            position: fixed;
+            bottom: 95px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            z-index: 9999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            pointer-events: none;
+            text-align: center;
+            max-width: 90%;
+        }
+        #toastNotification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
+    <!-- TOAST BENACHRICHTIGUNG (VERSCHWINDET VON ALLEIN) -->
+    <div id="toastNotification">✅ Retoure als abgeholt markiert!</div>
+
     <!-- ANMELDE-OVERLAY (LOCKSCREEN) -->
     <div id="lockScreenOverlay">
         <div class="lock-card">
-            <h2 style="margin-bottom:6px; text-align:center;">🔒 LagerDoku Login</h2>
+            <h2 style="margin-bottom:6px; text-align:center;">🔒 Lagerratten-App Login</h2>
             <p style="text-align:center; color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
                 Bitte melde dich mit deiner Mitarbeiter-PIN und deinem Passwort an.
             </p>
@@ -631,8 +787,12 @@
         </div>
     </div>
 
+    <!-- HEADER MIT ZÄHLER OBEN RECHTS -->
     <header>
-        <h1>Erfassung <span id="cloudStatusBadge" class="cloud-badge">☁️ Live Cloud verknüpft</span></h1>
+        <h1>Lagerratten-App</h1>
+        <div class="header-done-badge">
+            Erledigt: <span id="headerDoneCount" style="color:var(--primary);">0</span>
+        </div>
     </header>
 
     <div class="container">
@@ -640,6 +800,7 @@
         <div id="tab-erfassen" class="tab-content active">
             <div class="card">
                 <form id="entryForm">
+                    <!-- 1. FOTO -->
                     <div class="form-group">
                         <label>Fotos der Ware / Palette (Mehrere Aufnahmen nacheinander möglich)</label>
                         <input type="file" id="photoInput" accept="image/*" multiple capture="environment" style="display: none;" onchange="handleFileSelect(event)">
@@ -649,14 +810,20 @@
                         <div class="photo-preview-grid" id="previewGrid"></div>
                     </div>
 
-                    <div class="form-group">
+                    <!-- 2. AT-NUMMER -->
+                    <div class="form-group" id="atGroupWrapper">
                         <label for="atNummer">AT-Nummer (Nur Zahlen eingeben)</label>
-                        <div class="at-input-wrapper">
-                            <span class="at-prefix">AT-</span>
-                            <input type="number" id="atNummer" pattern="[0-9]*" inputmode="numeric" placeholder="z. B. 998877" required oninput="filterNumbersOnly(this)">
+                        <div class="at-input-container">
+                            <div class="at-input-wrapper">
+                                <span class="at-prefix">AT-</span>
+                                <input type="number" id="atNummer" pattern="[0-9]*" inputmode="numeric" placeholder="z. B. 998877" required oninput="filterNumbersOnly(this)">
+                            </div>
+                            <input type="file" id="ocrInput" accept="image/*" capture="environment" style="display:none;" onchange="scanATNumberFromPhoto(event)">
+                            <button type="button" class="scan-ocr-btn" onclick="document.getElementById('ocrInput').click()" title="AT-Aufkleber per Kamera scannen">📷</button>
                         </div>
                     </div>
 
+                    <!-- 3. BEREICH -->
                     <div class="form-group">
                         <label for="bereich">Bereich</label>
                         <select id="bereich">
@@ -671,17 +838,41 @@
                             <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
                             <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
                             <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                            <option value="Ohne Lagerort">Ohne spezifischen Lagerort</option>
                         </select>
                     </div>
 
+                    <!-- 4. LIEFERSTATUS -->
                     <div class="form-group">
                         <label for="status">Lieferstatus</label>
-                        <select id="status">
+                        <select id="status" onchange="toggleATRequirementByStatus(this.value)">
                             <option value="Vollständig" selected>🟢 Vollständig</option>
                             <option value="Teillieferung">🟠 Teillieferung</option>
+                            <option value="Nicht vollständig">🔴 Nicht vollständig</option>
+                            <option value="Retoure">⚠️ Retoure</option>
                         </select>
                     </div>
 
+                    <!-- DYNAMISCHE RETOUREN-FELDER -->
+                    <div id="retoureExtrasArea" style="display:none; background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--border); margin-bottom:1.1rem;">
+                        <div class="form-group" style="margin-bottom:0.8rem;">
+                            <label style="color:#facc15;">Anlass / Retourengrund</label>
+                            <select id="retoureGrundSelect">
+                                <option value="Transportschaden">💥 Transportschaden</option>
+                                <option value="Falschlieferung">📦 Falschlieferung</option>
+                                <option value="Kunde verweigert">🚫 Annahme / Kunde verweigert</option>
+                                <option value="Fehlbestellung">❓ Fehlbestellung / Überlieferung</option>
+                                <option value="Mangelhafte Ware">📄 Mangelhafte / Defekte Ware</option>
+                                <option value="Sonstiges">❓ Sonstiges / Unbekannt</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="color:#facc15;">Spedition / Abholer (Optional)</label>
+                            <input type="text" id="retoureSpeditionInput" placeholder="z. B. Dachser, Schenker, DHL...">
+                        </div>
+                    </div>
+
+                    <!-- 5. ANMERKUNGEN -->
                     <div class="form-group">
                         <label for="hinweis">Anmerkungen / Zustand (Per Sprache einsprechen möglich)</label>
                         <div class="dictate-wrapper">
@@ -700,7 +891,7 @@
             <div class="form-group">
                 <input type="text" id="atSearchInput" placeholder="AT-Nummer (z. B. 9988 eingeben)" oninput="checkAT()">
             </div>
-            <div id="atResult">
+            <div id="atResult" class="at-list-container">
                 <p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">
                     Gib eine AT-Nummer ein, um den Bestand zu prüfen.
                 </p>
@@ -710,48 +901,76 @@
         <!-- TAB 3: BESTAND -->
         <div id="tab-bestand" class="tab-content">
             <div class="card" style="padding:0.8rem; margin-bottom:10px;">
-                <div class="filter-grid">
+                <div class="form-group" style="margin-bottom:0.4rem;">
+                    <label style="font-size:0.75rem;">AT-Nummer suchen</label>
+                    <input type="text" id="filterATNummer" placeholder="AT-Nummer eingeben..." oninput="renderBestand()" style="min-height:38px; padding:0.4rem;">
+                </div>
+                
+                <div class="filter-row-three">
                     <div>
-                        <label style="font-size:0.75rem;">Bereich</label>
-                        <select id="filterLager" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
-                            <option value="ALL">Alle Bereiche</option>
-                            <option value="LB">LB – Lagerbüro</option>
-                            <option value="KZ">KZ – Kommissionszaun</option>
-                            <option value="KT">KT – Kommissionstür</option>
-                            <option value="KF">KF – Kommissionsfliesen</option>
-                            <option value="TB">TB – Tiefbau</option>
-                            <option value="HR3">HR3 – Holzregal 3</option>
-                            <option value="KPR">KPR – Kommissionsplatz Regal</option>
-                            <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
-                            <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
-                            <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
-                            <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        <label style="font-size:0.7rem;">Bereich</label>
+                        <select id="filterLager" onchange="renderBestand()">
+                            <option value="ALL">Alle</option>
+                            <option value="LB">LB</option>
+                            <option value="KZ">KZ</option>
+                            <option value="KT">KT</option>
+                            <option value="KF">KF</option>
+                            <option value="TB">TB</option>
+                            <option value="HR3">HR3</option>
+                            <option value="KPR">KPR</option>
+                            <option value="KPR1">KPR1</option>
+                            <option value="KPR2">KPR2</option>
+                            <option value="KPR3">KPR3</option>
+                            <option value="KPR4">KPR4</option>
+                            <option value="Ohne Lagerort">Ohne Ort</option>
                         </select>
                     </div>
                     <div>
-                        <label style="font-size:0.75rem;">Status Filter</label>
-                        <select id="filterStatus" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
-                            <option value="ALL">Alle Status</option>
+                        <label style="font-size:0.7rem;">Status</label>
+                        <select id="filterStatus" onchange="renderBestand()">
+                            <option value="ALL">Alle</option>
                             <option value="Vollständig">🟢 Vollständig</option>
                             <option value="Teillieferung">🟠 Teillieferung</option>
+                            <option value="Nicht vollständig">🔴 Nur unvollständig</option>
+                            <option value="Erledigt">⚪ Erledigt</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.7rem;">Sortierung</label>
+                        <select id="sortOrder" onchange="renderBestand()">
+                            <option value="newest">Neueste</option>
+                            <option value="oldest">Älteste</option>
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label style="font-size:0.75rem;">Sortierung</label>
-                    <select id="sortOrder" onchange="renderBestand()" style="min-height:40px; padding:0.4rem;">
-                        <option value="newest">Neueste zuerst</option>
-                        <option value="oldest">Älteste zuerst</option>
-                    </select>
-                </div>
             </div>
-            <div id="bestandList"></div>
+            <div id="bestandList" class="bestand-grid"></div>
         </div>
 
-        <!-- TAB 4: EINSTELLUNGEN -->
+        <!-- TAB 4: RETOURE -->
+        <div id="tab-retoure" class="tab-content">
+            <div class="card" style="padding:0.8rem; margin-bottom:10px;">
+                <h3>📦 Retouren-Verwaltung</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary);">
+                    Hier befinden sich alle aufgenommenen Retouren ohne AT-Pflicht.
+                </p>
+            </div>
+            <div id="retoureList" class="bestand-grid"></div>
+        </div>
+
+        <!-- TAB 5: EINSTELLUNGEN -->
         <div id="tab-settings" class="tab-content">
             
-            <!-- 1. OPTIONEN -->
+            <div class="card" id="ownerOnlyCard" style="display:none; border: 2px solid var(--primary); background: rgba(37,99,235,0.05);">
+                <h3>👑 Exklusiver Inhaber-Bereich (Nur für Florian)</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:8px;">
+                    Diese Ansicht wird keinem anderen Benutzer und keinen Admins angezeigt.
+                </p>
+                <div style="font-size:0.85rem; padding:8px; background:var(--surface); border-radius:8px; border:1px solid var(--border);">
+                    ✨ Status: <strong>Vollständig freigeschaltet</strong>
+                </div>
+            </div>
+
             <div class="card">
                 <h3>Optionen</h3>
                 <div class="form-group">
@@ -759,7 +978,7 @@
                     <select id="themeSelect" onchange="changeTheme(this.value)">
                         <option value="light">☀️ Helles Design</option>
                         <option value="dark" selected>🌙 Dunkles Design</option>
-                        <option value="grey">⚙️ Graumodus</option>
+                        <option value="grey">⚙ Graumodus</option>
                         <option value="oled">🖤 OLED Tiefschwarz</option>
                         <option value="contrast">⚡ Sehr hoher Kontrast</option>
                         <option value="galaxy">🌌 Galaxy Design</option>
@@ -771,7 +990,6 @@
                     <label>Schriftfarbe</label>
                     <select id="textColorSelect" onchange="changeTextColor(this.value)">
                         <option value="auto" selected>✨ Automatisch</option>
-                        <option value="white">⚪ Weiß</option>
                         <option value="lightblue">🩵 Hellblau</option>
                         <option value="yellow">💛 Gelb</option>
                         <option value="matrixgreen">🟢 Matrix-Grün</option>
@@ -788,7 +1006,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Schriftkontrast-Booster (Fettschrift)</label>
+                    <label>Fettschrift (Hoher Kontrast)</label>
                     <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
                         <option value="false" selected>Aus</option>
                         <option value="true">An</option>
@@ -808,16 +1026,18 @@
                         <option value="false">Aus</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Schnelleingabemodus</label>
-                    <select id="turboSelect" onchange="toggleTurboMode(this.value)">
-                        <option value="false" selected>Aus</option>
-                        <option value="true">An</option>
-                    </select>
-                </div>
             </div>
 
-            <!-- 2. KONTO & SITZUNG -->
+            <div class="card" id="exportManagerCard" style="display:none;">
+                <h3>📋 Datenverwaltung & Export</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">
+                    Verwaltung für Lagermeister & Admins:
+                </p>
+                <button type="button" class="btn btn-secondary" onclick="export30DaysPDF()">📄 PDF-Export (30+ Tage Ware)</button>
+                <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="exportBestandPDF()">📄 PDF-Export (Gesamtbestand)</button>
+                <button type="button" class="btn btn-danger" style="margin-top:8px;" onclick="deleteAllDoneItems()">🗑️ Alle erledigten Aufträge löschen</button>
+            </div>
+
             <div class="card">
                 <h3>Konto & Sitzung</h3>
                 <div id="loginSection">
@@ -826,34 +1046,59 @@
                 </div>
             </div>
 
-            <!-- 3. QR-CODE SCANNER -->
             <div class="card">
-                <h3>QR-Code / Barcode Scanner</h3>
-                <p style="font-size:0.9rem; color: var(--text-secondary); margin-bottom: 12px;">
-                    Hier wird später die automatische Kamera-Erkennung für Barcodes und QR-Codes auf Lieferscheinen integriert.
+                <h3>Spielereien</h3>
+                <p style="font-size:0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    Experimentelle Funktionen, Tools & Barcode-Scanner
                 </p>
-                <button type="button" class="btn" style="background:#94a3b8; cursor:not-allowed;" disabled>📷 Kamera-Scanner vorbereitet</button>
+                
+                <button type="button" class="btn" onclick="openPlaygroundModal()" style="margin-bottom:12px;">Tools öffnen</button>
+
+                <div style="background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+                    <label style="font-size:0.8rem; font-weight:bold; margin-bottom:6px; display:block;">📷 Barcode & QR-Code Tools</label>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" class="btn btn-secondary btn-sm" style="flex:1;" onclick="openQrGeneratorModal()">🖨 Generator</button>
+                        <button type="button" class="btn btn-secondary btn-sm" style="flex:1;" onclick="openCameraScannerModal()">📷 Scanner</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- 4. ADMIN-BEREICH -->
             <div class="card">
-                <h3>Admin-Bereich</h3>
-                <div class="form-group">
-                    <label>Haupt-Admin Kennwort</label>
-                    <input type="password" id="superAdminCodeInput" placeholder="Kennwort eingeben">
+                <h3>Inhaber Admin-Bereich</h3>
+                <div id="adminPassPrompt">
+                    <div class="form-group">
+                        <label>Haupt-Admin Kennwort</label>
+                        <input type="password" id="superAdminCodeInput" placeholder="Kennwort eingeben">
+                    </div>
+                    <button type="button" class="btn" onclick="verifySuperAdmin()">Als Inhaber freischalten</button>
+                    <p id="superAdminStatusText" style="margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: var(--text-secondary);"></p>
                 </div>
-                <button type="button" class="btn" onclick="verifySuperAdmin()">Als Haupt-Admin freischalten</button>
-                <p id="superAdminStatusText" style="margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: var(--text-secondary);"></p>
 
                 <div id="roleManagementArea" style="display: none; margin-top: 15px;">
-                    <!-- ADMIN KENNWORTSCHUTZ ÄNDERN -->
-                    <hr style="margin-bottom: 15px; border-color: var(--border);">
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
                         <label style="font-weight:bold;">🔑 Admin-Kennwort ändern</label>
                         <div style="display:flex; gap:8px; margin-top:6px;">
                             <input type="password" id="newAdminMasterPass" placeholder="Neues Admin-Kennwort" style="min-height:42px;">
                             <button type="button" class="btn btn-sm" onclick="changeAdminMasterPassword()" style="width:auto;">Speichern</button>
                         </div>
+                    </div>
+
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                        <label style="font-weight:bold;">✉️ Automatische E-Mail-Adresse für 30+ Tage Ware</label>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Hier deine persönliche E-Mail eintragen:</p>
+                        <div style="display:flex; gap:8px; margin-top:6px;">
+                            <input type="email" id="ownerEmailInput" placeholder="deine-email@beispiel.de" style="min-height:42px;">
+                            <button type="button" class="btn btn-sm" onclick="saveOwnerEmail()" style="width:auto;">Speichern</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary" style="margin-top:10px; width:100%;" onclick="send30DaysEmailNow()">📨 30+ Tage Bericht JETZT per E-Mail senden</button>
+                    </div>
+
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                        <label style="font-weight:bold;">💬 Automatischer WhatsApp-Eingangsbeleg</label>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Funktion hinterlegt – sendet direkte Benachrichtigung bei neuem Wareneingang.</p>
+                        <button type="button" class="btn btn-sm btn-whatsapp" style="margin-top:8px; width:100%;" onclick="testWhatsAppTemplate()">💬 Vorlage für WhatsApp Beleg testen</button>
                     </div>
 
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
@@ -865,17 +1110,92 @@
                     <div id="adminStatsArea" style="margin-top:8px; font-size:0.9rem;"></div>
 
                     <hr style="margin: 15px 0; border-color: var(--border);">
+                    <h4>📜 Protokoll für gelöschte Retouren:</h4>
+                    <div id="retoureAuditLog" style="margin-top:8px; font-size:0.85rem; max-height:150px; overflow-y:auto; background:var(--bg); padding:8px; border-radius:6px; border:1px solid var(--border);"></div>
+
+                    <hr style="margin: 15px 0; border-color: var(--border);">
                     <h4>🗑 Papierkorb (Gelöschte Artikel):</h4>
                     <div id="trashList" style="margin-top:8px; font-size:0.85rem;"></div>
-
-                    <button type="button" class="btn" style="margin-top:15px; background:#475569; color:white;" onclick="sendDailyReport()">📧 Tagesbericht an Florian Nienberg senden</button>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- DETAIL MODAL / GROSSANSICHT & BEARBEITEN -->
+    <!-- SPIELEREIEN MODAL -->
+    <div id="playgroundModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <button class="close-btn" onclick="closePlaygroundModal()">&times;</button>
+            <h2 style="margin-bottom:12px;">Spielereien</h2>
+
+            <div id="playgroundMenu">
+                <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('inventur')">📋 Inventur-Modus (Stichtags-Prüfung)</button>
+                <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('monthly')">📊 Monatlicher automatischer Bestandsbericht</button>
+                <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('capacity')">📦 Lagerplatz-Kapazitätsauslastung & Raster</button>
+            </div>
+
+            <div id="toolInventurArea" style="display:none; margin-top:10px;">
+                <button class="btn btn-sm btn-secondary" onclick="resetPlaygroundMenu()" style="margin-bottom:12px;">⬅️ Zurück zum Menü</button>
+                <h3>📋 Inventur-Modus</h3>
+                <div id="inventurAreaSelect" class="playground-area-grid"></div>
+
+                <div id="inventurRunner" style="display:none; margin-top:15px; background:var(--bg); padding:15px; border-radius:10px; border:2px solid var(--border);">
+                    <h4 id="invCurrentAT">AT-998877</h4>
+                    <p style="font-size:0.85rem; color:var(--text-secondary);" id="invItemInfo"></p>
+                    <div id="invPhotoContainer" style="margin:10px 0;"></div>
+                    
+                    <div style="display:flex; gap:10px; margin-top:12px;">
+                        <button class="btn btn-success" onclick="recordInventoryStatus(true)">✅ Gefunden</button>
+                        <button class="btn btn-danger" onclick="recordInventoryStatus(false)">❌ Fehlt</button>
+                    </div>
+
+                    <div class="progress-bar-bg" style="margin-top:12px;">
+                        <div id="invProgressBarFill" class="progress-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <p id="invProgressText" style="text-align:center; font-size:0.8rem; margin-top:6px; color:var(--text-secondary);"></p>
+                </div>
+
+                <div id="inventurSummaryArea" style="display:none; margin-top:15px; background:var(--bg); padding:15px; border-radius:10px; border:2px solid var(--border);">
+                    <h4>📊 Inventur-Ergebnis für Bereich <span id="summaryAreaTitle"></span></h4>
+                    <div id="missingItemsList"></div>
+                    <button class="btn btn-secondary" style="margin-top:12px;" onclick="printInventoryReportPDF()">📄 Inventur-Protokoll als PDF drucken</button>
+                    <button class="btn btn-danger" style="margin-top:8px;" onclick="resetCurrentAreaInventory()">🔄 Inventur für diesen Bereich zurücksetzen</button>
+                </div>
+            </div>
+
+            <div id="toolMonthlyArea" style="display:none; margin-top:10px;">
+                <button class="btn btn-sm btn-secondary" onclick="resetPlaygroundMenu()" style="margin-bottom:12px;">⬅️ Zurück zum Menü</button>
+                <h3>📊 Monatlicher Bestandsbericht</h3>
+                <button class="btn" onclick="generateMonthlyReportPDF()">📄 Bericht als PDF / Druckansicht erstellen</button>
+                <button class="btn btn-secondary" style="margin-top:8px;" onclick="sendMonthlyReportEmail()">📅 Monatlichen Bericht per E-Mail senden</button>
+            </div>
+
+            <div id="toolCapacityArea" style="display:none; margin-top:10px;">
+                <button class="btn btn-sm btn-secondary" onclick="resetPlaygroundMenu()" style="margin-bottom:12px;">⬅️ Zurück zum Menü</button>
+                <h3>📦 Kapazität & Visueller Lagerplan</h3>
+                <div id="capacityList"></div>
+                <h4 style="margin-top:15px;">🗺 Visualisierte Stellplatz-Rasteransicht:</h4>
+                <div id="rasterOverview" class="raster-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: FÜR RETOURE-ABHOLUNG BESTÄTIGEN -->
+    <div id="pickupDocModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePickupDocModal()">&times;</button>
+            <h2>📦 Retoure abholen</h2>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">
+                Möchtest du diese Retoure endgültig als abgeholt bestätigen?
+            </p>
+
+            <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-success" onclick="confirmRetourePickup()">📦 Als abgeholt bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: DETAIL / GROSSANSICHT -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">&times;</button>
@@ -883,23 +1203,57 @@
             <div id="modalGallery" class="modal-gallery"></div>
             
             <div id="modalViewMode">
-                <p><strong>Bereich:</strong> <span id="modalBereich"></span></p>
-                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-                <p><strong>Angenommen von:</strong> <span id="modalUser"></span></p>
-                <p><strong>Datum:</strong> <span id="modalDatum"></span></p>
-                <p><strong>Anmerkungen:</strong></p>
-                <p id="modalHinweis" style="color: var(--text-secondary); background: var(--bg); padding: 10px; border-radius: 8px; margin-top: 6px; border: 1px solid var(--border);"></p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:0.9rem;">
+                    <div><strong>Bereich:</strong> <span id="modalBereich"></span></div>
+                    <div><strong>Status:</strong> <span id="modalStatus"></span></div>
+                    <div><strong>Von:</strong> <span id="modalUser"></span></div>
+                    <div><strong>Datum:</strong> <span id="modalDatum"></span></div>
+                </div>
+
+                <div id="modalRetoureExtraInfo" style="display:none; margin-top:8px; background:var(--bg); padding:8px; border-radius:8px; border:1px solid var(--border); font-size:0.85rem;">
+                    <div><strong>Anlass:</strong> <span id="modalRetoureGrund" style="color:#facc15;"></span></div>
+                    <div><strong>Spedition:</strong> <span id="modalRetoureSpedition"></span></div>
+                </div>
+
+                <div id="modalDoneInfoArea" style="display:none; margin: 8px 0; font-size: 0.85rem; color: var(--success); font-weight:bold;"></div>
                 
-                <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Per WhatsApp teilen</button>
-                <div id="userEditArea"></div>
-                <div id="adminDeleteArea"></div>
+                <p style="margin-top:8px;"><strong>Anmerkungen:</strong></p>
+                <p id="modalHinweis" style="color: var(--text-secondary); background: var(--bg); padding: 8px; border-radius: 8px; margin-top: 4px; border: 1px solid var(--border); font-size:0.9rem;"></p>
+                
+                <div id="quickRelocateContainer" style="margin-top:10px; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+                    <label style="font-size:0.8rem; font-weight:bold;">📍 Lagerort ändern (Umlagern):</label>
+                    <div style="display:flex; gap:6px; margin-top:4px;">
+                        <select id="quickRelocateSelect" style="min-height:38px; padding:0.2rem; font-size:0.85rem;">
+                            <option value="LB">LB – Lagerbüro</option>
+                            <option value="KZ">KZ – Kommissionszaun</option>
+                            <option value="KT">KT – Kommissionstür</option>
+                            <option value="KF">KF – Kommissionsfliesen</option>
+                            <option value="TB">TB – Tiefbau</option>
+                            <option value="HR3">HR3 – Holzregal 3</option>
+                            <option value="KPR">KPR – Kommissionsplatz Regal</option>
+                            <option value="KPR1">KPR1 – Kommissionsplatz R1</option>
+                            <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
+                            <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
+                            <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                            <option value="Ohne Lagerort">Ohne Ort</option>
+                        </select>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="executeQuickRelocate()" style="width:auto;">Umlagern</button>
+                    </div>
+                </div>
+
+                <div id="modalActionArea" class="compact-action-grid">
+                    <div id="whatsAppBtnArea"></div>
+                    <div id="toggleDoneBtnArea"></div>
+                    <div id="userEditArea"></div>
+                    <div id="adminDeleteArea"></div>
+                </div>
             </div>
 
             <!-- BEARBEITEN-MODUS -->
             <div id="modalEditMode" style="display:none;">
                 <h3>Eintrag bearbeiten</h3>
                 <br>
-                <div class="form-group">
+                <div class="form-group" id="editATGroupWrapper">
                     <label>AT-Nummer (Nur Zahlen)</label>
                     <div class="at-input-wrapper">
                         <span class="at-prefix">AT-</span>
@@ -920,6 +1274,7 @@
                         <option value="KPR2">KPR2 – Kommissionsplatz R2</option>
                         <option value="KPR3">KPR3 – Kommissionsplatz R3</option>
                         <option value="KPR4">KPR4 – Kommissionsplatz R4</option>
+                        <option value="Ohne Lagerort">Ohne spezifischen Lagerort</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -927,6 +1282,9 @@
                     <select id="editStatus">
                         <option value="Vollständig">🟢 Vollständig</option>
                         <option value="Teillieferung">🟠 Teillieferung</option>
+                        <option value="Nicht vollständig">🔴 Nicht vollständig</option>
+                        <option value="Retoure">⚠️ Retoure</option>
+                        <option value="Erledigt">⚪ Erledigt / Abgeholt</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -934,7 +1292,7 @@
                     <textarea id="editHinweis" rows="3"></textarea>
                 </div>
                 <button type="button" class="btn" onclick="saveEditedItem()">Änderungen speichern</button>
-                <button type="button" class="btn btn-secondary" onclick="cancelEditMode()">Abbrechen</button>
+                <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="cancelEditMode()">Abbrechen</button>
             </div>
         </div>
     </div>
@@ -942,11 +1300,11 @@
     <!-- BOTTOM NAVIGATION -->
     <nav class="nav-bar">
         <div class="nav-item active" onclick="switchTab('erfassen', 'Erfassung', this)">📥<br>Erfassung</div>
-        <div class="nav-item" onclick="switchTab('at', 'AT-Bestandsprüfung', this)">🔍<br>AT-Prüfung</div>
-        <div class="nav-item" onclick="switchTab('bestand', 'Gesamter Bestand', this)">📦<br>Bestand</div>
+        <div class="nav-item" onclick="switchTab('at', 'AT-Prüfung', this)">🔍<br>AT-Prüfung</div>
+        <div class="nav-item" onclick="switchTab('bestand', 'Bestand', this)">📦<br>Bestand</div>
+        <div class="nav-item" onclick="switchTab('retoure', 'Retoure', this)">⚠️<br>Retoure</div>
         <div class="nav-item" onclick="switchTab('settings', 'Einstellungen', this)">⚙️<br>Einstellungen</div>
     </nav>
-
     <script>
         // FIREBASE INITIALISIERUNG
         const firebaseConfig = {
@@ -962,7 +1320,6 @@
         firebase.initializeApp(firebaseConfig);
         const cloudDb = firebase.firestore();
 
-        // GERÄTE-ID FÜR LIVE-STATUS
         let myDeviceId = localStorage.getItem('app_device_id');
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
@@ -970,39 +1327,82 @@
         }
 
         let currentPhotos = [];
-        let isSuperAdmin = false;
+        let isSuperAdmin = sessionStorage.getItem('admin_session_active') === 'true';
         let currentUser = null;
         let selectedItem = null;
         let enableVibration = true;
         let enableSound = true;
-        let enableTurboMode = false;
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
+        let ownerEmail = localStorage.getItem('owner_email') || 'florian.nienberg@example.com';
 
         const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
-            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 3, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] }
+            { id: 2, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'admin', isOwner: false, isLocked: false, devices: [] },
+            { id: 3, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 4, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 5, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 6, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'azubi', isOwner: false, isLocked: false, devices: [] }
         ];
 
         let users = [...defaultUsers];
         let db = [];
         let trashDb = [];
+        let retoureLogs = [];
 
-        // INITIALE PRÜFUNG DES ANMELDESTATUS
+        const allAreas = ["LB", "KZ", "KT", "KF", "TB", "HR3", "KPR", "KPR1", "KPR2", "KPR3", "KPR4", "Ohne Lagerort"];
+
+        let currentInvArea = "";
+        let currentInvItems = [];
+        let currentInvIndex = 0;
+
         const savedUserId = localStorage.getItem('logged_user_id');
         if (!savedUserId) {
             document.getElementById('lockScreenOverlay').style.display = 'flex';
+        }
+
+        // HINWEIS OHNE OK BESTÄTIGUNG ANZEIGEN (Verschwindet nach 3.5 Sekunden)
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            if(!toast) return;
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
         }
 
         function filterNumbersOnly(input) {
             input.value = input.value.replace(/[^0-9]/g, '');
         }
 
-        // BENUTZER-EINSTELLUNGEN GELADEN
+        function getStatusBadgeClass(status) {
+            if(status === 'Vollständig') return 'badge-full';
+            if(status === 'Teillieferung') return 'badge-partial';
+            if(status === 'Nicht vollständig') return 'badge-notfull';
+            if(status === 'Erledigt') return 'badge-done';
+            if(status === 'Abgeholt') return 'badge-abgeholt';
+            if(status === 'Retoure') return 'badge-retoure';
+            return 'badge-full';
+        }
+
+        function toggleATRequirementByStatus(val) {
+            const atWrapper = document.getElementById('atGroupWrapper');
+            const atInput = document.getElementById('atNummer');
+            const retoureExtras = document.getElementById('retoureExtrasArea');
+
+            if(val === 'Retoure') {
+                atWrapper.style.display = 'none';
+                atInput.removeAttribute('required');
+                atInput.value = '';
+                retoureExtras.style.display = 'block';
+            } else {
+                atWrapper.style.display = 'block';
+                atInput.setAttribute('required', 'required');
+                retoureExtras.style.display = 'none';
+            }
+        }
+
         function loadSavedAppSettings() {
             const savedTheme = localStorage.getItem('app_theme') || 'dark';
             const savedColor = localStorage.getItem('app_textcolor') || 'auto';
@@ -1010,11 +1410,9 @@
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
             const savedVibe = localStorage.getItem('app_vibration');
             const savedSound = localStorage.getItem('app_sound');
-            const savedTurbo = localStorage.getItem('app_turbomode');
 
             enableVibration = (savedVibe !== null) ? (savedVibe === 'true') : true;
             enableSound = (savedSound !== null) ? (savedSound === 'true') : true;
-            enableTurboMode = (savedTurbo !== null) ? (savedTurbo === 'true') : false;
 
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-textcolor', savedColor);
@@ -1027,7 +1425,7 @@
             const boosterSel = document.getElementById('boosterSelect');
             const vibeSel = document.getElementById('vibeSelect');
             const soundSel = document.getElementById('soundSelect');
-            const turboSel = document.getElementById('turboSelect');
+            const emailInp = document.getElementById('ownerEmailInput');
 
             if(themeSel) themeSel.value = savedTheme;
             if(colorSel) colorSel.value = savedColor;
@@ -1035,12 +1433,16 @@
             if(boosterSel) boosterSel.value = savedBooster;
             if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
             if(soundSel) soundSel.value = enableSound ? 'true' : 'false';
-            if(turboSel) turboSel.value = enableTurboMode ? 'true' : 'false';
+            if(emailInp) emailInp.value = ownerEmail;
+
+            if(isSuperAdmin) {
+                document.getElementById('adminPassPrompt').style.display = 'none';
+                document.getElementById('roleManagementArea').style.display = 'block';
+            }
         }
 
         loadSavedAppSettings();
 
-        // 1. ECHTZEIT-SYNCHRONISATION BENUTZER & PASSWÖRTER & GERÄTE CLOUD
         cloudDb.collection("users").onSnapshot((snapshot) => {
             if(snapshot.empty) {
                 defaultUsers.forEach(u => cloudDb.collection("users").doc(String(u.id)).set(u));
@@ -1057,10 +1459,7 @@
                 const savedId = localStorage.getItem('logged_user_id');
                 if(savedId) {
                     const found = users.find(u => u.id == savedId);
-                    const devList = found ? (found.devices || []) : [];
-                    const isDeviceActive = devList.includes(myDeviceId);
-
-                    if(found && !found.isLocked && isDeviceActive) {
+                    if(found && !found.isLocked) {
                         currentUser = found;
                         document.getElementById('lockScreenOverlay').style.display = 'none';
                         updateLoginUI();
@@ -1076,15 +1475,29 @@
             }
         });
 
-        // 2. ECHTZEIT-SYNCHRONISATION BESTAND CLOUD
         cloudDb.collection("bestand").onSnapshot((snapshot) => {
             let cloudItems = [];
             snapshot.forEach((doc) => cloudItems.push(doc.data()));
             db = cloudItems;
             renderBestand();
+            renderRetouren();
             checkAT();
+            updateDoneCount();
             if(isSuperAdmin) renderAdminStats();
         });
+
+        cloudDb.collection("retoure_logs").onSnapshot((snapshot) => {
+            let logs = [];
+            snapshot.forEach((doc) => logs.push(doc.data()));
+            retoureLogs = logs;
+            renderRetoureLogs();
+        });
+
+        function updateDoneCount() {
+            const doneCount = db.filter(item => item.status === 'Erledigt' || item.status === 'Abgeholt').length;
+            const badge = document.getElementById('headerDoneCount');
+            if(badge) badge.textContent = doneCount;
+        }
 
         function saveUserToCloud(user) {
             cloudDb.collection("users").doc(String(user.id)).set(user);
@@ -1155,10 +1568,6 @@
                 document.getElementById('lockPinInput').value = '';
                 document.getElementById('lockPasswordInput').value = '';
                 updateLoginUI();
-
-                if(enableTurboMode) {
-                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
-                }
             } else {
                 errDiv.textContent = '❌ Falsches Passwort oder Einmal-Passwort verfallen.';
                 errDiv.style.display = 'block';
@@ -1173,6 +1582,8 @@
                 saveUserToCloud(currentUser);
             }
             currentUser = null;
+            sessionStorage.removeItem('admin_session_active');
+            isSuperAdmin = false;
             localStorage.removeItem('logged_user_id');
             document.getElementById('lockScreenOverlay').style.display = 'flex';
             updateLoginUI();
@@ -1180,10 +1591,31 @@
 
         function updateLoginUI() {
             const statusText = document.getElementById('currentLoginStatus');
+            const exportCard = document.getElementById('exportManagerCard');
+            const ownerCard = document.getElementById('ownerOnlyCard');
+
             if(currentUser) {
-                statusText.innerHTML = `Angemeldet als: <strong>${currentUser.name}</strong> (${currentUser.role === 'admin' ? 'Admin / Verwalter' : 'Lagerist'})`;
+                let roleTitle = 'Lagerist';
+                if(currentUser.role === 'admin') roleTitle = 'Admin / Verwalter';
+                if(currentUser.role === 'azubi') roleTitle = 'Azubi-Lutscher 🍭';
+
+                statusText.innerHTML = `Angemeldet als: <strong>${currentUser.name}</strong> (${roleTitle})`;
+                
+                if(currentUser.role === 'admin' || isSuperAdmin) {
+                    exportCard.style.display = 'block';
+                } else {
+                    exportCard.style.display = 'none';
+                }
+
+                if(currentUser.isOwner) {
+                    ownerCard.style.display = 'block';
+                } else {
+                    ownerCard.style.display = 'none';
+                }
             } else {
                 statusText.innerHTML = `Status: <strong style="color:red;">Nicht angemeldet</strong>`;
+                exportCard.style.display = 'none';
+                ownerCard.style.display = 'none';
             }
         }
 
@@ -1193,12 +1625,16 @@
             if(code === adminMasterCode || (currentUser && currentUser.isOwner)) {
                 triggerVibe();
                 isSuperAdmin = true;
+                sessionStorage.setItem('admin_session_active', 'true');
                 statusText.style.color = 'var(--primary)';
                 statusText.textContent = '✅ Haupt-Admin freigeschaltet!';
+                document.getElementById('adminPassPrompt').style.display = 'none';
                 document.getElementById('roleManagementArea').style.display = 'block';
                 renderUserRoleList();
                 renderAdminStats();
                 renderTrashList();
+                renderRetoureLogs();
+                updateLoginUI();
             } else {
                 isSuperAdmin = false;
                 statusText.style.color = 'var(--danger)';
@@ -1219,8 +1655,291 @@
             document.getElementById('newAdminMasterPass').value = '';
         }
 
+        function saveOwnerEmail() {
+            const email = document.getElementById('ownerEmailInput').value.trim();
+            if(!email.includes('@')) {
+                alert('Bitte eine gültige E-Mail-Adresse eingeben.');
+                return;
+            }
+            triggerVibe();
+            ownerEmail = email;
+            localStorage.setItem('owner_email', ownerEmail);
+            alert('Deine Benachrichtigungs-E-Mail wurde erfolgreich gespeichert!');
+        }
+
+        function send30DaysEmailNow() {
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            const oldItems = db.filter(item => item.timestamp && (now - item.timestamp >= thirtyDaysMs));
+
+            if(oldItems.length === 0) {
+                alert('Aktuell liegt keine Ware seit 30+ Tagen im Lager.');
+                return;
+            }
+
+            let bodyText = `Hallo Florian,\n\nhier ist die Übersicht der Ware, die seit 30 Tagen oder länger im Lager liegt (${oldItems.length} Artikel):\n\n`;
+            oldItems.forEach(item => {
+                bodyText += `• ${item.atNummer} | Bereich: ${item.bereich} | Erfasst von: ${item.user} am ${item.datum}\n`;
+            });
+            bodyText += `\nViele Grüße,\nDeine Lagerratten-App`;
+
+            window.location.href = `mailto:${ownerEmail}?subject=⚠ Lagerratten-App: ${oldItems.length} Artikel seit 30+ Tagen auf Lager&body=${encodeURIComponent(bodyText)}`;
+        }
+
+        function testWhatsAppTemplate() {
+            alert('💬 Vorlage für WhatsApp-Eingangsbeleg:\n\n"Hallo, die Ware AT-998877 wurde gerade im Bereich KZ vom Mitarbeiter Jan aufgenommen."');
+        }
+
+        function openQrGeneratorModal() {
+            triggerVibe();
+            alert('🖨 Barcode / QR-Code Generator geöffnet:\nHier werden druckfähige Etiketten für Paletten generiert.');
+        }
+
+        function openCameraScannerModal() {
+            triggerVibe();
+            alert('📷 Kamera-Barcode-Scanner gestartet:\nRichte die Kamera auf das Paletten-Label.');
+        }
+
+        function executeQuickRelocate() {
+            if(!selectedItem) return;
+            const newArea = document.getElementById('quickRelocateSelect').value;
+            triggerVibe();
+
+            selectedItem.bereich = newArea;
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                playSuccessSound();
+                showToast(`📍 Ware erfolgreich nach ${newArea} umgelagert!`);
+                closeModal();
+            });
+        }
+
+        function openPlaygroundModal() {
+            triggerVibe();
+            document.getElementById('playgroundModal').style.display = 'block';
+            resetPlaygroundMenu();
+        }
+
+        function closePlaygroundModal() {
+            document.getElementById('playgroundModal').style.display = 'none';
+        }
+
+        function resetPlaygroundMenu() {
+            document.getElementById('playgroundMenu').style.display = 'block';
+            document.getElementById('toolInventurArea').style.display = 'none';
+            document.getElementById('toolMonthlyArea').style.display = 'none';
+            document.getElementById('toolCapacityArea').style.display = 'none';
+        }
+
+        function showPlaygroundTool(tool) {
+            triggerVibe();
+            document.getElementById('playgroundMenu').style.display = 'none';
+
+            if(tool === 'inventur') {
+                document.getElementById('toolInventurArea').style.display = 'block';
+                renderInventurAreaButtons();
+            } else if(tool === 'monthly') {
+                document.getElementById('toolMonthlyArea').style.display = 'block';
+            } else if(tool === 'capacity') {
+                document.getElementById('toolCapacityArea').style.display = 'block';
+                renderCapacityOverview();
+            }
+        }
+
+        function renderInventurAreaButtons() {
+            const grid = document.getElementById('inventurAreaSelect');
+            document.getElementById('inventurRunner').style.display = 'none';
+            document.getElementById('inventurSummaryArea').style.display = 'none';
+
+            grid.innerHTML = allAreas.map(area => {
+                const count = db.filter(x => x.bereich === area && x.status !== 'Erledigt' && x.status !== 'Abgeholt').length;
+                return `
+                    <div class="playground-btn" onclick="startInventurForArea('${area}')">
+                        <span style="font-size:1.1rem; color:var(--primary);">${area}</span><br>
+                        <small style="color:var(--text-secondary);">${count} Artikel</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startInventurForArea(area) {
+            triggerVibe();
+            currentInvArea = area;
+            currentInvItems = db.filter(x => x.bereich === area && x.status !== 'Erledigt' && x.status !== 'Abgeholt');
+            currentInvIndex = 0;
+
+            if(currentInvItems.length === 0) {
+                alert(`Im Bereich ${area} befinden sich aktuell keine aktiven Artikel.`);
+                return;
+            }
+
+            document.getElementById('inventurRunner').style.display = 'block';
+            document.getElementById('inventurSummaryArea').style.display = 'none';
+            showCurrentInventurItem();
+        }
+
+        function showCurrentInventurItem() {
+            if(currentInvIndex >= currentInvItems.length) {
+                renderInventurSummary();
+                return;
+            }
+
+            const item = currentInvItems[currentInvIndex];
+            document.getElementById('invCurrentAT').textContent = item.atNummer || '⚠️ Retoure';
+            document.getElementById('invItemInfo').textContent = `Bereich: ${item.bereich} | Erfasst von: ${item.user} (${item.datum})`;
+            
+            const photoDiv = document.getElementById('invPhotoContainer');
+            if(item.fotos && item.fotos[0]) {
+                photoDiv.innerHTML = `<img src="${item.fotos[0]}" style="width:100%; max-height:180px; object-fit:cover; border-radius:8px;">`;
+            } else {
+                photoDiv.innerHTML = '';
+            }
+
+            const progressPct = Math.round(((currentInvIndex) / currentInvItems.length) * 100);
+            document.getElementById('invProgressBarFill').style.width = progressPct + '%';
+            document.getElementById('invProgressText').textContent = `Artikel ${currentInvIndex + 1} von ${currentInvItems.length} (${progressPct}%)`;
+        }
+
+        function recordInventoryStatus(found) {
+            triggerVibe();
+            const item = currentInvItems[currentInvIndex];
+            item.inventoryChecked = true;
+            item.inventoryStatus = found ? 'Gefunden' : 'Fehlt';
+
+            cloudDb.collection("bestand").doc(String(item.id)).set(item);
+
+            currentInvIndex++;
+            showCurrentInventurItem();
+        }
+
+        function renderInventurSummary() {
+            document.getElementById('inventurRunner').style.display = 'none';
+            document.getElementById('inventurSummaryArea').style.display = 'block';
+            document.getElementById('summaryAreaTitle').textContent = currentInvArea;
+
+            const areaItems = db.filter(x => x.bereich === currentInvArea && x.status !== 'Erledigt' && x.status !== 'Abgeholt');
+            const missing = areaItems.filter(x => x.inventoryStatus === 'Fehlt');
+            const listDiv = document.getElementById('missingItemsList');
+
+            if(missing.length === 0) {
+                listDiv.innerHTML = '<p style="color:var(--success); font-weight:bold;">🟢 Alles vollständig! Kein Artikel fehlt in diesem Bereich.</p>';
+            } else {
+                listDiv.innerHTML = missing.map(item => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:var(--surface); border:1px solid var(--danger); border-radius:8px; margin-bottom:6px;">
+                        <div>
+                            <strong style="color:var(--danger);">${item.atNummer || 'Retoure'}</strong><br>
+                            <small style="color:var(--text-secondary);">${item.user} • ${item.datum}</small>
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="markMissingItemFound(${item.id})">Nachträglich gefunden</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function printInventoryReportPDF() {
+            const areaItems = db.filter(x => x.bereich === currentInvArea && x.status !== 'Erledigt' && x.status !== 'Abgeholt');
+            let printWin = window.open('', '_blank');
+            let html = `<html><head><title>Inventur-Protokoll ${currentInvArea}</title><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#eee;}</style></head><body>`;
+            html += `<h2>📋 Inventur-Protokoll für Bereich: ${currentInvArea}</h2><p>Erstellt am: ${new Date().toLocaleString('de-DE')}</p><table><tr><th>AT-Nummer / Typ</th><th>Status</th><th>Eingelagert von</th><th>Datum</th></tr>`;
+            
+            areaItems.forEach(item => {
+                const stat = item.inventoryStatus || 'Ungeprüft';
+                html += `<tr><td><b>${item.atNummer || 'Retoure'}</b></td><td>${stat}</td><td>${item.user}</td><td>${item.datum}</td></tr>`;
+            });
+
+            html += `</table></body></html>`;
+            printWin.document.write(html);
+            printWin.document.close();
+            printWin.print();
+        }
+
+        function markMissingItemFound(id) {
+            triggerVibe();
+            const item = db.find(x => x.id === id);
+            if(item) {
+                item.inventoryStatus = 'Gefunden';
+                cloudDb.collection("bestand").doc(String(id)).set(item).then(() => {
+                    renderInventurSummary();
+                });
+            }
+        }
+
+        function resetCurrentAreaInventory() {
+            if(!confirm(`Möchtest du alle Inventur-Markierungen für den Bereich ${currentInvArea} zurücksetzen?`)) return;
+            
+            triggerVibe();
+            const areaItems = db.filter(x => x.bereich === currentInvArea);
+            areaItems.forEach(item => {
+                delete item.inventoryChecked;
+                delete item.inventoryStatus;
+                cloudDb.collection("bestand").doc(String(item.id)).set(item);
+            });
+
+            showToast(`Inventur für ${currentInvArea} wurde zurückgesetzt!`);
+            renderInventurAreaButtons();
+        }
+
+        function generateMonthlyReportPDF() {
+            let printWin = window.open('', '_blank');
+            let html = `<html><head><title>Monatlicher Bestandsbericht</title><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#eee;}</style></head><body>`;
+            html += `<h2>📊 Monatlicher Lagerratten Bestandsbericht</h2><p>Erstellt am: ${new Date().toLocaleString('de-DE')}</p>`;
+            html += `<p>Gesamtzahl eingelagerter Artikel: <b>${db.length}</b></p><table><tr><th>AT / Typ</th><th>Bereich</th><th>Status</th><th>Erfasst von</th><th>Datum</th></tr>`;
+            
+            db.forEach(item => {
+                html += `<tr><td><b>${item.atNummer || 'Retoure'}</b></td><td>${item.bereich}</td><td>${item.status}</td><td>${item.user}</td><td>${item.datum}</td></tr>`;
+            });
+
+            html += `</table></body></html>`;
+            printWin.document.write(html);
+            printWin.document.close();
+            printWin.print();
+        }
+
+        function sendMonthlyReportEmail() {
+            let bodyText = `Monatlicher Bestandsbericht Lagerratten-App (${db.length} Einträge total):\n\n`;
+            db.forEach(item => {
+                bodyText += `• ${item.atNummer || 'Retoure'} | Bereich: ${item.bereich} | Status: ${item.status} | Erfasst von: ${item.user}\n`;
+            });
+
+            window.location.href = `mailto:${ownerEmail}?subject=📊 Monatlicher%20Lagerratten%20Bestandsbericht&body=${encodeURIComponent(bodyText)}`;
+        }
+
+        function renderCapacityOverview() {
+            const div = document.getElementById('capacityList');
+            const rasterDiv = document.getElementById('rasterOverview');
+            const dummyMaxPerArea = 20;
+
+            div.innerHTML = allAreas.map(area => {
+                const count = db.filter(x => x.bereich === area && x.status !== 'Erledigt' && x.status !== 'Abgeholt').length;
+                const percent = Math.min(100, Math.round((count / dummyMaxPerArea) * 100));
+
+                return `
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                            <span><strong>${area}</strong> (${count} Paletten/Artikel)</span>
+                            <span><strong>${percent}%</strong> Belegt</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            rasterDiv.innerHTML = allAreas.map(area => {
+                const count = db.filter(x => x.bereich === area && x.status !== 'Erledigt' && x.status !== 'Abgeholt').length;
+                const isFull = count > 10;
+                return `
+                    <div class="raster-box ${isFull ? 'is-full' : 'is-ok'}">
+                        <strong>${area}</strong><br>
+                        <small>${count} Artikel</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderUserRoleList() {
             const listDiv = document.getElementById('userRoleList');
+            if(!listDiv) return;
             listDiv.innerHTML = users.map(u => {
                 const devCount = (u.devices || []).length;
                 const isOnline = devCount > 0;
@@ -1243,6 +1962,7 @@
                         ` : `
                             <select onchange="changeUserRole(${u.id}, this.value)" style="width: auto; min-height: 36px; padding:2px 6px;">
                                 <option value="lagerist" ${u.role === 'lagerist' ? 'selected' : ''}>Lagerist</option>
+                                <option value="azubi" ${u.role === 'azubi' ? 'selected' : ''}>Azubi-Lutscher 🍭</option>
                                 <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                             </select>
                         `}
@@ -1266,7 +1986,7 @@
             user.isLocked = false;
             saveUserToCloud(user);
             triggerVibe();
-            alert(`Einmal-Passwort für ${user.name} generiert:\n\nPasswort: ${randomPW}\n\nEs ist JETZT auf allen Handys gültig!`);
+            showToast(`Einmal-PW für ${user.name} generiert: ${randomPW}`);
         }
 
         function adminLogoutUser(userId) {
@@ -1276,11 +1996,12 @@
             user.devices = [];
             saveUserToCloud(user);
             triggerVibe();
-            alert(`${user.name} wurde live auf allen Geräten abgemeldet!`);
+            showToast(`${user.name} wurde live abgemeldet!`);
         }
 
         function renderAdminStats() {
             const statsDiv = document.getElementById('adminStatsArea');
+            if(!statsDiv) return;
             let counts = {};
             users.forEach(u => counts[u.name] = 0);
             db.forEach(item => {
@@ -1297,14 +2018,30 @@
 
         function renderTrashList() {
             const trashDiv = document.getElementById('trashList');
+            if(!trashDiv) return;
             if(trashDb.length === 0) {
                 trashDiv.innerHTML = '<p style="color:var(--text-secondary);">Papierkorb ist leer.</p>';
                 return;
             }
             trashDiv.innerHTML = trashDb.map(item => `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:var(--bg); padding:6px; border-radius:6px;">
-                    <span>${item.atNummer} (${item.bereich})</span>
+                    <span>${item.atNummer || 'Retoure'} (${item.bereich})</span>
                     <button class="btn btn-sm" onclick="restoreFromTrash(${item.id})">Wiederherstellen</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRetoureLogs() {
+            const logDiv = document.getElementById('retoureAuditLog');
+            if(!logDiv) return;
+            if(retoureLogs.length === 0) {
+                logDiv.innerHTML = '<p style="color:var(--text-secondary);">Keine Retouren-Löschungen protokolliert.</p>';
+                return;
+            }
+            logDiv.innerHTML = retoureLogs.map(l => `
+                <div style="padding:4px 0; border-bottom:1px solid var(--border);">
+                    <strong>${l.deletedBy}</strong> hat Retoure (Bereich: ${l.bereich}) gelöscht.<br>
+                    <small style="color:var(--text-secondary);">${l.date}</small>
                 </div>
             `).join('');
         }
@@ -1315,7 +2052,7 @@
             trashDb = trashDb.filter(x => x.id !== id);
             cloudDb.collection("bestand").doc(String(item.id)).set(item);
             renderTrashList();
-            alert('Artikel wiederhergestellt!');
+            showToast('Artikel wiederhergestellt!');
         }
 
         function changeUserRole(userId, newRole) {
@@ -1324,13 +2061,41 @@
                 triggerVibe();
                 user.role = newRole;
                 saveUserToCloud(user);
-                alert(`Rolle von ${user.name} geändert.`);
+                showToast(`Rolle von ${user.name} geändert.`);
             }
+        }
+
+        function scanATNumberFromPhoto(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const inputField = document.getElementById('atNummer');
+            inputField.placeholder = "Scanne Text vom Foto...";
+
+            Tesseract.recognize(
+                file,
+                'eng',
+                { logger: m => console.log(m) }
+            ).then(({ data: { text } }) => {
+                const match = text.match(/\b\d{4,8}\b/);
+                if(match) {
+                    inputField.value = match[0];
+                    playSuccessSound();
+                    triggerVibe();
+                } else {
+                    showToast('Keine AT-Nummer auf dem Foto erkannt.');
+                }
+            }).catch(err => {
+                showToast('Fehler bei der Foto-Texterkennung.');
+            }).finally(() => {
+                inputField.placeholder = "z. B. 998877";
+                e.target.value = '';
+            });
         }
 
         function startDictation() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert('Spracherkennung wird auf diesem Gerät leider nicht unterstützt.');
+                showToast('Spracherkennung wird nicht unterstützt.');
                 return;
             }
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1339,7 +2104,7 @@
             recognition.interimResults = false;
 
             recognition.onstart = function() {
-                alert('🎙 Höre zu... Jetzt sprechen.');
+                showToast('🎙 Höre zu... Sprechen.');
             };
 
             recognition.onresult = function(event) {
@@ -1350,18 +2115,69 @@
             };
 
             recognition.onerror = function() {
-                alert('Fehler bei der Spracherkennung.');
+                showToast('Fehler bei der Spracherkennung.');
             };
 
             recognition.start();
         }
 
-        function sendDailyReport() {
-            let bodyText = `Tagesbericht Bestand (${db.length} Einträge):\n\n`;
-            db.forEach(item => {
-                bodyText += `• ${item.atNummer} | ${item.bereich} | Status: ${item.status} | Angenommen von: ${item.user}\n`;
+        function deleteAllDoneItems() {
+            const doneItems = db.filter(item => item.status === 'Erledigt' || item.status === 'Abgeholt');
+            if(doneItems.length === 0) {
+                showToast('Keine erledigten/abgeholten Aufträge vorhanden.');
+                return;
+            }
+            if(!confirm(`Möchtest du wirklich ALLE ${doneItems.length} erledigten/abgeholten Aufträge endgültig löschen?`)) return;
+
+            triggerVibe();
+            doneItems.forEach(item => {
+                cloudDb.collection("bestand").doc(String(item.id)).delete();
             });
-            window.location.href = `mailto:florian.nienberg@example.com?subject=Tagesbericht%20Lagerbestand&body=${encodeURIComponent(bodyText)}`;
+            showToast('Alle erledigten Aufträge gelöscht!');
+        }
+
+        function export30DaysPDF() {
+            const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            const oldItems = db.filter(item => item.timestamp && (now - item.timestamp >= thirtyDaysMs));
+
+            if(oldItems.length === 0) {
+                showToast('Keine Artikel seit 30+ Tagen im Lager.');
+                return;
+            }
+
+            let printWin = window.open('', '_blank');
+            let html = `<html><head><title>30+ Tage Wareneingang</title><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#eee;}</style></head><body>`;
+            html += `<h2>📦 Artikelübersicht (30 Tage oder länger eingelagert)</h2><p>Erstellt am: ${new Date().toLocaleString('de-DE')}</p><table><tr><th>AT-Nummer</th><th>Bereich</th><th>Status</th><th>Eingelagert von</th><th>Datum</th></tr>`;
+            
+            oldItems.forEach(item => {
+                html += `<tr><td><b>${item.atNummer || 'Retoure'}</b></td><td>${item.bereich}</td><td>${item.status}</td><td>${item.user}</td><td>${item.datum}</td></tr>`;
+            });
+
+            html += `</table></body></html>`;
+            printWin.document.write(html);
+            printWin.document.close();
+            printWin.print();
+        }
+
+        function exportBestandPDF() {
+            if(db.length === 0) {
+                showToast('Kein Bestand vorhanden.');
+                return;
+            }
+
+            let printWin = window.open('', '_blank');
+            let html = `<html><head><title>Gesamtbestand</title><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#eee;}</style></head><body>`;
+            html += `<h2>📦 Gesamter Lagerbestand</h2><p>Erstellt am: ${new Date().toLocaleString('de-DE')}</p><table><tr><th>AT-Nummer</th><th>Bereich</th><th>Status</th><th>Erfasst von</th><th>Datum</th></tr>`;
+            
+            db.forEach(item => {
+                html += `<tr><td><b>${item.atNummer || 'Retoure'}</b></td><td>${item.bereich}</td><td>${item.status}</td><td>${item.user}</td><td>${item.datum}</td></tr>`;
+            });
+
+            html += `</table></body></html>`;
+            printWin.document.write(html);
+            printWin.document.close();
+            printWin.print();
         }
 
         function handleFileSelect(e) {
@@ -1397,6 +2213,7 @@
 
         function renderPhotoPreviews() {
             const previewGrid = document.getElementById('previewGrid');
+            if(!previewGrid) return;
             previewGrid.innerHTML = '';
 
             currentPhotos.forEach((src, index) => {
@@ -1434,23 +2251,33 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             element.classList.add('active');
             
-            if(tabId === 'erfassen' && enableTurboMode) {
-                setTimeout(() => document.getElementById('atNummer').focus(), 150);
-            }
             if(tabId === 'bestand') renderBestand();
+            if(tabId === 'retoure') renderRetouren();
         }
 
         document.getElementById('entryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             if(!currentUser) {
-                alert('Bitte melde dich zuerst an!');
+                showToast('Bitte zuerst anmelden!');
                 document.getElementById('lockScreenOverlay').style.display = 'flex';
                 return;
             }
 
-            const rawNum = document.getElementById('atNummer').value.trim();
-            const fullAT = 'AT-' + rawNum;
+            const statusVal = document.getElementById('status').value;
+            let fullAT = '';
+
+            if(statusVal !== 'Retoure') {
+                const rawNum = document.getElementById('atNummer').value.trim();
+                fullAT = 'AT-' + rawNum;
+
+                const existingItem = db.find(item => item.atNummer && item.atNummer.toLowerCase() === fullAT.toLowerCase());
+                if(existingItem) {
+                    if(!confirm(`⚠️ ACHTUNG: Die Nummer ${fullAT} existiert bereits im Bestand!\n\nTrotzdem als neuen/zweiten Eintrag abspeichern?`)) {
+                        return;
+                    }
+                }
+            }
 
             const submitBtn = document.getElementById('saveSubmitBtn');
             submitBtn.disabled = true;
@@ -1462,7 +2289,7 @@
                 id: now,
                 atNummer: fullAT,
                 bereich: document.getElementById('bereich').value,
-                status: document.getElementById('status').value,
+                status: statusVal,
                 user: currentUser.name,
                 hinweis: document.getElementById('hinweis').value || 'Keine Anmerkungen',
                 datum: new Date().toLocaleString('de-DE'),
@@ -1470,19 +2297,21 @@
                 fotos: currentPhotos.length > 0 ? [...currentPhotos] : ['https://via.placeholder.com/300?text=Kein+Foto']
             };
 
+            if(statusVal === 'Retoure') {
+                newEntry.retoureGrund = document.getElementById('retoureGrundSelect').value;
+                newEntry.retoureSpedition = document.getElementById('retoureSpeditionInput').value || 'Keine Angabe';
+            }
+
             cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
                 playSuccessSound();
-                alert('✅ Ware erfolgreich in der Cloud gespeichert & live verteilt!');
+                showToast('✅ Ware/Retoure erfolgreich gespeichert!');
                 document.getElementById('entryForm').reset();
                 document.getElementById('previewGrid').innerHTML = '';
                 currentPhotos = [];
                 document.getElementById('status').value = 'Vollständig';
-
-                if(enableTurboMode) {
-                    setTimeout(() => document.getElementById('atNummer').focus(), 200);
-                }
+                toggleATRequirementByStatus('Vollständig');
             }).catch(err => {
-                alert('❌ Fehler beim Cloud-Upload: ' + err.message);
+                showToast('❌ Fehler beim Cloud-Upload.');
             }).finally(() => {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Ware einsenden & Speichern';
@@ -1498,35 +2327,43 @@
                 return;
             }
 
-            const matches = db.filter(item => item.atNummer.toLowerCase().includes(query));
+            const matches = db.filter(item => item.atNummer && item.atNummer.toLowerCase().includes(query));
             if(matches.length === 0) {
                 resultDiv.innerHTML = '<div class="card" style="text-align:center; color: #dc2626;">❌ Keine Ware gefunden.</div>';
                 return;
             }
 
-            resultDiv.innerHTML = matches.map(item => `
-                <div class="item-card" onclick="openModal(${item.id}, 'at')">
-                    <img src="${item.fotos[0]}" alt="Foto">
-                    <div style="flex:1;">
-                        <span class="badge">${item.bereich}</span>
-                        <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span><br>
-                        <strong>${item.atNummer}</strong><br>
-                        <small style="color: var(--text-secondary);">${item.user} • ${item.hinweis.substring(0, 30)}...</small>
+            resultDiv.innerHTML = matches.map(item => {
+                const isDone = item.status === 'Erledigt' || item.status === 'Abgeholt';
+                return `
+                    <div class="item-card ${isDone ? 'is-done' : ''}" onclick="openModal(${item.id}, 'at')">
+                        <img src="${item.fotos[0]}" alt="Foto">
+                        <div style="flex:1;">
+                            <span class="badge">${item.bereich}</span>
+                            <span class="badge-status ${getStatusBadgeClass(item.status)}">${item.status}</span><br>
+                            <strong style="font-size:1.1rem;">${item.atNummer}</strong><br>
+                            <small style="color: var(--text-secondary);">${item.user} • ${item.hinweis.substring(0, 40)}...</small>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderBestand() {
+            const filterAT = document.getElementById('filterATNummer').value.trim().toLowerCase();
             const filterArea = document.getElementById('filterLager').value;
             const filterStat = document.getElementById('filterStatus').value;
             const sortOrd = document.getElementById('sortOrder').value;
             const listDiv = document.getElementById('bestandList');
+            if(!listDiv) return;
 
-            let filtered = db.filter(item => {
+            let filtered = db.filter(item => item.status !== 'Retoure' && item.status !== 'Abgeholt');
+
+            filtered = filtered.filter(item => {
+                const matchAT = !filterAT || (item.atNummer && item.atNummer.toLowerCase().includes(filterAT));
                 const matchArea = (filterArea === 'ALL' || item.bereich === filterArea);
                 const matchStat = (filterStat === 'ALL' || item.status === filterStat);
-                return matchArea && matchStat;
+                return matchAT && matchArea && matchStat;
             });
 
             filtered.sort((a,b) => {
@@ -1536,7 +2373,7 @@
             });
 
             if(filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; padding:20px;">Keine Einträge für diese Filter.</p>';
+                listDiv.innerHTML = '<p style="text-align:center; padding:20px; grid-column:1/-1;">Keine Einträge für diese Filter.</p>';
                 return;
             }
 
@@ -1548,16 +2385,45 @@
                 const itemAge = item.timestamp ? (now - item.timestamp) : 0;
                 const is60Old = itemAge > sixtyDaysMs;
                 const is30Old = !is60Old && (itemAge > thirtyDaysMs);
+                const isDone = item.status === 'Erledigt';
 
                 return `
-                    <div class="item-card" onclick="openModal(${item.id}, 'bestand')">
+                    <div class="item-card ${isDone ? 'is-done' : ''}" onclick="openModal(${item.id}, 'bestand')">
                         <img src="${item.fotos[0]}" alt="Foto">
-                        <div style="flex:1;">
+                        <div>
                             <span class="badge">${item.bereich}</span>
-                            <span class="badge-status ${item.status === 'Vollständig' ? 'badge-full' : 'badge-partial'}">${item.status}</span>
+                            <span class="badge-status ${getStatusBadgeClass(item.status)}">${item.status}</span>
                             ${is60Old ? `<span class="badge-old">⚠️ 60T+</span>` : (is30Old ? `<span class="badge-30d">⚠️ 30T+</span>` : '')}
                             <br>
                             <strong>${item.atNummer}</strong><br>
+                            <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRetouren() {
+            const listDiv = document.getElementById('retoureList');
+            if(!listDiv) return;
+
+            const retouren = db.filter(item => item.status === 'Retoure' || item.status === 'Abgeholt');
+
+            if(retouren.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; padding:20px; grid-column:1/-1;">Aktuell keine Retouren erfasst.</p>';
+                return;
+            }
+
+            listDiv.innerHTML = retouren.map(item => {
+                const isAbgeholt = item.status === 'Abgeholt';
+                return `
+                    <div class="item-card ${isAbgeholt ? 'is-abgeholt' : ''}" onclick="openModal(${item.id}, 'retoure')">
+                        <img src="${item.fotos[0]}" alt="Foto">
+                        <div>
+                            <span class="badge" style="background:${isAbgeholt ? '#16a34a' : '#eab308'}; color:#fff;">⚠️ ${item.bereich}</span>
+                            <span class="badge-status ${getStatusBadgeClass(item.status)}">${item.status}</span>
+                            <br>
+                            <strong style="color:${isAbgeholt ? '#4ade80' : '#facc15'};">${isAbgeholt ? '🟢 Abgeholt' : 'Retoure'}</strong><br>
                             <small style="color: var(--text-secondary);">${item.user} • ${item.datum}</small>
                         </div>
                     </div>
@@ -1570,30 +2436,79 @@
             selectedItem = db.find(x => x.id === id);
             if(!selectedItem) return;
 
-            document.getElementById('modalAT').textContent = selectedItem.atNummer;
+            document.getElementById('modalAT').textContent = selectedItem.atNummer || '⚠️ Retoure (Keine AT)';
             document.getElementById('modalBereich').textContent = selectedItem.bereich;
             document.getElementById('modalStatus').textContent = selectedItem.status;
             document.getElementById('modalUser').textContent = selectedItem.user || 'Unbekannt';
             document.getElementById('modalDatum').textContent = selectedItem.datum;
             document.getElementById('modalHinweis').textContent = selectedItem.hinweis;
+            document.getElementById('quickRelocateSelect').value = selectedItem.bereich;
+
+            const retoureExtraDiv = document.getElementById('modalRetoureExtraInfo');
+            if(selectedItem.status === 'Retoure' || selectedItem.status === 'Abgeholt') {
+                retoureExtraDiv.style.display = 'block';
+                document.getElementById('modalRetoureGrund').textContent = selectedItem.retoureGrund || 'Keine Angabe';
+                document.getElementById('modalRetoureSpedition').textContent = selectedItem.retoureSpedition || 'Keine Angabe';
+            } else {
+                retoureExtraDiv.style.display = 'none';
+            }
+
+            const doneInfoDiv = document.getElementById('modalDoneInfoArea');
+            if((selectedItem.status === 'Erledigt' || selectedItem.status === 'Abgeholt') && selectedItem.doneBy) {
+                doneInfoDiv.style.display = 'block';
+                doneInfoDiv.innerHTML = `✔ ${selectedItem.status} von <b>${selectedItem.doneBy}</b> am ${selectedItem.doneDate || ''}`;
+            } else {
+                doneInfoDiv.style.display = 'none';
+            }
 
             const gallery = document.getElementById('modalGallery');
             gallery.innerHTML = selectedItem.fotos.map(src => `<img src="${src}">`).join('');
 
+            const whatsAppArea = document.getElementById('whatsAppBtnArea');
+            const toggleDoneBtnArea = document.getElementById('toggleDoneBtnArea');
             const userEditArea = document.getElementById('userEditArea');
             const deleteArea = document.getElementById('adminDeleteArea');
+            const relocateContainer = document.getElementById('quickRelocateContainer');
+
+            const isDone = selectedItem.status === 'Erledigt' || selectedItem.status === 'Abgeholt';
+            const isAdmin = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
+            const isDoneByMe = currentUser && (selectedItem.doneBy === currentUser.name);
+
+            if(origin === 'bestand' || origin === 'retoure') {
+                relocateContainer.style.display = 'block';
+            } else {
+                relocateContainer.style.display = 'none';
+            }
+
+            if(origin === 'bestand') {
+                whatsAppArea.innerHTML = `<button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 WhatsApp</button>`;
+            } else {
+                whatsAppArea.innerHTML = '';
+            }
+
+            if(!isDone) {
+                if(selectedItem.status === 'Retoure') {
+                    toggleDoneBtnArea.innerHTML = `<button class="btn btn-success" onclick="openPickupDocModal()">📦 Als abgeholt bestätigen</button>`;
+                } else {
+                    toggleDoneBtnArea.innerHTML = `<button class="btn btn-success" onclick="markItemAsDone('Erledigt')">✅ Erledigen</button>`;
+                }
+            } else {
+                if(isAdmin || isDoneByMe) {
+                    toggleDoneBtnArea.innerHTML = `<button class="btn btn-secondary" onclick="resetItemStatus()">🔄 Zurücksetzen</button>`;
+                } else {
+                    toggleDoneBtnArea.innerHTML = '';
+                }
+            }
 
             const isOwnEntry = currentUser && (currentUser.name === selectedItem.user);
-            const isAdminUser = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
-
-            if(isOwnEntry || isAdminUser) {
-                userEditArea.innerHTML = `<button class="btn btn-secondary" onclick="enableEditMode()">✏️️ Eintrag bearbeiten</button>`;
+            if((origin === 'bestand' || origin === 'retoure') && (isOwnEntry || isAdmin)) {
+                userEditArea.innerHTML = `<button class="btn btn-secondary" onclick="enableEditMode()">✏ Bearbeiten</button>`;
             } else {
                 userEditArea.innerHTML = '';
             }
 
-            if(origin === 'bestand' && isAdminUser) {
-                deleteArea.innerHTML = `<button class="btn btn-danger" onclick="deleteItem(${selectedItem.id})">🗑️ Artikel aus Bestand löschen</button>`;
+            if(isAdmin) {
+                deleteArea.innerHTML = `<button class="btn btn-danger" onclick="deleteItem(${selectedItem.id})">🗑 Löschen</button>`;
             } else {
                 deleteArea.innerHTML = '';
             }
@@ -1602,11 +2517,74 @@
             document.getElementById('detailModal').style.display = 'block';
         }
 
+        function openPickupDocModal() {
+            triggerVibe();
+            document.getElementById('detailModal').style.display = 'none';
+            document.getElementById('pickupDocModal').style.display = 'block';
+        }
+
+        function closePickupDocModal() {
+            document.getElementById('pickupDocModal').style.display = 'none';
+        }
+
+        function confirmRetourePickup() {
+            if(!selectedItem || !currentUser) return;
+            triggerVibe();
+
+            selectedItem.status = 'Abgeholt';
+            selectedItem.doneBy = currentUser.name;
+            selectedItem.doneDate = new Date().toLocaleString('de-DE');
+
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                playSuccessSound();
+                closePickupDocModal();
+                closeModal();
+                renderRetouren();
+                showToast('✅ Retoure als abgeholt markiert!');
+            });
+        }
+
+        function markItemAsDone(newStatus = 'Erledigt') {
+            if(!selectedItem || !currentUser) return;
+            triggerVibe();
+
+            selectedItem.status = newStatus;
+            selectedItem.doneBy = currentUser.name;
+            selectedItem.doneDate = new Date().toLocaleString('de-DE');
+
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                playSuccessSound();
+                showToast(`✅ Als ${newStatus} markiert!`);
+                closeModal();
+            });
+        }
+
+        function resetItemStatus() {
+            if(!selectedItem) return;
+            triggerVibe();
+
+            selectedItem.status = selectedItem.atNummer ? 'Vollständig' : 'Retoure';
+            delete selectedItem.doneBy;
+            delete selectedItem.doneDate;
+
+            cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
+                showToast('🔄 Status zurückgesetzt!');
+                closeModal();
+            });
+        }
+
         function enableEditMode() {
             if(!selectedItem) return;
             
-            const cleanNum = selectedItem.atNummer.replace(/^AT-?/i, '');
-            document.getElementById('editATNummer').value = cleanNum;
+            const atGroup = document.getElementById('editATGroupWrapper');
+            if(selectedItem.status === 'Retoure' || selectedItem.status === 'Abgeholt') {
+                atGroup.style.display = 'none';
+            } else {
+                atGroup.style.display = 'block';
+                const cleanNum = selectedItem.atNummer ? selectedItem.atNummer.replace(/^AT-?/i, '') : '';
+                document.getElementById('editATNummer').value = cleanNum;
+            }
+
             document.getElementById('editBereich').value = selectedItem.bereich;
             document.getElementById('editStatus').value = selectedItem.status;
             document.getElementById('editHinweis').value = selectedItem.hinweis;
@@ -1624,14 +2602,20 @@
             if(!selectedItem) return;
             triggerVibe();
 
-            const rawNum = document.getElementById('editATNummer').value.trim();
-            selectedItem.atNummer = 'AT-' + rawNum;
+            const statusVal = document.getElementById('editStatus').value;
+            if(statusVal !== 'Retoure' && statusVal !== 'Abgeholt') {
+                const rawNum = document.getElementById('editATNummer').value.trim();
+                selectedItem.atNummer = 'AT-' + rawNum;
+            } else {
+                selectedItem.atNummer = '';
+            }
+
             selectedItem.bereich = document.getElementById('editBereich').value;
-            selectedItem.status = document.getElementById('editStatus').value;
+            selectedItem.status = statusVal;
             selectedItem.hinweis = document.getElementById('editHinweis').value;
 
             cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
-                alert('Eintrag erfolgreich in Cloud aktualisiert!');
+                showToast('Eintrag erfolgreich aktualisiert!');
                 closeModal();
             });
         }
@@ -1650,20 +2634,31 @@
 
         function deleteItem(id) {
             const item = db.find(x => x.id === id);
-            const atName = item ? item.atNummer : '';
+            const titleName = item ? (item.atNummer || 'Retoure') : '';
             
-            if(!confirm(`Möchtest du den Artikel (${atName}) wirklich aus der Cloud löschen?`)) return;
+            if(!confirm(`Möchtest du (${titleName}) wirklich aus der Cloud löschen?`)) return;
             
             triggerVibe();
-            if(item) trashDb.unshift(item);
+            if(item) {
+                trashDb.unshift(item);
+                
+                if(item.status === 'Retoure' || item.status === 'Abgeholt') {
+                    const logObj = {
+                        id: Date.now(),
+                        bereich: item.bereich,
+                        deletedBy: currentUser ? currentUser.name : 'Admin',
+                        date: new Date().toLocaleString('de-DE')
+                    };
+                    cloudDb.collection("retoure_logs").doc(String(logObj.id)).set(logObj);
+                }
+            }
             
             cloudDb.collection("bestand").doc(String(id)).delete().then(() => {
                 closeModal();
-                alert('Artikel wurde aus der Cloud gelöscht.');
+                showToast('Eintrag wurde gelöscht!');
             });
         }
 
-        // SPEICHERN DER OPTIONEN
         function changeTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('app_theme', theme);
@@ -1692,11 +2687,6 @@
         function toggleSound(val) {
             enableSound = (val === 'true');
             localStorage.setItem('app_sound', val);
-        }
-
-        function toggleTurboMode(val) {
-            enableTurboMode = (val === 'true');
-            localStorage.setItem('app_turbomode', val);
         }
     </script>
 </body>
