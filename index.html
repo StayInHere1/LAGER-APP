@@ -2244,7 +2244,7 @@
                     geminiApiKey = data.apiKey;
                     localStorage.setItem('gemini_api_key', data.apiKey);
                     const geminiInp = document.getElementById('geminiApiKeyInput');
-                    if(geminiInp && !geminiInp.value) {
+                    if(geminiInp) {
                         geminiInp.value = data.apiKey;
                     }
                 }
