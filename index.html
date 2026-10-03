@@ -8,9 +8,6 @@
     <!-- FIREBASE SDKs (Web / Cloud) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
-    <!-- TESSERACT OCR FÜR TEXTERKENNUNG VOM FOTO -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         :root {
@@ -33,7 +30,7 @@
             --font-weight-bold: 600;
         }
 
-        /* ERSCHEINUNGSBILD / THEMES (Nur noch Helles, Dunkles, OLED & Galaxy) */
+        /* ERSCHEINUNGSBILD / THEMES (Nur noch Helles, Dunkles, OLED & Galaxy)[cite: 2] */
         [data-theme="light"] {
             --bg: #f8fafc;
             --surface: #ffffff;
@@ -769,8 +766,8 @@
                                 <span class="at-prefix">AT-</span>
                                 <input type="number" id="atNummer" pattern="[0-9]*" inputmode="numeric" placeholder="z. B. 998877" required oninput="filterNumbersOnly(this)">
                             </div>
-                            <input type="file" id="ocrInput" accept="image/*" capture="environment" style="display:none;" onchange="scanATNumberFromPhoto(event)">
-                            <button type="button" class="scan-ocr-btn" onclick="document.getElementById('ocrInput').click()" title="AT-Aufkleber per Kamera scannen">📷</button>
+                            <input type="file" id="ocrInput" accept="image/*" capture="environment" style="display:none;" onchange="scanATNumberWithGemini(event)">
+                            <button type="button" class="scan-ocr-btn" onclick="document.getElementById('ocrInput').click()" title="KI AT-Aufkleber per Kamera scannen">✨📷</button>
                         </div>
                     </div>
 
@@ -1028,6 +1025,16 @@
 
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
+                        <label style="font-weight:bold;">✨ Google Gemini API-Key für KI-Funktionen</label>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Dein API-Schlüssel für die smarte AT-Erkennung & KI-Auslastung:</p>
+                        <div style="display:flex; gap:8px; margin-top:6px;">
+                            <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." style="min-height:42px;">
+                            <button type="button" class="btn btn-sm" onclick="saveGeminiKey()" style="width:auto;">Speichern</button>
+                        </div>
+                    </div>
+
+                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
                         <label style="font-weight:bold;">✉️ Automatische E-Mail-Adresse für Berichte</label>
                         <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Deine E-Mail:</p>
                         <div style="display:flex; gap:8px; margin-top:6px;">
@@ -1044,7 +1051,7 @@
                         <button type="button" class="btn btn-sm btn-whatsapp" style="margin-top:8px; width:100%;" onclick="testWhatsAppTemplate()">💬 Vorlage für WhatsApp Beleg testen</button>
                     </div>
 
-                    <hr style="margin-bottom: 15px; border-color: var(--border);">
+                    <hr style="margin: 15px 0; border-color: var(--border);">
                     <h4>Mitarbeiter-Zugänge, Geräte & Live-Status:</h4>
                     <div id="userRoleList" style="margin-top: 10px;"></div>
                     
@@ -1070,12 +1077,37 @@
     <div id="playgroundModal" class="modal">
         <div class="modal-content" style="max-width: 550px;">
             <button class="close-btn" onclick="closePlaygroundModal()">&times;</button>
-            <h2 style="margin-bottom:12px;">Spielereien</h2>
+            <h2 style="margin-bottom:12px;">Spielereien & KI-Tools</h2>
 
             <div id="playgroundMenu">
                 <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('inventur')">📋 Inventur-Modus (Stichtags-Prüfung)</button>
                 <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('monthly')">📊 Monatlicher automatischer Bestandsbericht</button>
                 <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="showPlaygroundTool('capacity')">📦 Lagerplatz-Kapazitätsauslastung & Raster</button>
+                <button class="btn" style="margin-bottom:10px; background:linear-gradient(135deg, #2563eb, #d946ef);" onclick="showPlaygroundTool('ai_chat')">🤖 KI Chat-Assistent ("Frag die Ratte")</button>
+                <button class="btn" style="margin-bottom:10px; background:linear-gradient(135deg, #16a34a, #2563eb);" onclick="showPlaygroundTool('ai_capacity')">✨ KI Lager-Kapazitätsanalyse</button>
+            </div>
+
+            <!-- KI CHAT ASSISTENT -->
+            <div id="toolAiChatArea" style="display:none; margin-top:10px;">
+                <button class="btn btn-sm btn-secondary" onclick="resetPlaygroundMenu()" style="margin-bottom:12px;">⬅️ Zurück zum Menü</button>
+                <h3>🤖 KI Chat-Assistent</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Frag die KI nach bestimmten AT-Nummern, Beständen oder Retouren.</p>
+                <div id="aiChatBox" style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; height:200px; overflow-y:auto; font-size:0.9rem; margin-bottom:10px;">
+                    <div style="color:var(--primary); margin-bottom:6px;"><b>Ratten-KI:</b> Moin! Was möchtest du über das Lager wissen?</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="aiChatInput" placeholder="z. B. Wo liegt AT-9988?" style="min-height:44px;">
+                    <button class="btn" style="width:auto;" onclick="sendAiChatMessage()">Senden</button>
+                </div>
+            </div>
+
+            <!-- KI LAGERANALYSE -->
+            <div id="toolAiCapacityArea" style="display:none; margin-top:10px;">
+                <button class="btn btn-sm btn-secondary" onclick="resetPlaygroundMenu()" style="margin-bottom:12px;">⬅️ Zurück zum Menü</button>
+                <h3>✨ KI Lager-Einschätzung</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">Lass die KI deine aktuellen Bestandsdaten analysieren und eine Einschätzung abgeben:</p>
+                <button class="btn" onclick="runAiCapacityAnalysis()">🤖 Jetzt KI-Analyse starten</button>
+                <div id="aiCapacityResult" style="margin-top:12px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:0.9rem; white-space:pre-wrap; display:none;"></div>
             </div>
 
             <div id="toolInventurArea" style="display:none; margin-top:10px;">
@@ -1279,6 +1311,7 @@
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
         let ownerEmail = localStorage.getItem('owner_email') || 'flori.msi03@gmail.com';
+        let geminiApiKey = "AQ.Ab8RN6Ij70_SvNSSfGW8dcycF9IR6WOAavG4a6bSPRnOvRq5BQ";
 
         const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
@@ -1369,6 +1402,7 @@
             const vibeSel = document.getElementById('vibeSelect');
             const soundSel = document.getElementById('soundSelect');
             const emailInp = document.getElementById('ownerEmailInput');
+            const geminiInp = document.getElementById('geminiApiKeyInput');
 
             if(themeSel) themeSel.value = savedTheme;
             if(colorSel) colorSel.value = savedColor;
@@ -1377,6 +1411,7 @@
             if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
             if(soundSel) soundSel.value = enableSound ? 'true' : 'false';
             if(emailInp) emailInp.value = ownerEmail;
+            if(geminiInp) geminiInp.value = geminiApiKey;
 
             if(isSuperAdmin) {
                 document.getElementById('adminPassPrompt').style.display = 'none';
@@ -1610,6 +1645,13 @@
             showToast('E-Mail-Adresse erfolgreich gespeichert!');
         }
 
+        function saveGeminiKey() {
+            const key = document.getElementById('geminiApiKeyInput').value.trim();
+            triggerVibe();
+            geminiApiKey = key;
+            showToast('Gemini API-Key erfolgreich gespeichert!');
+        }
+
         function send30DaysEmailNow() {
             const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
             const now = Date.now();
@@ -1642,10 +1684,8 @@
                 bodyText += `• Bereich: ${l.bereich} | Gelöscht von: ${l.deletedBy} am ${l.date}\n`;
             });
 
-            // E-Mail öffnen
             window.location.href = `mailto:${ownerEmail}?subject=📜 Protokoll gelöschter Retouren&body=${encodeURIComponent(bodyText)}`;
 
-            // Sauber per Batch aus Firebase löschen
             let batch = cloudDb.batch();
             retoureLogs.forEach(l => {
                 let docRef = cloudDb.collection("retoure_logs").doc(String(l.id));
@@ -1704,6 +1744,8 @@
             document.getElementById('toolInventurArea').style.display = 'none';
             document.getElementById('toolMonthlyArea').style.display = 'none';
             document.getElementById('toolCapacityArea').style.display = 'none';
+            document.getElementById('toolAiChatArea').style.display = 'none';
+            document.getElementById('toolAiCapacityArea').style.display = 'none';
         }
 
         function showPlaygroundTool(tool) {
@@ -1718,7 +1760,137 @@
             } else if(tool === 'capacity') {
                 document.getElementById('toolCapacityArea').style.display = 'block';
                 renderCapacityOverview();
+            } else if(tool === 'ai_chat') {
+                document.getElementById('toolAiChatArea').style.display = 'block';
+            } else if(tool === 'ai_capacity') {
+                document.getElementById('toolAiCapacityArea').style.display = 'block';
             }
+        }
+
+        // ================= GEMINI KI FUNKTIONEN =================
+        async function callGeminiVision(base64Image, promptText) {
+            if(!geminiApiKey) {
+                alert('Kein API-Key hinterlegt!');
+                return null;
+            }
+            const cleanBase64 = base64Image.split(',')[1] || base64Image;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        { inline_data: { mime_type: "image/jpeg", data: cleanBase64 } }
+                    ]
+                }]
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if(data.candidates && data.candidates[0].content) {
+                    return data.candidates[0].content.parts[0].text;
+                }
+                return null;
+            } catch(e) {
+                console.error("Gemini API Fehler:", e);
+                return null;
+            }
+        }
+
+        async function callGeminiText(promptText) {
+            if(!geminiApiKey) {
+                return "Kein API-Key hinterlegt.";
+            }
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+            const payload = { contents: [{ parts: [{ text: promptText }] }] };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if(data.candidates && data.candidates[0].content) {
+                    return data.candidates[0].content.parts[0].text;
+                }
+                return "Keine Antwort erhalten.";
+            } catch(e) {
+                console.error("Gemini API Fehler:", e);
+                return "Fehler bei der KI-Anfrage.";
+            }
+        }
+
+        async function scanATNumberWithGemini(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const inputField = document.getElementById('atNummer');
+            inputField.placeholder = "KI liest AT-Nummer aus...";
+            showToast('✨ KI analysiert das Foto...');
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const base64 = evt.target.result;
+                const prompt = "Lese auf diesem Bild die AT-Nummer (eine 4- bis 8-stellige Nummer, oft nach 'AT' oder auf einem Aufkleber) heraus. Antworte AUSSCHLIESSLICH mit den Ziffern der Nummer, ohne Text, ohne 'AT'. Wenn keine Nummer da ist, antworte mit 'FEHLER'.";
+                
+                const result = await callGeminiVision(base64, prompt);
+                if(result) {
+                    const cleanNum = result.replace(/[^0-9]/g, '');
+                    if(cleanNum.length >= 4 && cleanNum.length <= 8) {
+                        inputField.value = cleanNum;
+                        playSuccessSound();
+                        triggerVibe();
+                        showToast(`✅ AT-Nummer ${cleanNum} per KI erkannt!`);
+                    } else {
+                        showToast('⚠️ Keine eindeutige AT-Nummer gefunden. Bitte manuell eingeben.');
+                    }
+                } else {
+                    showToast('❌ Fehler bei der KI-Anfrage.');
+                }
+                inputField.placeholder = "z. B. 998877";
+                e.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function sendAiChatMessage() {
+            const input = document.getElementById('aiChatInput');
+            const box = document.getElementById('aiChatBox');
+            const text = input.value.trim();
+            if(!text) return;
+
+            box.innerHTML += `<div style="margin-bottom:6px; text-align:right;"><b>Du:</b> ${text}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            const inventorySummary = JSON.stringify(db.map(x => ({ at: x.atNummer, bereich: x.bereich, status: x.status, note: x.hinweis, user: x.user, datum: x.datum })));
+            const prompt = `Du bist der hilfreiche KI-Assistent 'Ratten-KI' für eine Lager-App. Hier ist der aktuelle Lagerbestand als JSON: ${inventorySummary}. Beantworte folgende Frage des Lagermitarbeiters kurz, präzise und freundlich auf Deutsch: "${text}"`;
+
+            const aiReply = await callGeminiText(prompt);
+            box.innerHTML += `<div style="color:var(--primary); margin-bottom:6px;"><b>Ratten-KI:</b> ${aiReply}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function runAiCapacityAnalysis() {
+            const resDiv = document.getElementById('aiCapacityResult');
+            resDiv.style.display = 'block';
+            resDiv.textContent = '🤖 KI analysiert die Lagerbereiche...';
+
+            const summary = allAreas.map(area => {
+                const count = db.filter(x => x.bereich === area && x.status !== 'Erledigt' && x.status !== 'Abgeholt').length;
+                return `Bereich ${area}: ${count} aktive Artikel`;
+            }).join(', ');
+
+            const prompt = `Du bist ein erfahrener Logistik-Experte. Hier ist die aktuelle Anzahl an Artikeln pro Lagerbereich: [${summary}]. Gib eine professionelle, knackige Einschätzung und Empfehlung auf Deutsch ab, welche Bereiche aktuell besonders voll sind und wo ggf. Engpässe drohen.`;
+
+            const analysis = await callGeminiText(prompt);
+            resDiv.textContent = analysis;
         }
 
         function renderInventurAreaButtons() {
@@ -2039,72 +2211,6 @@
                 saveUserToCloud(user);
                 showToast(`Rolle von ${user.name} geändert.`);
             }
-        }
-
-        function scanATNumberFromPhoto(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-
-            const inputField = document.getElementById('atNummer');
-            inputField.placeholder = "Optimiere Bild & lese aus...";
-            showToast('📷 Bild wird verarbeitet...');
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 800;
-                    let w = img.width, h = img.height;
-                    if(w > maxDim || h > maxDim) {
-                        if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
-                    }
-                    canvas.width = w; 
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    
-                    ctx.drawImage(img, 0, 0, w, h);
-                    
-                    const imgData = ctx.getImageData(0, 0, w, h);
-                    const data = imgData.data;
-                    for (let i = 0; i < data.length; i += 4) {
-                        let avg = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
-                        let thresh = avg < 140 ? 0 : 255; 
-                        data[i] = thresh;
-                        data[i + 1] = thresh;
-                        data[i + 2] = thresh;
-                    }
-                    ctx.putImageData(imgData, 0, 0);
-                    const processedImageUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-                    Tesseract.recognize(
-                        processedImageUrl,
-                        'eng',
-                        { 
-                            logger: m => console.log(m),
-                            tessedit_char_whitelist: '0123456789'
-                        }
-                    ).then(({ data: { text } }) => {
-                        const matches = text.match(/\b\d{4,8}\b/);
-                        if(matches) {
-                            inputField.value = matches[0];
-                            playSuccessSound();
-                            triggerVibe();
-                            showToast(`✅ AT-Nummer ${matches[0]} erkannt!`);
-                        } else {
-                            showToast('⚠️ Keine klare Nummer erkannt. Bitte manuell eingeben.');
-                        }
-                    }).catch(err => {
-                        showToast('❌ Fehler bei der Texterkennung.');
-                    }).finally(() => {
-                        inputField.placeholder = "z. B. 998877";
-                        e.target.value = '';
-                    });
-                };
-                img.src = evt.target.result;
-            };
-            reader.readAsDataURL(file);
         }
 
         function startDictation() {
