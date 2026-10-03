@@ -2086,11 +2086,11 @@
 
         const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
-            { id: 2, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'admin', isOwner: false, isLocked: false, devices: [] },
-            { id: 3, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 4, name: 'Manni Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 5, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 6, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'azubi', isOwner: false, isLocked: false, devices: [] }
+            { id: 2, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 3, name: 'Manni Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 4, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 5, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'azubi', isOwner: false, isLocked: false, devices: [] },
+            { id: 6, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'admin', isOwner: false, isLocked: false, devices: [] }
         ];
 
         let users = [...defaultUsers];
@@ -2203,24 +2203,46 @@
                 let cloudUsers = [];
                 snapshot.forEach(doc => {
                     const u = doc.data();
-                    // Korrektur: PIN 21204 ist Tommy Böckenhauer (ID 5)
-                    if(u.pin === '21204' || u.id === 5) {
-                        if(u.name !== 'Tommy Böckenhauer' || u.pin !== '21204') {
-                            u.name = 'Tommy Böckenhauer';
-                            u.pin = '21204';
-                            cloudDb.collection("users").doc(String(u.id)).update({ name: 'Tommy Böckenhauer', pin: '21204' });
+                    const def = defaultUsers.find(d => d.id === u.id);
+                    if(def) {
+                        let needsUpdate = false;
+                        let updateObj = {};
+                        if(u.name !== def.name) {
+                            u.name = def.name;
+                            updateObj.name = def.name;
+                            needsUpdate = true;
                         }
-                    }
-                    // Manni Huppert ist PIN 21203 (ID 4)
-                    if(u.id === 4 || (u.name && (u.name.includes('Manny') || u.name.includes('Hoppert') || u.name === 'Manni Huppert'))) {
-                        if(u.name !== 'Manni Huppert' || u.pin !== '21203') {
-                            u.name = 'Manni Huppert';
-                            u.pin = '21203';
-                            cloudDb.collection("users").doc(String(u.id)).update({ name: 'Manni Huppert', pin: '21203' });
+                        if(u.pin !== def.pin) {
+                            u.pin = def.pin;
+                            updateObj.pin = def.pin;
+                            needsUpdate = true;
+                        }
+                        if(def.role && (def.role === 'azubi' || def.id === 1 || def.id === 6) && u.role !== def.role) {
+                            u.role = def.role;
+                            updateObj.role = def.role;
+                            needsUpdate = true;
+                        }
+                        if(def.isOwner !== undefined && u.isOwner !== def.isOwner) {
+                            u.isOwner = def.isOwner;
+                            updateObj.isOwner = def.isOwner;
+                            needsUpdate = true;
+                        }
+                        if(needsUpdate) {
+                            cloudDb.collection("users").doc(String(u.id)).update(updateObj);
                         }
                     }
                     cloudUsers.push(u);
                 });
+                
+                // Falls ein User in der Cloud fehlt, anlegen
+                defaultUsers.forEach(def => {
+                    if(!cloudUsers.some(cu => cu.id === def.id)) {
+                        cloudDb.collection("users").doc(String(def.id)).set(def);
+                        cloudUsers.push(def);
+                    }
+                });
+
+                cloudUsers.sort((a, b) => a.id - b.id);
                 users = cloudUsers;
                 
                 const savedId = localStorage.getItem('logged_user_id');
