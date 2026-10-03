@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lagerratten-App</title>
+    <meta name="description" content="Lagerverwaltung und Erfassung für Waren, Paletten und Retouren mit Barcode, Status und Bestandsübersicht.">
+    <meta property="og:title" content="Lagerratten-App">
+    <meta property="og:description" content="Lagerverwaltung und Erfassung für Waren, Paletten und Retouren mit Barcode, Status und Bestandsübersicht.">
     
     <!-- FIREBASE SDKs (Web / Cloud) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -56,32 +59,466 @@
             --primary: #3b82f6;
         }
 
+        /* EXKLUSIVES FORTNITE GALAXY SKIN THEME (Nur Haupt-Admin & Azubi-Lutscher) */
         [data-theme="galaxy"] {
-            --bg: #090514;
-            --surface: #130a2a;
-            --text: #e0e7ff;
-            --text-secondary: #a5b4fc;
-            --border: #3b1d82;
-            --primary: #d946ef;
-            --primary-dark: #c026d3;
-            background: radial-gradient(circle at top left, #2e1065, #090514 60%, #1e1b4b);
-            background-attachment: fixed;
+            --bg: #05010f;
+            --surface: rgba(18, 5, 38, 0.92);
+            --text: #fdf4ff;
+            --text-secondary: #c084fc;
+            --border: #7c3aed;
+            --primary: #c026d3;
+            --primary-dark: #9333ea;
+            background: radial-gradient(ellipse at top, #3b0764 0%, #1e1b4b 35%, #05010f 80%) fixed !important;
+            color: #fdf4ff;
         }
 
-        [data-theme="galaxy"] .card, [data-theme="galaxy"] header, [data-theme="galaxy"] .nav-bar {
-            background: rgba(19, 10, 42, 0.85);
-            backdrop-filter: blur(10px);
-            border: 2px solid #6366f1;
-            box-shadow: 0 0 15px rgba(217, 70, 239, 0.25);
+        [data-theme="galaxy"] body {
+            background: radial-gradient(ellipse at 50% 10%, #4a044e 0%, #1e1b4b 40%, #030008 85%) fixed !important;
+        }
+
+        [data-theme="galaxy"] .card, [data-theme="galaxy"] header, [data-theme="galaxy"] .nav-bar, [data-theme="galaxy"] .modal-content {
+            background: radial-gradient(circle at 50% 0%, rgba(59, 7, 100, 0.9), rgba(10, 2, 22, 0.96)) !important;
+            backdrop-filter: blur(12px);
+            border: 2px solid #c084fc !important;
+            box-shadow: 0 0 25px rgba(192, 132, 252, 0.4), inset 0 0 15px rgba(34, 211, 238, 0.25) !important;
         }
 
         [data-theme="galaxy"] .btn {
-            background: linear-gradient(135deg, #d946ef, #06b6d4);
-            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
-            color: #ffffff;
+            background: linear-gradient(135deg, #d946ef 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+            box-shadow: 0 0 16px rgba(217, 70, 239, 0.5) !important;
+            color: #ffffff !important;
+            border: 1px solid #f472b6 !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 6px rgba(0,0,0,0.6);
         }
 
-        /* SCHRIFTFARBEN AUSWAHL */
+        [data-theme="galaxy"] .badge {
+            background: linear-gradient(90deg, #9333ea, #06b6d4) !important;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        @keyframes galaxyPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.7), 0 0 40px rgba(6,182,212,0.4); transform: translateY(0px); }
+            50% { box-shadow: 0 0 30px rgba(236,72,153,0.9), 0 0 50px rgba(168,85,247,0.6); transform: translateY(-5px); }
+        }
+
+        .galaxy-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: linear-gradient(135deg, #2e0854, #05010f);
+            border: 2px solid #d946ef;
+            border-radius: 12px;
+            padding: 6px 12px;
+            animation: galaxyPulse 3s ease-in-out infinite;
+            cursor: pointer;
+            box-shadow: 0 0 18px rgba(217, 70, 239, 0.6);
+        }
+
+        [data-theme="galaxy"] .galaxy-easteregg-badge {
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* MYSTISCHES COZY SUNSET DESIGN (Exklusiv für Florian / Inhaber) */
+        [data-theme="cozy-sunset"] {
+            --bg: #090611;
+            --surface: #190e24;
+            --text: #fff7ed;
+            --text-secondary: #fed7aa;
+            --border: rgba(251, 146, 60, 0.35);
+            --primary: #f97316;
+            --primary-dark: #ea580c;
+            color: #fff7ed;
+        }
+
+        [data-theme="cozy-sunset"] body {
+            background: radial-gradient(ellipse at 50% 0%, #571529 0%, #2f1007 35%, #150b1d 75%, #090611 100%) !important;
+            color: #fff7ed;
+        }
+
+        [data-theme="cozy-sunset"] .card, 
+        [data-theme="cozy-sunset"] header, 
+        [data-theme="cozy-sunset"] .nav-bar, 
+        [data-theme="cozy-sunset"] .modal-content {
+            background: #190e24 !important;
+            border: 1px solid rgba(251, 146, 60, 0.32) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(249, 115, 22, 0.12) !important;
+        }
+
+        [data-theme="cozy-sunset"] .btn {
+            background: linear-gradient(135deg, #f97316 0%, #e11d48 50%, #9333ea 100%) !important;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(254, 215, 170, 0.4) !important;
+            font-weight: 600 !important;
+        }
+
+        [data-theme="cozy-sunset"] .btn-secondary {
+            background: #251438 !important;
+            border: 1px solid rgba(251, 146, 60, 0.3) !important;
+            color: #fed7aa !important;
+        }
+
+        [data-theme="cozy-sunset"] .badge {
+            background: linear-gradient(90deg, #f97316, #e11d48) !important;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+            color: #ffffff !important;
+        }
+
+        [data-theme="cozy-sunset"] input, 
+        [data-theme="cozy-sunset"] select, 
+        [data-theme="cozy-sunset"] textarea {
+            background: #12091c !important;
+            border-color: rgba(251, 146, 60, 0.28) !important;
+            color: #fff7ed !important;
+        }
+
+        .sunset-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: linear-gradient(135deg, #431407, #1e112a);
+            border: 1.5px solid #f97316;
+            border-radius: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(249, 115, 22, 0.5);
+            color: #fed7aa;
+            font-size: 0.78rem;
+            font-weight: bold;
+            transform: translateZ(0);
+        }
+
+        [data-theme="cozy-sunset"] .sunset-easteregg-badge {
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* MIDNIGHT OBSIDIAN (Edel & Minimalistisch) - Exklusiv für Inhaber */
+        [data-theme="midnight-obsidian"] {
+            --bg: #090b0d;
+            --surface: #111417;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #23282f;
+            --primary: #e2e8f0;
+            --primary-dark: #cbd5e1;
+            color: #f8fafc;
+        }
+        [data-theme="midnight-obsidian"] body {
+            background: #090b0d linear-gradient(180deg, #111418 0%, #07090a 100%) !important;
+            color: #f8fafc;
+        }
+        [data-theme="midnight-obsidian"] .card,
+        [data-theme="midnight-obsidian"] header,
+        [data-theme="midnight-obsidian"] .nav-bar,
+        [data-theme="midnight-obsidian"] .modal-content {
+            background: #111417 !important;
+            border: 1px solid #282e37 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+        }
+        [data-theme="midnight-obsidian"] .btn {
+            background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%) !important;
+            color: #090b0d !important;
+            border: 1px solid #ffffff !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.12) !important;
+        }
+        [data-theme="midnight-obsidian"] .btn-secondary {
+            background: #1a1f26 !important;
+            border: 1px solid #333c48 !important;
+            color: #e2e8f0 !important;
+        }
+        [data-theme="midnight-obsidian"] .badge {
+            background: #23282f !important;
+            color: #f1f5f9 !important;
+            border: 1px solid #3f4756;
+        }
+        [data-theme="midnight-obsidian"] input,
+        [data-theme="midnight-obsidian"] select,
+        [data-theme="midnight-obsidian"] textarea {
+            background: #090b0d !important;
+            border-color: #282e37 !important;
+            color: #f8fafc !important;
+        }
+
+        /* MATRIX CODE (Terminal-Stil - FÜR JEDEN FREIGESCHALTET) */
+        [data-theme="matrix-code"] {
+            --bg: #000000;
+            --surface: #040d06;
+            --text: #4ade80;
+            --text-secondary: #22c55e;
+            --border: #15803d;
+            --primary: #22c55e;
+            --primary-dark: #16a34a;
+            color: #4ade80;
+        }
+        [data-theme="matrix-code"] body {
+            background: #010602 !important;
+            color: #4ade80;
+        }
+        [data-theme="matrix-code"] .card,
+        [data-theme="matrix-code"] header,
+        [data-theme="matrix-code"] .nav-bar,
+        [data-theme="matrix-code"] .modal-content {
+            background: #040d06 !important;
+            border: 1px solid #22c55e !important;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2) !important;
+            border-radius: 4px !important;
+        }
+        [data-theme="matrix-code"] .btn {
+            background: #021a08 !important;
+            border: 1px solid #22c55e !important;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.3) !important;
+            color: #4ade80 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px;
+            border-radius: 4px !important;
+        }
+        [data-theme="matrix-code"] .btn:hover {
+            background: #22c55e !important;
+            color: #000000 !important;
+        }
+        [data-theme="matrix-code"] .badge {
+            background: #04240d !important;
+            border: 1px solid #22c55e !important;
+            color: #4ade80 !important;
+        }
+        [data-theme="matrix-code"] input,
+        [data-theme="matrix-code"] select,
+        [data-theme="matrix-code"] textarea {
+            background: #010803 !important;
+            border: 1px solid #22c55e !important;
+            color: #4ade80 !important;
+            border-radius: 4px !important;
+        }
+        .matrix-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: #010b04;
+            border: 1.5px solid #22c55e;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.5);
+            color: #4ade80;
+            font-weight: 900;
+            font-size: 0.75rem;
+            transform: translateZ(0);
+        }
+        [data-theme="matrix-code"] .matrix-easteregg-badge { display: flex !important; align-items: center; gap: 6px; }
+
+        /* SOLAR FLARE (Wüstensonne) - Exklusiv für Inhaber */
+        [data-theme="solar-flare"] {
+            --bg: #110a04;
+            --surface: #201308;
+            --text: #fef3c7;
+            --text-secondary: #fde047;
+            --border: #d97706;
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            color: #fef3c7;
+        }
+        [data-theme="solar-flare"] body {
+            background: radial-gradient(ellipse at 50% 0%, #5e2a0b 0%, #351503 40%, #150a04 80%, #0c0502 100%) !important;
+            color: #fef3c7;
+        }
+        [data-theme="solar-flare"] .card,
+        [data-theme="solar-flare"] header,
+        [data-theme="solar-flare"] .nav-bar,
+        [data-theme="solar-flare"] .modal-content {
+            background: #201308 !important;
+            border: 1px solid rgba(245, 158, 11, 0.35) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(217, 119, 6, 0.15) !important;
+        }
+        [data-theme="solar-flare"] .btn {
+            background: linear-gradient(135deg, #ea580c 0%, #d97706 50%, #facc15 100%) !important;
+            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4) !important;
+            color: #0c0502 !important;
+            font-weight: 800 !important;
+            border: 1px solid #fde047 !important;
+        }
+        [data-theme="solar-flare"] .btn-secondary {
+            background: #2b190c !important;
+            border: 1px solid #d97706 !important;
+            color: #fde047 !important;
+        }
+        [data-theme="solar-flare"] .badge {
+            background: linear-gradient(90deg, #ea580c, #f59e0b) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+        }
+        [data-theme="solar-flare"] input,
+        [data-theme="solar-flare"] select,
+        [data-theme="solar-flare"] textarea {
+            background: #170c05 !important;
+            border-color: #d97706 !important;
+            color: #fef3c7 !important;
+        }
+        .solar-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: linear-gradient(135deg, #451a03, #1c0b02);
+            border: 1.5px solid #f59e0b;
+            border-radius: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+            color: #fde047;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transform: translateZ(0);
+        }
+        [data-theme="solar-flare"] .solar-easteregg-badge { display: flex !important; align-items: center; gap: 6px; }
+
+        /* ARCTIC FROST (Eisblau) - Exklusiv für Inhaber */
+        [data-theme="arctic-frost"] {
+            --bg: #030a14;
+            --surface: #07172c;
+            --text: #f0f9ff;
+            --text-secondary: #7dd3fc;
+            --border: #0284c7;
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
+            color: #f0f9ff;
+        }
+        [data-theme="arctic-frost"] body {
+            background: radial-gradient(circle at 50% 0%, #035380 0%, #062440 35%, #030f20 70%, #02060d 100%) !important;
+            color: #f0f9ff;
+        }
+        [data-theme="arctic-frost"] .card,
+        [data-theme="arctic-frost"] header,
+        [data-theme="arctic-frost"] .nav-bar,
+        [data-theme="arctic-frost"] .modal-content {
+            background: #07172c !important;
+            border: 1px solid #38bdf8 !important;
+            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25) !important;
+        }
+        [data-theme="arctic-frost"] .btn {
+            background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #e0f2fe 100%) !important;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35) !important;
+            color: #031326 !important;
+            font-weight: 800 !important;
+            border: 1px solid #bae6fd !important;
+        }
+        [data-theme="arctic-frost"] .btn-secondary {
+            background: #0c2544 !important;
+            border: 1px solid #38bdf8 !important;
+            color: #7dd3fc !important;
+        }
+        [data-theme="arctic-frost"] .badge {
+            background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+            color: #021020 !important;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+        }
+        [data-theme="arctic-frost"] input,
+        [data-theme="arctic-frost"] select,
+        [data-theme="arctic-frost"] textarea {
+            background: #04101e !important;
+            border-color: #38bdf8 !important;
+            color: #f0f9ff !important;
+        }
+        .arctic-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: linear-gradient(135deg, #072a4a, #030f20);
+            border: 1.5px solid #38bdf8;
+            border-radius: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+            color: #e0f2fe;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transform: translateZ(0);
+        }
+        [data-theme="arctic-frost"] .arctic-easteregg-badge { display: flex !important; align-items: center; gap: 6px; }
+
+        /* VOLCANIC MAGMA (Dunkel & Aggressiv) - Exklusiv für Inhaber */
+        [data-theme="volcanic-magma"] {
+            --bg: #090202;
+            --surface: #180606;
+            --text: #fff1f2;
+            --text-secondary: #fb923c;
+            --border: #ef4444;
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            color: #fff1f2;
+        }
+        [data-theme="volcanic-magma"] body {
+            background: radial-gradient(ellipse at 50% 100%, #631717 0%, #380808 35%, #180404 70%, #070101 100%) !important;
+            color: #fff1f2;
+        }
+        [data-theme="volcanic-magma"] .card,
+        [data-theme="volcanic-magma"] header,
+        [data-theme="volcanic-magma"] .nav-bar,
+        [data-theme="volcanic-magma"] .modal-content {
+            background: #180606 !important;
+            border: 1px solid #ef4444 !important;
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.3) !important;
+        }
+        [data-theme="volcanic-magma"] .btn {
+            background: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #facc15 100%) !important;
+            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.45) !important;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            border: 1px solid #fca5a5 !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+        [data-theme="volcanic-magma"] .btn-secondary {
+            background: #2a0b0b !important;
+            border: 1px solid #ef4444 !important;
+            color: #fb923c !important;
+        }
+        [data-theme="volcanic-magma"] .badge {
+            background: linear-gradient(90deg, #dc2626, #ea580c) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+        }
+        [data-theme="volcanic-magma"] input,
+        [data-theme="volcanic-magma"] select,
+        [data-theme="volcanic-magma"] textarea {
+            background: #120303 !important;
+            border-color: #ef4444 !important;
+            color: #fff1f2 !important;
+        }
+        .magma-easteregg-badge {
+            display: none;
+            position: fixed;
+            bottom: 74px;
+            right: 14px;
+            z-index: 999;
+            background: linear-gradient(135deg, #450a0a, #1a0303);
+            border: 1.5px solid #ef4444;
+            border-radius: 12px;
+            padding: 6px 12px;
+            cursor: pointer;
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
+            color: #fca5a5;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transform: translateZ(0);
+        }
+        [data-theme="volcanic-magma"] .magma-easteregg-badge { display: flex !important; align-items: center; gap: 6px; }
+
+        /* SCHRIFTFARBEN AUSWAHL (Globale Übersteuerung) */
         [data-textcolor="lightblue"] {
             --text: #38bdf8 !important;
             --text-secondary: #7dd3fc !important;
@@ -90,6 +527,18 @@
             --text: #facc15 !important;
             --text-secondary: #fde047 !important;
         }
+        [data-textcolor="pink"] {
+            --text: #ff2d87 !important;
+            --text-secondary: #ff70a6 !important;
+        }
+        [data-textcolor="violet"] {
+            --text: #c084fc !important;
+            --text-secondary: #e9d5ff !important;
+        }
+        [data-textcolor="red"] {
+            --text: #ff453a !important;
+            --text-secondary: #ff8577 !important;
+        }
         [data-textcolor="matrixgreen"] {
             --text: #22c55e !important;
             --text-secondary: #4ade80 !important;
@@ -97,6 +546,43 @@
         [data-textcolor="signalorange"] {
             --text: #f97316 !important;
             --text-secondary: #fb923c !important;
+        }
+
+        /* Wenn nicht Automatisch, übersteuert die gewählte Schriftfarbe alle Text-Elemente und Themes */
+        html:not([data-textcolor="auto"]) body,
+        html:not([data-textcolor="auto"]) .card,
+        html:not([data-textcolor="auto"]) .item-card,
+        html:not([data-textcolor="auto"]) label,
+        html:not([data-textcolor="auto"]) p,
+        html:not([data-textcolor="auto"]) h1,
+        html:not([data-textcolor="auto"]) h2,
+        html:not([data-textcolor="auto"]) h3,
+        html:not([data-textcolor="auto"]) h4,
+        html:not([data-textcolor="auto"]) input,
+        html:not([data-textcolor="auto"]) select,
+        html:not([data-textcolor="auto"]) textarea {
+            color: var(--text) !important;
+        }
+
+        /* SCHRIFTARTEN (Font-Family) */
+        [data-fontfamily="default"] {
+            --app-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        [data-fontfamily="tech"] {
+            --app-font: ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", "Courier New", monospace;
+        }
+        [data-fontfamily="rounded"] {
+            --app-font: "Nunito", "Quicksand", "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+        [data-fontfamily="serif"] {
+            --app-font: "Georgia", "Cambria", "Times New Roman", Times, serif;
+        }
+        [data-fontfamily="compact"] {
+            --app-font: "Impact", "Arial Narrow", "Trebuchet MS", sans-serif;
+        }
+
+        body, button, input, select, textarea, .card, h1, h2, h3, h4, p, span, label {
+            font-family: var(--app-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
         }
 
         [data-contrastbooster="true"] {
@@ -473,8 +959,8 @@
 
         .item-card.is-abgeholt {
             border: 2px solid var(--success) !important;
-            background: rgba(22, 163, 74, 0.12) !important;
-            opacity: 0.5 !important;
+            background: rgba(22, 163, 74, 0.16) !important;
+            opacity: 0.88 !important;
         }
 
         .badge {
@@ -499,6 +985,21 @@
         .badge-done { background: #e2e8f0; color: #334155; }
         .badge-retoure { background: #fef08a; color: #854d0e; border: 1px solid #eab308; }
         .badge-abgeholt { background: #16a34a; color: #ffffff; border: 1px solid #15803d; }
+
+        .chip-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.72rem;
+            padding: 3px 7px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.15s;
+        }
+        .chip-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
 
         .badge-30d {
             background: #ffedd5;
@@ -760,14 +1261,14 @@
                     </div>
 
                     <div class="form-group" id="atGroupWrapper">
-                        <label for="atNummer">AT-Nummer (Nur Zahlen eingeben)</label>
+                        <label for="atNummer">AT-Nummer</label>
                         <div class="at-input-container">
                             <div class="at-input-wrapper">
                                 <span class="at-prefix">AT-</span>
-                                <input type="number" id="atNummer" pattern="[0-9]*" inputmode="numeric" placeholder="z. B. 998877" required oninput="filterNumbersOnly(this)">
+                                <input type="text" id="atNummer" pattern="[0-9]*" inputmode="numeric" maxlength="10" placeholder="Nummer eingeben..." required oninput="filterNumbersOnly(this)">
                             </div>
                             <input type="file" id="ocrInput" accept="image/*" capture="environment" style="display:none;" onchange="scanATNumberWithGemini(event)">
-                            <button type="button" class="scan-ocr-btn" onclick="document.getElementById('ocrInput').click()" title="KI AT-Aufkleber per Kamera scannen">✨📷</button>
+                            <button type="button" class="scan-ocr-btn" onclick="document.getElementById('ocrInput').click()" title="AT-Aufkleber per Kamera scannen">📷</button>
                         </div>
                     </div>
 
@@ -833,7 +1334,8 @@
         <!-- TAB 2: AT-PRÜFUNG -->
         <div id="tab-at" class="tab-content">
             <div class="form-group">
-                <input type="text" id="atSearchInput" placeholder="AT-Nummer (z. B. 9988 eingeben)" oninput="checkAT()">
+                <label style="font-weight:bold; margin-bottom:4px; display:block;">AT-Nummer</label>
+                <input type="text" id="atSearchInput" placeholder="AT-Nummer" oninput="checkAT()">
             </div>
             <div id="atResult" class="at-list-container">
                 <p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">
@@ -923,7 +1425,13 @@
                         <option value="light">☀️ Helles Design</option>
                         <option value="dark" selected>🌙 Dunkles Design</option>
                         <option value="oled">🖤 OLED Tiefschwarz</option>
-                        <option value="galaxy">🌌 Galaxy Design</option>
+                        <option value="matrix-code" id="optThemeMatrix">📟 Matrix Code (Terminal 🟢)</option>
+                        <option value="galaxy" id="optThemeGalaxy" style="display:none;">🌌 Galaxy Design (Exklusiv-Lutscher 🍭)</option>
+                        <option value="cozy-sunset" id="optThemeSunset" style="display:none;">🌅 Cozy Sunset (Inhaber Exklusiv 🕯️)</option>
+                        <option value="midnight-obsidian" id="optThemeObsidian" style="display:none;">💎 Midnight Obsidian (Inhaber Exklusiv 🖤)</option>
+                        <option value="solar-flare" id="optThemeSolar" style="display:none;">☀️ Solar Flare (Inhaber Exklusiv 🏜️)</option>
+                        <option value="arctic-frost" id="optThemeArctic" style="display:none;">❄️ Arctic Frost (Inhaber Exklusiv 🧊)</option>
+                        <option value="volcanic-magma" id="optThemeMagma" style="display:none;">🌋 Volcanic Magma (Inhaber Exklusiv 🔥)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -932,8 +1440,21 @@
                         <option value="auto" selected>✨ Automatisch</option>
                         <option value="lightblue">🩵 Hellblau</option>
                         <option value="yellow">💛 Gelb</option>
+                        <option value="pink">💖 Pink</option>
+                        <option value="violet">💜 Violett</option>
+                        <option value="red">🔴 Rot</option>
                         <option value="matrixgreen">🟢 Matrix-Grün</option>
                         <option value="signalorange">🟠 Signal-Orange</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftart</label>
+                    <select id="fontFamilySelect" onchange="changeFontFamily(this.value)">
+                        <option value="default" selected>Standard</option>
+                        <option value="tech">Monospace</option>
+                        <option value="rounded">Soft Sans</option>
+                        <option value="serif">Serif</option>
+                        <option value="compact">Kompakt</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -946,7 +1467,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Fettschrift (Hoher Kontrast)</label>
+                    <label>Fettschrift</label>
                     <select id="boosterSelect" onchange="toggleContrastBooster(this.value)">
                         <option value="false" selected>Aus</option>
                         <option value="true">An</option>
@@ -1015,6 +1536,14 @@
                 </div>
 
                 <div id="roleManagementArea" style="display: none; margin-top: 15px;">
+                    <div style="background:rgba(37,99,235,0.08); border:1.5px dashed var(--primary); padding:10px 12px; border-radius:8px; margin-bottom:15px; font-size:0.85rem;">
+                        <strong style="color:var(--primary); display:block; margin-bottom:4px;">📌 Merkzettel / Geplante Features:</strong>
+                        <ul style="margin:0; padding-left:18px; line-height:1.45;">
+                            <li>QR-Codes Generator & Barcode-Scanner kommen später als eigenständiger Extra-Tab in die Hauptleiste (genau wie Retoure & Bestand). Aktuell bei Spielereien & Tools verfügbar.</li>
+                            <li style="margin-top:4px;"><strong>🌲 Forest Mist (Wald & Natur):</strong> Beruhigendes Design in Tannengrün- und Holz-Optik für das Baustoff- und Holzregallager (für später gemerkt).</li>
+                        </ul>
+                    </div>
+
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
                         <label style="font-weight:bold;">🔑 Admin-Kennwort ändern</label>
                         <div style="display:flex; gap:8px; margin-top:6px;">
@@ -1026,7 +1555,7 @@
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
                         <label style="font-weight:bold;">✨ Google Gemini API-Key für KI-Funktionen</label>
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Dein API-Schlüssel für die smarte AT-Erkennung & KI-Auslastung:</p>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Server-seitig aktiv (Standard). Optional eigener Gemini API-Schlüssel:</p>
                         <div style="display:flex; gap:8px; margin-top:6px;">
                             <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." style="min-height:42px;">
                             <button type="button" class="btn btn-sm" onclick="saveGeminiKey()" style="width:auto;">Speichern</button>
@@ -1156,18 +1685,250 @@
         </div>
     </div>
 
-    <!-- MODAL 2: FÜR RETOURE-ABHOLUNG BESTÄTIGEN -->
+    <!-- MODAL 2: FÜR RETOURE-ABHOLUNG & LIEFERSCHEIN -->
     <div id="pickupDocModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 550px;">
             <button class="close-btn" onclick="closePickupDocModal()">&times;</button>
-            <h2>📦 Retoure abholen</h2>
-            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">
-                Möchtest du diese Retoure endgültig als abgeholt bestätigen?
+            <h2 style="margin-bottom:4px;">📦 Retouren-Abholung & Lieferschein</h2>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;" id="pickupItemHeadline">
+                Lieferschein aufnehmen, KI-Analyse durchführen und vom Fahrer quittieren lassen.
             </p>
 
-            <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
-                <button class="btn btn-success" onclick="confirmRetourePickup()">📦 Als abgeholt bestätigen</button>
+            <!-- Schritt 1: Foto vom Lieferschein -->
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px;">
+                <label style="font-weight:bold; color:var(--text); display:flex; justify-content:space-between; align-items:center;">
+                    <span>1. 📷 Foto vom Lieferschein / Frachtbrief</span>
+                    <span id="lieferscheinOcrStatus" style="font-size:0.75rem; color:var(--primary); font-weight:bold;"></span>
+                </label>
+                <input type="file" id="lieferscheinFileInput" accept="image/*" capture="environment" style="display:none;" onchange="handleLieferscheinPhoto(event)">
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button type="button" class="btn btn-secondary btn-sm" style="flex:1;" onclick="document.getElementById('lieferscheinFileInput').click()">
+                        📷 Lieferschein fotografieren / wählen
+                    </button>
+                </div>
+                <div id="lieferscheinPreviewContainer" style="display:none; margin-top:10px; text-align:center;">
+                    <img id="lieferscheinThumb" src="" style="width:100%; max-height:170px; object-fit:contain; border-radius:6px; background:#000; border:1px solid var(--border);">
+                    <small style="color:var(--text-secondary); display:block; margin-top:4px;">✨ Foto wird im Artikel archiviert.</small>
+                </div>
             </div>
+
+            <!-- Schritt 2: Extrahierte Lieferschein-Daten -->
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px;">
+                <label style="font-weight:bold; color:var(--text); margin-bottom:8px; display:block;">
+                    2. 📋 Stichdaten des Lieferscheins (KI-Extrahiert & editierbar)
+                </label>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div class="form-group" style="margin-bottom:6px;">
+                        <label style="font-size:0.75rem;">Lieferschein-Nr. / Frachtbrief</label>
+                        <input type="text" id="lsNummer" placeholder="z. B. LS-884920" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:6px;">
+                        <label style="font-size:0.75rem;">Spedition / Abholer</label>
+                        <input type="text" id="lsSpedition" placeholder="z. B. Dachser / Schenker" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div class="form-group" style="margin-bottom:6px;">
+                        <label style="font-size:0.75rem;">KFZ-Kennzeichen</label>
+                        <input type="text" id="lsKfz" placeholder="z. B. HRO-AB 123" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:6px;">
+                        <label style="font-size:0.75rem;">Paletten (Ladungsträger)</label>
+                        <input type="text" id="lsPaletten" list="palletTypesList" placeholder="z. B. 2 Europaletten, 1 KS-Palette" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                    </div>
+                </div>
+
+                <datalist id="palletTypesList">
+                    <option value="1 Europalette">
+                    <option value="2 Europaletten">
+                    <option value="1 KS-Palette (Kalksandstein)">
+                    <option value="2 KS-Paletten (Kalksandstein)">
+                    <option value="1 Porenbetonpalette">
+                    <option value="1 Gipskartonpalette">
+                    <option value="1 Ziegelpalette">
+                    <option value="1 Pflasterpalette (Berding)">
+                    <option value="2 Pflasterpaletten (Berding)">
+                    <option value="1 Einwegpalette">
+                    <option value="1 Gitterbox">
+                    <option value="1 Permazellpalette">
+                </datalist>
+
+                <!-- Schnell-Auswahl für Palettenarten -->
+                <div style="margin-bottom:8px;">
+                    <small style="font-size:0.7rem; color:var(--text-secondary); display:block; margin-bottom:3px;">⚡ Schnellklick Palettenart:</small>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Europaletten')">+ Euro</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('KS-Paletten')">+ KS</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Porenbetonpaletten')">+ Porenbeton</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Gipskartonpaletten')">+ Gipskarton</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Ziegelpaletten')">+ Ziegel</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Pflasterpaletten (Berding)')">+ Pflaster/Berding</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Einwegpaletten')">+ Einweg</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Gitterboxen')">+ Gitterbox</button>
+                        <button type="button" class="chip-btn" onclick="addPalletTag('Permazellpaletten')">+ Permazell</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:6px;">
+                    <label style="font-size:0.75rem;">Warenbezeichnung (Reine Ware / Material)</label>
+                    <input type="text" id="lsWare" placeholder="z. B. Blockstufen, Klinker, Dämmung, Rohre (keine Paletten)" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:0.75rem;">Vermerke / Mängel</label>
+                    <input type="text" id="lsVermerk" placeholder="z. B. Verpackung beschädigt, vollständig" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                </div>
+            </div>
+
+            <!-- Schritt 3: Fahrer-Unterschrift -->
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px;">
+                <label style="font-weight:bold; color:var(--text); margin-bottom:4px; display:block;">
+                    3. ✍️ Fahrer- / Lieferanten-Unterschrift
+                </label>
+                <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:8px;">
+                    Der Fahrer quittiert die Übernahme der Ware im Querformat auf dem Display.
+                </p>
+                <div id="signaturePreviewArea" style="display:none; margin-bottom:8px; background:#fff; padding:6px; border-radius:6px; text-align:center; border:1px solid var(--border);">
+                    <img id="signatureThumb" style="max-height:75px; max-width:100%; display:inline-block;" alt="Unterschrift">
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openSignatureModal()" style="width:100%;">
+                    ✍️ Lieferant unterschreiben lassen (Querformat)
+                </button>
+            </div>
+
+            <!-- Schritt 4: PDF & Abschluss -->
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button type="button" class="btn btn-secondary" onclick="generateRetourenLieferscheinPDF()">
+                    📄 Lieferschein als PDF speichern / drucken
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmRetourePickup()">
+                    ✅ Endgültig als abgeholt bestätigen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNATURE MODAL (QUERFORMAT / LANDSCAPE PAD) -->
+    <div id="signatureModal" class="modal" style="background:rgba(0,0,0,0.92); z-index:1100;">
+        <div class="modal-content" style="max-width: 680px; width:95%; padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h3 style="font-size:1.15rem; margin:0;">✍️ Lieferanten-Unterschrift</h3>
+                <span style="font-size:0.8rem; color:#facc15; font-weight:bold;">📱 Smartphone bitte querhalten</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:8px;">
+                Hiermit bestätigt der Abholer/Fahrer die ordnungsgemäße Warenübernahme von team baucenter Stäbelow.
+            </p>
+
+            <div style="border:2px dashed #94a3b8; border-radius:8px; background:#ffffff; overflow:hidden; position:relative; touch-action:none;">
+                <canvas id="signatureCanvas" style="display:block; width:100%; height:220px; cursor:crosshair;"></canvas>
+                <div style="position:absolute; bottom:6px; right:10px; font-size:0.75rem; color:#64748b; pointer-events:none;">
+                    Unterschrift ____________________
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearSignatureCanvas()" style="flex:1;">
+                    🗑️ Löschen
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeSignatureModal()" style="flex:1;">
+                    ❌ Abbrechen
+                </button>
+                <button type="button" class="btn btn-success btn-sm" onclick="saveSignatureAndClose()" style="flex:2;">
+                    ✅ OK / Speichern
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIEFERSCHEIN FOTO ANSICHT MODAL -->
+    <div id="lieferscheinViewModal" class="modal" style="z-index:1050;">
+        <div class="modal-content" style="max-width: 500px; text-align:center;">
+            <button class="close-btn" onclick="document.getElementById('lieferscheinViewModal').style.display='none'">&times;</button>
+            <h3 style="margin-bottom:8px;">📷 Gespeicherter Lieferschein</h3>
+            <div style="margin:12px 0;">
+                <img id="lieferscheinFullViewImg" src="" style="width:100%; max-height:450px; object-fit:contain; border-radius:8px; background:#000; border:1px solid var(--border);">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('lieferscheinViewModal').style.display='none'">Schließen</button>
+        </div>
+    </div>
+
+    <!-- MODAL: BARCODE & QR-CODE GENERATOR -->
+    <div id="labelGenModal" class="modal" style="z-index:1060;">
+        <div class="modal-content" style="max-width: 480px;">
+            <button class="close-btn" onclick="document.getElementById('labelGenModal').style.display='none'">&times;</button>
+            <h3 style="margin-bottom:6px;">🖨 Paletten-Etiketten Generator</h3>
+            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                Druckfähige Etiketten mit QR-Code für Paletten und Lagerplätze generieren.
+            </p>
+
+            <div class="form-group" style="margin-bottom:8px;">
+                <label style="font-size:0.75rem;">Aus Bestand wählen (oder manuell eingeben)</label>
+                <select id="labelGenItemSelect" onchange="onLabelItemSelectChange(this.value)" style="min-height:38px; padding:0.4rem; font-size:0.85rem;">
+                    <option value="">-- Manueller Eintrag --</option>
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:8px;">
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem;">AT-Nummer / Bezeichnung</label>
+                    <input type="text" id="labelGenAT" placeholder="z. B. AT-1234567890" oninput="renderLabelPreview()" style="min-height:38px; padding:0.4rem;">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem;">Lagerbereich</label>
+                    <input type="text" id="labelGenBereich" placeholder="z. B. TB" oninput="renderLabelPreview()" style="min-height:38px; padding:0.4rem;">
+                </div>
+            </div>
+
+            <!-- Etiketten-Vorschau -->
+            <div id="palletLabelPreviewBox" style="background:#fff; color:#000; border:2px solid #000; border-radius:8px; padding:12px; margin:10px 0; text-align:center;">
+                <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:4px; font-weight:900; font-size:12px;">
+                    <span>team baucenter Stäbelow</span>
+                    <span id="labelPreviewBereich">TB</span>
+                </div>
+                <div id="labelPreviewAT" style="font-size:24px; font-weight:900; letter-spacing:1px; margin:10px 0 6px;">
+                    AT-1234567890
+                </div>
+                <div id="labelPreviewQrContainer" style="display:flex; justify-content:center; margin:8px 0;">
+                    <img id="labelPreviewQrImg" src="" style="width:130px; height:130px;" alt="QR-Code">
+                </div>
+                <div style="font-size:10px; color:#555; border-top:1px solid #ccc; padding-top:4px;">
+                    team baucenter • Mühlenweg 14, 18198 Stäbelow
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('labelGenModal').style.display='none'" style="flex:1;">Schließen</button>
+                <button type="button" class="btn btn-primary" onclick="printPalletLabel()" style="flex:2;">🖨 Etikett drucken</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: KAMERA BARCODE & QR SCANNER -->
+    <div id="barcodeScanModal" class="modal" style="z-index:1060;">
+        <div class="modal-content" style="max-width: 440px; text-align:center;">
+            <button class="close-btn" onclick="document.getElementById('barcodeScanModal').style.display='none'">&times;</button>
+            <h3 style="margin-bottom:6px;">📷 Barcode- & QR-Scanner</h3>
+            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+                Fotografiere das Paletten-Etikett oder den Barcode/QR-Code, um den Artikel sofort im Lager aufzurufen.
+            </p>
+
+            <input type="file" id="barcodeScanFileInput" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodeScanPhoto(event)">
+            
+            <div style="margin:16px 0;">
+                <div onclick="document.getElementById('barcodeScanFileInput').click()" style="border:2px dashed var(--primary); border-radius:12px; padding:24px 16px; cursor:pointer; background:var(--bg);">
+                    <div style="font-size:2.5rem; margin-bottom:8px;">📷</div>
+                    <strong style="color:var(--primary); display:block;">Etikett / Barcode fotografieren</strong>
+                    <small style="color:var(--text-secondary);">Kamera öffnet sich sofort</small>
+                </div>
+            </div>
+
+            <div id="barcodeScanResultArea" style="display:none; margin:10px 0; padding:10px; border-radius:8px; background:var(--bg); border:1px solid var(--border);">
+                <div id="barcodeScanStatusText" style="font-size:0.85rem; font-weight:bold;"></div>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('barcodeScanModal').style.display='none'" style="width:100%;">Abbrechen</button>
         </div>
     </div>
 
@@ -1193,9 +1954,19 @@
 
                 <div id="modalDoneInfoArea" style="display:none; margin: 8px 0; font-size: 0.85rem; color: var(--success); font-weight:bold;"></div>
                 
+                <div id="modalKiErkennungBox" style="display:none; margin-top:8px; background:rgba(37,99,235,0.08); border:1px solid var(--primary); padding:8px 10px; border-radius:8px; font-size:0.85rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:var(--primary);">✨ KI-Material- & Platzanalyse:</strong>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="reAnalyzeSelectedItemPhoto()" style="font-size:0.75rem; padding:2px 8px; min-height:26px; width:auto;">Neu analysieren</button>
+                    </div>
+                    <div id="modalKiErkennungText" style="margin-top:4px; color:var(--text);"></div>
+                </div>
+
                 <p style="margin-top:8px;"><strong>Anmerkungen:</strong></p>
                 <p id="modalHinweis" style="color: var(--text-secondary); background: var(--bg); padding: 8px; border-radius: 8px; margin-top: 4px; border: 1px solid var(--border); font-size:0.9rem;"></p>
                 
+                <div id="modalRelocationInfo" style="display:none; margin-top:8px; font-size:0.75rem; color:var(--text-secondary); background:var(--bg); border:1px dashed var(--border); padding:6px 10px; border-radius:6px;"></div>
+
                 <div id="quickRelocateContainer" style="margin-top:10px; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
                     <label style="font-size:0.8rem; font-weight:bold;">📍 Lagerort ändern (Umlagern):</label>
                     <div style="display:flex; gap:6px; margin-top:4px;">
@@ -1230,10 +2001,10 @@
                 <h3>Eintrag bearbeiten</h3>
                 <br>
                 <div class="form-group" id="editATGroupWrapper">
-                    <label>AT-Nummer (Nur Zahlen)</label>
+                    <label>AT-Nummer (10 Ziffern 0-9)</label>
                     <div class="at-input-wrapper">
                         <span class="at-prefix">AT-</span>
-                        <input type="number" id="editATNummer" pattern="[0-9]*" inputmode="numeric" oninput="filterNumbersOnly(this)">
+                        <input type="text" id="editATNummer" pattern="[0-9]*" inputmode="numeric" maxlength="10" placeholder="10 Ziffern" oninput="filterNumbersOnly(this)">
                     </div>
                 </div>
                 <div class="form-group">
@@ -1311,13 +2082,13 @@
 
         let adminMasterCode = localStorage.getItem('waren_admin_code') || '9999';
         let ownerEmail = localStorage.getItem('owner_email') || 'flori.msi03@gmail.com';
-        let geminiApiKey = "AQ.Ab8RN6Ij70_SvNSSfGW8dcycF9IR6WOAavG4a6bSPRnOvRq5BQ";
+        let geminiApiKey = localStorage.getItem('gemini_api_key') || "";
 
         const defaultUsers = [
             { id: 1, name: 'Florian Nienberg', pin: '21201', password: 'Admin2026!', tempPass: null, role: 'admin', isOwner: true, isLocked: false, devices: [] },
             { id: 2, name: 'Benny Vetter', pin: '21206', password: null, tempPass: null, role: 'admin', isOwner: false, isLocked: false, devices: [] },
             { id: 3, name: 'Jan Zocher', pin: '21202', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
-            { id: 4, name: 'Manny Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
+            { id: 4, name: 'Manni Huppert', pin: '21203', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
             { id: 5, name: 'Tommy Böckenhauer', pin: '21204', password: null, tempPass: null, role: 'lagerist', isOwner: false, isLocked: false, devices: [] },
             { id: 6, name: 'Lukas Dumke', pin: '21205', password: null, tempPass: null, role: 'azubi', isOwner: false, isLocked: false, devices: [] }
         ];
@@ -1349,7 +2120,7 @@
         }
 
         function filterNumbersOnly(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
+            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 10);
         }
 
         function getStatusBadgeClass(status) {
@@ -1382,6 +2153,7 @@
         function loadSavedAppSettings() {
             const savedTheme = localStorage.getItem('app_theme') || 'dark';
             const savedColor = localStorage.getItem('app_textcolor') || 'auto';
+            const savedFontFamily = localStorage.getItem('app_fontfamily') || 'default';
             const savedFontSize = localStorage.getItem('app_fontsize') || 'normal';
             const savedBooster = localStorage.getItem('app_contrastbooster') || 'false';
             const savedVibe = localStorage.getItem('app_vibration');
@@ -1392,11 +2164,13 @@
 
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.documentElement.setAttribute('data-textcolor', savedColor);
+            document.documentElement.setAttribute('data-fontfamily', savedFontFamily);
             document.documentElement.setAttribute('data-fontsize', savedFontSize);
             document.documentElement.setAttribute('data-contrastbooster', savedBooster);
 
             const themeSel = document.getElementById('themeSelect');
             const colorSel = document.getElementById('textColorSelect');
+            const fontFamilySel = document.getElementById('fontFamilySelect');
             const fontSel = document.getElementById('fontSelect');
             const boosterSel = document.getElementById('boosterSelect');
             const vibeSel = document.getElementById('vibeSelect');
@@ -1406,6 +2180,7 @@
 
             if(themeSel) themeSel.value = savedTheme;
             if(colorSel) colorSel.value = savedColor;
+            if(fontFamilySel) fontFamilySel.value = savedFontFamily;
             if(fontSel) fontSel.value = savedFontSize;
             if(boosterSel) boosterSel.value = savedBooster;
             if(vibeSel) vibeSel.value = enableVibration ? 'true' : 'false';
@@ -1426,8 +2201,16 @@
                 defaultUsers.forEach(u => cloudDb.collection("users").doc(String(u.id)).set(u));
             } else {
                 let cloudUsers = [];
-                snapshot.forEach(doc => cloudUsers.push(doc.data()));
+                snapshot.forEach(doc => {
+                    const u = doc.data();
+                    if(u.name && (u.name.includes('Manny') || u.name.includes('Hoppert') || u.id === 4)) {
+                        u.name = 'Manni Huppert';
+                        cloudDb.collection("users").doc(String(u.id)).update({ name: 'Manni Huppert' });
+                    }
+                    cloudUsers.push(u);
+                });
                 users = cloudUsers;
+                updateThemeSelectVisibility();
                 
                 if(isSuperAdmin) {
                     renderUserRoleList();
@@ -1649,6 +2432,7 @@
             const key = document.getElementById('geminiApiKeyInput').value.trim();
             triggerVibe();
             geminiApiKey = key;
+            localStorage.setItem('gemini_api_key', geminiApiKey);
             showToast('Gemini API-Key erfolgreich gespeichert!');
         }
 
@@ -1708,23 +2492,144 @@
 
         function openQrGeneratorModal() {
             triggerVibe();
-            alert('🖨 Barcode / QR-Code Generator geöffnet:\nHier werden druckfähige Etiketten für Paletten generiert.');
+            const select = document.getElementById('labelGenItemSelect');
+            select.innerHTML = '<option value="">-- Manueller Eintrag --</option>' + 
+                db.filter(x => x.atNummer).map(x => `<option value="${x.id}">${x.atNummer} (${x.bereich})</option>`).join('');
+
+            const atInput = document.getElementById('labelGenAT');
+            const berInput = document.getElementById('labelGenBereich');
+            if(!atInput.value) atInput.value = 'AT-1234567890';
+            if(!berInput.value) berInput.value = 'TB';
+
+            renderLabelPreview();
+            document.getElementById('labelGenModal').style.display = 'block';
+        }
+
+        function onLabelItemSelectChange(val) {
+            if(!val) return;
+            const item = db.find(x => x.id == val);
+            if(!item) return;
+            document.getElementById('labelGenAT').value = item.atNummer || 'Retoure';
+            document.getElementById('labelGenBereich').value = item.bereich || 'TB';
+            renderLabelPreview();
+        }
+
+        function renderLabelPreview() {
+            const at = document.getElementById('labelGenAT').value.trim() || 'AT-1234567890';
+            const ber = document.getElementById('labelGenBereich').value.trim() || 'TB';
+            document.getElementById('labelPreviewAT').textContent = at;
+            document.getElementById('labelPreviewBereich').textContent = ber;
+            document.getElementById('labelPreviewQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(at)}`;
+        }
+
+        function printPalletLabel() {
+            triggerVibe();
+            const at = document.getElementById('labelGenAT').value.trim() || 'AT-1234567890';
+            const ber = document.getElementById('labelGenBereich').value.trim() || 'TB';
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(at)}`;
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Paletten-Etikett_${at}</title>
+<style>
+@page { size: 100mm 150mm; margin: 5mm; }
+body { font-family: -apple-system, sans-serif; text-align: center; margin: 0; padding: 10px; }
+.label-border { border: 4px solid #000; padding: 15px; border-radius: 8px; }
+.header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 6px; font-weight: 900; font-size: 14px; }
+.at-title { font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 15px 0 10px; }
+.qr-img { width: 180px; height: 180px; margin: 10px auto; display: block; }
+.footer { font-size: 11px; color: #444; border-top: 1px solid #000; padding-top: 6px; margin-top: 10px; }
+@media print { body { padding: 0; } }
+</style>
+</head>
+<body>
+<div class="label-border">
+  <div class="header">
+    <span>team baucenter Stäbelow</span>
+    <span style="font-size:18px;">${ber}</span>
+  </div>
+  <div class="at-title">${at}</div>
+  <img src="${qrUrl}" class="qr-img" alt="QR-Code">
+  <div class="footer">team baucenter Stäbelow • Mühlenweg 14, 18198 Stäbelow</div>
+</div>
+</body>
+</html>`;
+            openPrintWindow(html);
         }
 
         function openCameraScannerModal() {
             triggerVibe();
-            alert('📷 Kamera-Barcode-Scanner gestartet:\nRichte die Kamera auf das Paletten-Label.');
+            document.getElementById('barcodeScanResultArea').style.display = 'none';
+            document.getElementById('barcodeScanModal').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('barcodeScanFileInput').click();
+            }, 180);
+        }
+
+        async function handleBarcodeScanPhoto(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const resArea = document.getElementById('barcodeScanResultArea');
+            const statusText = document.getElementById('barcodeScanStatusText');
+            resArea.style.display = 'block';
+            statusText.textContent = '⚡ Scanne Barcode / QR-Code / AT-Nummer...';
+            showToast('⚡ Analysiere Barcode...');
+
+            try {
+                const compressedBase64 = await compressImageForOCR(file, 960);
+                const prompt = "Lese von diesem Palettenetikett oder Barcode/QR-Code die AT-Auftragsnummer oder den Barcode-Inhalt aus. Antworte AUSSCHLIESSLICH mit der Zahlenfolge oder AT-Nummer. Wenn nichts lesbar ist, antworte mit FEHLER.";
+                const result = await callGeminiVision(compressedBase64, prompt);
+
+                if(result && result.trim() !== 'FEHLER') {
+                    const clean = result.replace(/[^0-9]/g, '');
+                    let foundItem = null;
+                    if(clean) {
+                        foundItem = db.find(x => x.atNummer && x.atNummer.includes(clean));
+                    }
+
+                    if(foundItem) {
+                        playSuccessSound();
+                        triggerVibe();
+                        statusText.innerHTML = `✅ Gefunden: <b>${foundItem.atNummer}</b> (${foundItem.bereich})<br><button class="btn btn-sm btn-primary" onclick="document.getElementById('barcodeScanModal').style.display='none'; openModal(${foundItem.id}, 'bestand');" style="margin-top:6px;">Artikel öffnen</button>`;
+                        showToast(`✅ Gefunden: ${foundItem.atNummer}`);
+                    } else if(clean) {
+                        playSuccessSound();
+                        statusText.innerHTML = `Nummer erkannt: <b>AT-${clean}</b> (Nicht im aktuellen Bestand).<br><button class="btn btn-sm btn-secondary" onclick="document.getElementById('barcodeScanModal').style.display='none'; switchTab('erfassen', 'Erfassung', document.querySelectorAll('.nav-item')[0]); document.getElementById('atNummer').value='${clean}';" style="margin-top:6px;">Als Neu erfassen</button>`;
+                    } else {
+                        statusText.textContent = '⚠️ Kein eindeutiger Barcode / AT-Nummer erkannt.';
+                    }
+                } else {
+                    statusText.textContent = '⚠️ Kein Barcode erkannt. Bitte nochmal versuchen.';
+                }
+            } catch(err) {
+                console.error("Barcode scan error:", err);
+                statusText.textContent = '❌ Fehler beim Scannen.';
+            } finally {
+                e.target.value = '';
+            }
         }
 
         function executeQuickRelocate() {
             if(!selectedItem) return;
             const newArea = document.getElementById('quickRelocateSelect').value;
+            if(selectedItem.bereich === newArea) {
+                showToast(`Ware steht bereits in ${newArea}.`);
+                return;
+            }
             triggerVibe();
 
+            const oldArea = selectedItem.bereich;
             selectedItem.bereich = newArea;
+            selectedItem.relocatedBy = currentUser ? currentUser.name : 'Mitarbeiter';
+            selectedItem.relocatedDate = new Date().toLocaleString('de-DE');
+            selectedItem.relocatedFrom = oldArea;
+
             cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
                 playSuccessSound();
-                showToast(`📍 Ware erfolgreich nach ${newArea} umgelagert!`);
+                showToast(`📍 Ware erfolgreich von ${oldArea} nach ${newArea} umgelagert!`);
                 closeModal();
             });
         }
@@ -1767,63 +2672,125 @@
             }
         }
 
-        // ================= GEMINI KI FUNKTIONEN =================
-        async function callGeminiVision(base64Image, promptText) {
-            if(!geminiApiKey) {
-                alert('Kein API-Key hinterlegt!');
-                return null;
-            }
-            const cleanBase64 = base64Image.split(',')[1] || base64Image;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
-            
-            const payload = {
-                contents: [{
-                    parts: [
-                        { text: promptText },
-                        { inline_data: { mime_type: "image/jpeg", data: cleanBase64 } }
-                    ]
-                }]
-            };
+        // ================= GEMINI KI FUNKTIONEN (Server-Proxy + Direkter GitHub-Fallback) =================
+        const DEFAULT_GEMINI_API_KEY = ""; // Optional: Trage hier bei Bedarf einen API-Key ein, falls index.html rein statisch auf GitHub gehostet wird
 
+        function getActiveApiKey() {
+            return (geminiApiKey && geminiApiKey.trim()) || DEFAULT_GEMINI_API_KEY || '';
+        }
+
+        async function callGeminiDirectRest(parts) {
+            const apiKey = getActiveApiKey();
+            if (!apiKey) return null;
+            const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+            for (const model of models) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts }] })
+                    });
+                    const data = await res.json();
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                        return data.candidates[0].content.parts.map(p => p.text).join('');
+                    }
+                } catch (e) {
+                    console.warn(`Direct model ${model} error:`, e);
+                }
+            }
+            return null;
+        }
+
+        async function callGeminiVision(base64Image, promptText) {
+            const cleanBase64 = base64Image.split(',')[1] || base64Image;
+
+            // 1. Zuerst Server-Proxy versuchen
             try {
-                const response = await fetch(url, {
+                const response = await fetch('/api/gemini/vision', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        imageBase64: cleanBase64,
+                        prompt: promptText,
+                        mimeType: 'image/jpeg',
+                        customApiKey: getActiveApiKey() || undefined
+                    })
                 });
-                const data = await response.json();
-                if(data.candidates && data.candidates[0].content) {
-                    return data.candidates[0].content.parts[0].text;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!data.error && data.text) return data.text;
                 }
-                return null;
             } catch(e) {
-                console.error("Gemini API Fehler:", e);
-                return null;
+                // Bei statischem Hosting (z. B. GitHub Pages) schlägt /api fehl -> direkter Fallback
             }
+
+            // 2. Direkter Fallback (z. B. auf GitHub Pages oder lokal ohne Server)
+            return await callGeminiDirectRest([
+                { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } },
+                { text: promptText }
+            ]);
         }
 
         async function callGeminiText(promptText) {
-            if(!geminiApiKey) {
-                return "Kein API-Key hinterlegt.";
-            }
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
-            const payload = { contents: [{ parts: [{ text: promptText }] }] };
-
+            // 1. Zuerst Server-Proxy versuchen
             try {
-                const response = await fetch(url, {
+                const response = await fetch('/api/gemini/text', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        prompt: promptText,
+                        customApiKey: getActiveApiKey() || undefined
+                    })
                 });
-                const data = await response.json();
-                if(data.candidates && data.candidates[0].content) {
-                    return data.candidates[0].content.parts[0].text;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!data.error && data.text) return data.text;
                 }
-                return "Keine Antwort erhalten.";
             } catch(e) {
-                console.error("Gemini API Fehler:", e);
-                return "Fehler bei der KI-Anfrage.";
+                // Bei statischem Hosting (z. B. GitHub Pages) schlägt /api fehl -> direkter Fallback
             }
+
+            // 2. Direkter Fallback
+            const directText = await callGeminiDirectRest([{ text: promptText }]);
+            if (directText) return directText;
+
+            if (!getActiveApiKey()) {
+                return "💡 Hinweis für GitHub-Hosting: Bitte trage deinen Gemini API-Key in den Inhaber-Einstellungen ein, damit die KI auch ohne eigenen Node-Server antworten kann.";
+            }
+            return "Fehler bei der KI-Anfrage.";
+        }
+
+        function compressImageForOCR(file, maxDimension = 960) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDimension || h > maxDimension) {
+                            if (w > h) {
+                                h = Math.round((h * maxDimension) / w);
+                                w = maxDimension;
+                            } else {
+                                w = Math.round((w * maxDimension) / h);
+                                h = maxDimension;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    img.onerror = () => resolve(e.target.result);
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
 
         async function scanATNumberWithGemini(e) {
@@ -1831,32 +2798,114 @@
             if(!file) return;
 
             const inputField = document.getElementById('atNummer');
-            inputField.placeholder = "KI liest AT-Nummer aus...";
-            showToast('✨ KI analysiert das Foto...');
+            inputField.placeholder = "⚡ Blitz-Scan: Lese 10 Ziffern...";
+            showToast('⚡ Bild optimiert, KI scannt AT-Nummer...');
 
-            const reader = new FileReader();
-            reader.onload = async function(evt) {
-                const base64 = evt.target.result;
-                const prompt = "Lese auf diesem Bild die AT-Nummer (eine 4- bis 8-stellige Nummer, oft nach 'AT' oder auf einem Aufkleber) heraus. Antworte AUSSCHLIESSLICH mit den Ziffern der Nummer, ohne Text, ohne 'AT'. Wenn keine Nummer da ist, antworte mit 'FEHLER'.";
+            try {
+                // Client-seitige Komprimierung: 100x schnellerer Upload
+                const base64 = await compressImageForOCR(file, 960);
+                const prompt = "Finde auf diesem Bild die 10-stellige AT-Auftragsnummer (genau 10 Ziffern von 0 bis 9, meist nach 'AT' oder 'AT-' auf dem Label/Barcode). Antworte AUSSCHLIESSLICH mit den 10 Ziffern (z. B. 0123456789), ohne Leerzeichen, ohne Text, ohne 'AT'. Wenn keine 10-stellige Nummer vorhanden ist, antworte mit FEHLER.";
                 
                 const result = await callGeminiVision(base64, prompt);
                 if(result) {
-                    const cleanNum = result.replace(/[^0-9]/g, '');
-                    if(cleanNum.length >= 4 && cleanNum.length <= 8) {
-                        inputField.value = cleanNum;
+                    const clean = result.trim();
+                    const match10 = clean.match(/\b\d{10}\b/) || clean.replace(/\D/g, '').match(/\d{10}/);
+                    if(match10) {
+                        const num = match10[0];
+                        inputField.value = num;
                         playSuccessSound();
                         triggerVibe();
-                        showToast(`✅ AT-Nummer ${cleanNum} per KI erkannt!`);
+                        showToast(`⚡ AT-${num} (10 Ziffern) erkannt!`);
                     } else {
-                        showToast('⚠️ Keine eindeutige AT-Nummer gefunden. Bitte manuell eingeben.');
+                        const anyDigits = clean.replace(/\D/g, '');
+                        if(anyDigits.length === 10) {
+                            inputField.value = anyDigits;
+                            playSuccessSound();
+                            triggerVibe();
+                            showToast(`⚡ AT-${anyDigits} erkannt!`);
+                        } else if(anyDigits.length > 0) {
+                            inputField.value = anyDigits.slice(0, 10);
+                            showToast(`⚠️ Erkannte Ziffern (${anyDigits.length}): ${anyDigits}`);
+                        } else {
+                            showToast('⚠️ Keine 10-stellige AT-Nummer gefunden. Bitte manuell eingeben.');
+                        }
                     }
                 } else {
-                    showToast('❌ Fehler bei der KI-Anfrage.');
+                    showToast('❌ Keine Antwort von der Schnell-KI.');
                 }
-                inputField.placeholder = "z. B. 998877";
+            } catch(err) {
+                console.error("Scan-Fehler:", err);
+                showToast('❌ Scan-Fehler beim Verarbeiten.');
+            } finally {
+                inputField.placeholder = "10 Ziffern (z. B. 1234567890)";
                 e.target.value = '';
-            };
-            reader.readAsDataURL(file);
+            }
+        }
+
+        async function callGeminiChatWithPhotos(promptText, imagesArray) {
+            try {
+                const response = await fetch('/api/gemini/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: promptText,
+                        images: imagesArray,
+                        customApiKey: geminiApiKey || undefined
+                    })
+                });
+                const data = await response.json();
+                if(data.error) {
+                    console.error("Gemini Chat Fehler:", data.error);
+                    return "Fehler bei der KI-Anfrage: " + data.error;
+                }
+                return data.text || "Keine Antwort erhalten.";
+            } catch(e) {
+                console.error("Gemini Chat Netzwerkfehler:", e);
+                return "Netzwerkfehler bei der KI-Anfrage.";
+            }
+        }
+
+        async function analyzeItemPhotoWithAI(itemId, photoBase64) {
+            try {
+                const cleanBase64 = photoBase64.includes(',') ? photoBase64.split(',')[1] : photoBase64;
+                const prompt = "Analysiere dieses Foto aus dem Baustoff- und Baulager. Erkenne die genaue Ware / das Material (z. B. Granitblockstufen, Pflasterklinker, Bordsteine, Rohre, Dämmung, Fliesen, Holz etc.) sowie den Ladungsträger und geschätzten Platzbedarf (z. B. 'auf Europalette, ca. 1.2 x 0.8 m / ca. 1 m² Stellplatz'). Antworte in genau 1 prägnanten Satz auf Deutsch:";
+                
+                const result = await callGeminiVision(cleanBase64, prompt);
+                if(result && result.trim() && result.trim() !== 'FEHLER') {
+                    const detectedText = result.trim();
+                    const item = db.find(x => x.id === itemId);
+                    if(item) {
+                        item.kiErkennung = detectedText;
+                    }
+                    cloudDb.collection("bestand").doc(String(itemId)).update({ kiErkennung: detectedText });
+                    console.log(`[KI-Vision] Artikel ${itemId} analysiert:`, detectedText);
+                }
+            } catch(e) {
+                console.warn("Fehler bei automatischer Bildanalyse:", e);
+            }
+        }
+
+        function reAnalyzeSelectedItemPhoto() {
+            if(!selectedItem || !selectedItem.fotos || !selectedItem.fotos[0] || selectedItem.fotos[0].includes('placeholder')) {
+                showToast('Kein Foto vorhanden.');
+                return;
+            }
+            triggerVibe();
+            showToast('✨ KI analysiert Material & Platzbedarf...');
+            const textEl = document.getElementById('modalKiErkennungText');
+            if(textEl) textEl.textContent = '⏳ Analysiere Ware auf dem Foto...';
+
+            analyzeItemPhotoWithAI(selectedItem.id, selectedItem.fotos[0]).then(() => {
+                const refreshed = db.find(x => x.id === selectedItem.id);
+                if(refreshed && refreshed.kiErkennung) {
+                    selectedItem.kiErkennung = refreshed.kiErkennung;
+                    if(textEl) textEl.textContent = refreshed.kiErkennung;
+                    playSuccessSound();
+                    showToast('✅ Erkannt: ' + refreshed.kiErkennung);
+                } else {
+                    if(textEl) textEl.textContent = 'Keine eindeutige Ware erkannt.';
+                }
+            });
         }
 
         async function sendAiChatMessage() {
@@ -1869,10 +2918,77 @@
             input.value = '';
             box.scrollTop = box.scrollHeight;
 
-            const inventorySummary = JSON.stringify(db.map(x => ({ at: x.atNummer, bereich: x.bereich, status: x.status, note: x.hinweis, user: x.user, datum: x.datum })));
-            const prompt = `Du bist der hilfreiche KI-Assistent 'Ratten-KI' für eine Lager-App. Hier ist der aktuelle Lagerbestand als JSON: ${inventorySummary}. Beantworte folgende Frage des Lagermitarbeiters kurz, präzise und freundlich auf Deutsch: "${text}"`;
+            const loadingId = 'ratte_loading_' + Date.now();
+            box.innerHTML += `<div id="${loadingId}" style="color:var(--text-secondary); margin-bottom:6px;"><i>⏳ Ratte analysiert Daten & Bilder...</i></div>`;
+            box.scrollTop = box.scrollHeight;
 
-            const aiReply = await callGeminiText(prompt);
+            // Vollständige Bestandsdaten inklusive Anmerkungen und KI-Bildanalysen!
+            const activeItems = db.filter(x => x.status !== 'Erledigt' && x.status !== 'Abgeholt');
+            const inventoryLines = activeItems.map(x => {
+                const parts = [
+                    x.atNummer ? `AT: ${x.atNummer}` : 'Typ: Retoure',
+                    `Bereich: ${x.bereich}`,
+                    `Status: ${x.status}`,
+                    (x.hinweis && x.hinweis !== 'Keine Anmerkungen') ? `Anmerkung/Zustand: "${x.hinweis}"` : null,
+                    x.kiErkennung ? `KI-Bilderkennung: "${x.kiErkennung}"` : null,
+                    x.retoureGrund ? `Retourengrund: ${x.retoureGrund}` : null,
+                    x.retoureSpedition ? `Spedition: ${x.retoureSpedition}` : null,
+                    x.user ? `Erfasser: ${x.user}` : null,
+                    x.datum ? `Datum: ${x.datum}` : null
+                ].filter(Boolean);
+                return `• ${parts.join(' | ')}`;
+            }).join('\n');
+
+            // Prüfen, ob der Mitarbeiter nach Bildern fragt
+            const lowerText = text.toLowerCase();
+            const relevantPhotos = [];
+            const wantsVisualInspection = lowerText.includes('foto') || lowerText.includes('bild') || lowerText.includes('sehen') || lowerText.includes('schau');
+
+            if(wantsVisualInspection) {
+                activeItems.forEach(item => {
+                    if(!item.fotos || !item.fotos[0] || item.fotos[0].includes('placeholder')) return;
+                    
+                    let matches = false;
+                    if(item.atNummer && lowerText.includes(item.atNummer.toLowerCase().replace('at-', ''))) matches = true;
+                    if(item.hinweis && lowerText.split(' ').some(w => w.length > 3 && item.hinweis.toLowerCase().includes(w))) matches = true;
+                    if(item.kiErkennung && lowerText.split(' ').some(w => w.length > 3 && item.kiErkennung.toLowerCase().includes(w))) matches = true;
+
+                    if(matches && relevantPhotos.length < 2) {
+                        relevantPhotos.push({
+                            data: item.fotos[0],
+                            mimeType: 'image/jpeg',
+                            label: `${item.atNummer || 'Retoure'} (${item.bereich})`
+                        });
+                    }
+                });
+            }
+
+            const prompt = `Du bist die Lagerratten-KI ('Ratten-KI') für das Baustofflager von team baucenter Stäbelow.
+Du hast Einblick in alle aktiven Lagerartikel, deren genaue Notizen/Anmerkungen des Personals, der Lagerorte und der KI-Fotoanalysen.
+
+AKTUELLE ARTIKELLISTE IM LAGER:
+${inventoryLines || 'Aktuell keine aktiven Artikel im System.'}
+
+FRAGE DES MITARBEITERS: "${text}"
+
+STRIKTE ANTWORT-REGELN (EXTREM WICHTIG):
+1. FASS DICH EXTREM KURZ! Maximal 1-2 Zeilen. Kein Lehrbuch, keine Begrüßung ("Hallo..."), keine Floskeln!
+2. Wenn Artikel gefunden: Nenne direkt die AT (oder Retoure) und WO sie steht:
+   "📍 Gefunden: [AT-Nummer oder Retoure] in Bereich [Bereich] ([Ware/Anmerkung])"
+3. Wenn nichts Eindeutiges passt: Antworte NUR:
+   "❌ Kein passender Artikel im Lager gefunden."
+   KEINE erfundenen Vermutungen anstellen! (Wenn jemand nach 'beige massive Steine' fragt und es gibt nur graue Granitblockstufen oder ganz andere Ware, behaupte keinesfalls, dass es das Gleiche ist!)`;
+
+            let aiReply;
+            if(relevantPhotos.length > 0) {
+                aiReply = await callGeminiChatWithPhotos(prompt, relevantPhotos);
+            } else {
+                aiReply = await callGeminiText(prompt);
+            }
+
+            const loadEl = document.getElementById(loadingId);
+            if(loadEl) loadEl.remove();
+
             box.innerHTML += `<div style="color:var(--primary); margin-bottom:6px;"><b>Ratten-KI:</b> ${aiReply}</div>`;
             box.scrollTop = box.scrollHeight;
         }
@@ -2115,14 +3231,26 @@
                             </select>
                         `}
                     </div>
-                    ${!u.isOwner ? `
-                        <div class="user-controls">
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="generateTempPassword(${u.id})">🔑 Einmal-PW generieren</button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="adminLogoutUser(${u.id})">🚪 Live-Abmelden (${devCount})</button>
-                        </div>
-                    ` : ''}
+                    <div class="user-controls" style="margin-top:6px;">
+                        ${!u.isOwner ? `<button type="button" class="btn btn-sm btn-secondary" onclick="generateTempPassword(${u.id})">🔑 Einmal-PW generieren</button>` : ''}
+                        <button type="button" class="btn btn-sm btn-danger" onclick="adminLogoutUser(${u.id})" style="${u.isOwner ? 'width:100%;' : ''}">
+                            🚪 Live-Abmelden (${devCount})
+                        </button>
+                    </div>
                 </div>
             `}).join('');
+        }
+
+        function adminLogoutUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if(!user) return;
+            user.tempPass = null;
+            user.devices = [];
+            saveUserToCloud(user);
+            renderUserRoleList();
+            triggerVibe();
+            playSuccessSound();
+            showToast(`${user.name}: Alle Geräte wurden erfolgreich live abgemeldet!`);
         }
 
         function generateTempPassword(userId) {
@@ -2222,20 +3350,28 @@
             const recognition = new SpeechRecognition();
             recognition.lang = 'de-DE';
             recognition.interimResults = false;
+            recognition.maxAlternatives = 3;
 
             recognition.onstart = function() {
-                showToast('🎙 Höre zu... Sprechen.');
+                showToast('🎙 Höre zu... Jetzt sprechen.');
             };
 
             recognition.onresult = function(event) {
-                const text = event.results[0][0].transcript;
-                const field = document.getElementById('hinweis');
-                field.value = field.value ? field.value + ' ' + text : text;
+                let text = '';
+                if(event.results && event.results[0] && event.results[0][0]) {
+                    text = event.results[0][0].transcript.trim();
+                }
+                if(text) {
+                    text = text.charAt(0).toUpperCase() + text.slice(1);
+                    const field = document.getElementById('hinweis');
+                    field.value = field.value ? field.value + ' ' + text : text;
+                    showToast('✔ Erfasst: "' + text + '"');
+                }
                 triggerVibe();
             };
 
             recognition.onerror = function() {
-                showToast('Fehler bei der Spracherkennung.');
+                showToast('Spracherkennung abgebrochen oder nicht verstanden.');
             };
 
             recognition.start();
@@ -2266,18 +3402,77 @@
                 return;
             }
 
-            let printWin = window.open('', '_blank');
-            let html = `<html><head><title>30+ Tage Wareneingang</title><style>body{font-family:sans-serif;padding:20px;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#eee;}</style></head><body>`;
-            html += `<h2>📦 Artikelübersicht (30 Tage oder länger eingelagert)</h2><p>Erstellt am: ${new Date().toLocaleString('de-DE')}</p><table><tr><th>AT-Nummer</th><th>Bereich</th><th>Status</th><th>Eingelagert von</th><th>Datum</th></tr>`;
-            
+            triggerVibe();
+            const today = new Date().toLocaleDateString('de-DE');
+
+            // 1. Offizielles PDF generieren
+            let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>30_Tage_Plus_Lagerbestand_${today}</title>
+<style>
+@page { size: A4 portrait; margin: 15mm; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0f172a; margin: 0; padding: 20px; font-size: 13px; }
+.header { border-bottom: 3px solid #2563eb; padding-bottom: 10px; margin-bottom: 15px; display:flex; justify-content:space-between; align-items:flex-start; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+th { background: #f1f5f9; font-weight: bold; font-size: 12px; }
+.badge-old { color: #dc2626; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h2 style="margin:0; color:#1e3a8a;">team baucenter Stäbelow</h2>
+    <small style="color:#64748b;">Mühlenweg 14, 18198 Stäbelow</small>
+  </div>
+  <div style="text-align:right;">
+    <strong>Offizieller 30+ Tage Bestandsbericht</strong><br>
+    <small>Erstellt: ${new Date().toLocaleString('de-DE')}</small>
+  </div>
+</div>
+<p>Folgende <b>${oldItems.length} Artikel</b> lagern seit mindestens 30 Tagen im Lager:</p>
+<table>
+  <tr>
+    <th>AT-Nummer / Typ</th>
+    <th>Bereich</th>
+    <th>Status</th>
+    <th>Tage im Lager</th>
+    <th>Erfasser</th>
+    <th>Einlagerung</th>
+  </tr>`;
+
+            let emailBody = `Offizieller 30+ Tage Bestandsbericht - team baucenter Stäbelow\nDatum: ${new Date().toLocaleString('de-DE')}\n\nFolgende ${oldItems.length} Artikel lagern seit 30+ Tagen:\n\n`;
+
             oldItems.forEach(item => {
-                html += `<tr><td><b>${item.atNummer || 'Retoure'}</b></td><td>${item.bereich}</td><td>${item.status}</td><td>${item.user}</td><td>${item.datum}</td></tr>`;
+                const days = Math.floor((now - item.timestamp) / (1000 * 60 * 60 * 24));
+                html += `<tr>
+                  <td><b>${item.atNummer || 'Retoure'}</b></td>
+                  <td>${item.bereich}</td>
+                  <td>${item.status}</td>
+                  <td class="badge-old">${days} Tage</td>
+                  <td>${item.user}</td>
+                  <td>${item.datum}</td>
+                </tr>`;
+
+                emailBody += `• ${item.atNummer || 'Retoure'} | Ort: ${item.bereich} | ${days} Tage | Status: ${item.status} | Erfasst von: ${item.user} (${item.datum})\n`;
             });
 
-            html += `</table></body></html>`;
-            printWin.document.write(html);
-            printWin.document.close();
-            printWin.print();
+            html += `</table><div style="margin-top:20px; font-size:11px; color:#64748b; text-align:center;">team baucenter Stäbelow • Interner Bericht</div></body></html>`;
+
+            emailBody += `\n(Der druckbare PDF-Bericht wurde im Browser geöffnet).\n\nStandort Stäbelow`;
+
+            // PDF-Druckansicht öffnen
+            openPrintWindow(html);
+
+            // In einem Schwung E-Mail öffnen
+            const recipient = ownerEmail || 'flori.msi03@gmail.com';
+            setTimeout(() => {
+                window.location.href = `mailto:${recipient}?subject=⚠ 30+ Tage Lagerbestand Bericht (${oldItems.length} Artikel)&body=${encodeURIComponent(emailBody)}`;
+            }, 500);
+            
+            showToast('📄 PDF geöffnet & E-Mail wird vorbereitet!');
         }
 
         function exportBestandPDF() {
@@ -2373,6 +3568,13 @@
             
             if(tabId === 'bestand') renderBestand();
             if(tabId === 'retoure') renderRetouren();
+            if(tabId === 'settings') updateThemeSelectVisibility();
+            if(tabId === 'at') {
+                const searchInput = document.getElementById('atSearchInput');
+                searchInput.value = '';
+                document.getElementById('atResult').innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 20px;">Gib eine AT-Nummer ein, um den Bestand zu prüfen.</p>';
+                setTimeout(() => searchInput.focus(), 60);
+            }
         }
 
         document.getElementById('entryForm').addEventListener('submit', function(e) {
@@ -2425,6 +3627,12 @@
             cloudDb.collection("bestand").doc(String(now)).set(newEntry).then(() => {
                 playSuccessSound();
                 showToast('✅ Ware/Retoure erfolgreich gespeichert!');
+                
+                // Automatische Hintergrund-KI-Analyse des Materials und Platzbedarfs
+                if(newEntry.fotos && newEntry.fotos[0] && !newEntry.fotos[0].includes('placeholder')) {
+                    analyzeItemPhotoWithAI(newEntry.id, newEntry.fotos[0]);
+                }
+
                 document.getElementById('entryForm').reset();
                 document.getElementById('previewGrid').innerHTML = '';
                 currentPhotos = [];
@@ -2564,6 +3772,20 @@
             document.getElementById('modalHinweis').textContent = selectedItem.hinweis;
             document.getElementById('quickRelocateSelect').value = selectedItem.bereich;
 
+            const kiBox = document.getElementById('modalKiErkennungBox');
+            const kiText = document.getElementById('modalKiErkennungText');
+            const isAdminOrOwner = currentUser && (currentUser.role === 'admin' || currentUser.isOwner || isSuperAdmin);
+
+            if(isAdminOrOwner && selectedItem.kiErkennung) {
+                kiBox.style.display = 'block';
+                kiText.textContent = selectedItem.kiErkennung;
+            } else if(isAdminOrOwner && selectedItem.fotos && selectedItem.fotos[0] && !selectedItem.fotos[0].includes('placeholder')) {
+                kiBox.style.display = 'block';
+                kiText.innerHTML = '<span style="color:var(--text-secondary);">Noch keine Bildanalyse vorhanden. </span><button type="button" class="btn btn-sm btn-secondary" onclick="reAnalyzeSelectedItemPhoto()" style="display:inline-block; width:auto; padding:2px 8px; font-size:0.75rem; margin-left:6px;">✨ Foto analysieren</button>';
+            } else {
+                kiBox.style.display = 'none';
+            }
+
             const retoureExtraDiv = document.getElementById('modalRetoureExtraInfo');
             if(selectedItem.status === 'Retoure' || selectedItem.status === 'Abgeholt') {
                 retoureExtraDiv.style.display = 'block';
@@ -2576,9 +3798,29 @@
             const doneInfoDiv = document.getElementById('modalDoneInfoArea');
             if((selectedItem.status === 'Erledigt' || selectedItem.status === 'Abgeholt') && selectedItem.doneBy) {
                 doneInfoDiv.style.display = 'block';
-                doneInfoDiv.innerHTML = `✔ ${selectedItem.status} von <b>${selectedItem.doneBy}</b> am ${selectedItem.doneDate || ''}`;
+                let extraHtml = `✔ Erledigt von <b>${selectedItem.doneBy}</b> am ${selectedItem.doneDate || ''}`;
+                
+                if(selectedItem.status === 'Abgeholt') {
+                    if(selectedItem.lieferscheinFoto) {
+                        extraHtml += `<br><button type="button" class="btn btn-sm btn-secondary" onclick="viewLieferscheinPhotoModal()" style="margin-top:6px; width:100%;">📷 Lieferschein-Foto ansehen</button>`;
+                    }
+                    if(selectedItem.signature) {
+                        extraHtml += `<div style="margin-top:8px; background:#fff; padding:6px; border-radius:6px; border:1px solid var(--border); text-align:center;"><small style="color:#475569; font-weight:bold; display:block;">✍️ Quittierte Fahrer-Unterschrift:</small><img src="${selectedItem.signature}" style="max-height:60px; max-width:100%; display:inline-block; margin-top:4px;"></div>`;
+                    }
+                    extraHtml += `<button type="button" class="btn btn-sm" style="background:#2563eb; width:100%; margin-top:8px;" onclick="printStoredRetourenLieferscheinPDF()">📄 Retouren-Lieferschein (PDF) drucken / anzeigen</button>`;
+                }
+
+                doneInfoDiv.innerHTML = extraHtml;
             } else {
                 doneInfoDiv.style.display = 'none';
+            }
+
+            const relocDiv = document.getElementById('modalRelocationInfo');
+            if(selectedItem.relocatedBy) {
+                relocDiv.style.display = 'block';
+                relocDiv.innerHTML = `📍 Umgelagert von <b>${selectedItem.relocatedFrom}</b> nach <b>${selectedItem.bereich}</b> durch <b>${selectedItem.relocatedBy}</b> (${selectedItem.relocatedDate})`;
+            } else {
+                relocDiv.style.display = 'none';
             }
 
             const gallery = document.getElementById('modalGallery');
@@ -2594,7 +3836,7 @@
             const isAdmin = currentUser && (currentUser.role === 'admin' || isSuperAdmin);
             const isDoneByMe = currentUser && (selectedItem.doneBy === currentUser.name);
 
-            if(origin === 'bestand' || origin === 'retoure') {
+            if((origin === 'bestand' || origin === 'retoure') && !isDone) {
                 relocateContainer.style.display = 'block';
             } else {
                 relocateContainer.style.display = 'none';
@@ -2608,7 +3850,7 @@
 
             if(!isDone) {
                 if(selectedItem.status === 'Retoure') {
-                    toggleDoneBtnArea.innerHTML = `<button class="btn btn-success" onclick="openPickupDocModal()">📦 Als abgeholt bestätigen</button>`;
+                    toggleDoneBtnArea.innerHTML = `<button class="btn btn-success" onclick="openPickupDocModal()">📦 Wird abgeholt</button>`;
                 } else {
                     toggleDoneBtnArea.innerHTML = `<button class="btn btn-success" onclick="markItemAsDone('Erledigt')">✅ Erledigen</button>`;
                 }
@@ -2637,30 +3879,584 @@
             document.getElementById('detailModal').style.display = 'block';
         }
 
+        let currentLieferscheinBase64 = null;
+        let currentSignatureBase64 = null;
+        let sigCanvas = null;
+        let sigCtx = null;
+        let hasSigned = false;
+        let isDrawing = false;
+
         function openPickupDocModal() {
+            if(!selectedItem) return;
             triggerVibe();
             document.getElementById('detailModal').style.display = 'none';
             document.getElementById('pickupDocModal').style.display = 'block';
+
+            currentLieferscheinBase64 = selectedItem.lieferscheinFoto || null;
+            currentSignatureBase64 = selectedItem.signature || null;
+
+            document.getElementById('pickupItemHeadline').textContent = 
+                `Bereich: ${selectedItem.bereich} | Anlass: ${selectedItem.retoureGrund || 'Retoure'} | Erfasst von: ${selectedItem.user}`;
+
+            const storedData = selectedItem.lieferscheinData || {};
+            document.getElementById('lsNummer').value = storedData.nr || '';
+            document.getElementById('lsSpedition').value = storedData.spedition || selectedItem.retoureSpedition || '';
+            document.getElementById('lsKfz').value = storedData.kfz || '';
+            document.getElementById('lsPaletten').value = storedData.paletten || storedData.menge || '1 Europalette';
+            document.getElementById('lsWare').value = storedData.ware || (selectedItem.hinweis && selectedItem.hinweis !== 'Keine Anmerkungen' ? selectedItem.hinweis : 'Retourenware');
+            document.getElementById('lsVermerk').value = storedData.vermerk || '';
+
+            if(currentLieferscheinBase64) {
+                document.getElementById('lieferscheinThumb').src = currentLieferscheinBase64;
+                document.getElementById('lieferscheinPreviewContainer').style.display = 'block';
+                document.getElementById('lieferscheinOcrStatus').textContent = 'Foto gespeichert';
+            } else {
+                document.getElementById('lieferscheinPreviewContainer').style.display = 'none';
+                document.getElementById('lieferscheinOcrStatus').textContent = '';
+            }
+
+            if(currentSignatureBase64) {
+                document.getElementById('signatureThumb').src = currentSignatureBase64;
+                document.getElementById('signaturePreviewArea').style.display = 'block';
+            } else {
+                document.getElementById('signaturePreviewArea').style.display = 'none';
+            }
         }
 
         function closePickupDocModal() {
             document.getElementById('pickupDocModal').style.display = 'none';
         }
 
+        function addPalletTag(tag) {
+            const input = document.getElementById('lsPaletten');
+            triggerVibe();
+            if(!input.value.trim()) {
+                input.value = '1 ' + tag;
+            } else {
+                input.value += ', 1 ' + tag;
+            }
+        }
+
+        async function handleLieferscheinPhoto(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const statusEl = document.getElementById('lieferscheinOcrStatus');
+            statusEl.textContent = '⚡ Bild wird optimiert...';
+            showToast('📷 Lieferschein geladen, KI analysiert...');
+
+            try {
+                const compressedBase64 = await compressImageForOCR(file, 1100);
+                currentLieferscheinBase64 = compressedBase64;
+                document.getElementById('lieferscheinThumb').src = compressedBase64;
+                document.getElementById('lieferscheinPreviewContainer').style.display = 'block';
+
+                statusEl.textContent = '🤖 KI liest Lieferschein...';
+
+                const prompt = `Analysiere diesen Lieferschein, Frachtbrief oder Rücklieferschein aus dem Baustoffbereich. Extrahiere die wichtigsten Daten.
+Antworte AUSSCHLIESSLICH im folgenden JSON-Format ohne Markdown und ohne Erklärungen:
+{
+  "lieferscheinNr": "Lieferschein- oder Belegnummer",
+  "spedition": "Spedition oder Transporteur",
+  "kfz": "KFZ-Kennzeichen des Fahrzeugs falls angegeben",
+  "paletten": "NUR Anzahl und genaue Art der Paletten / Ladungsträger. Identifiziere präzise zwischen: Europaletten (EP), KS-Paletten (Kalksandstein), Porenbetonpaletten, Gipskartonpaletten, Ziegelpaletten, Einwegpaletten, Gitterboxen, Permazellpaletten, Pflasterpaletten (u.a. Berdingpaletten). Beispiel: '2 Europaletten' oder '1 KS-Palette'",
+  "ware": "NUR die reine Warenbezeichnung bzw. das Material (z. B. 'Blockstufen', 'Klinker', 'Pflaster', 'Dämmung', 'KG-Rohre', 'Zement'). KEINE Palettenbezeichnung hier eintragen!",
+  "vermerk": "Zustandsvermerk oder Mängel"
+}`;
+
+                const result = await callGeminiVision(compressedBase64, prompt);
+                if(result) {
+                    try {
+                        const clean = result.replace(/```json/g, '').replace(/```/g, '').trim();
+                        const data = JSON.parse(clean);
+                        if(data.lieferscheinNr && data.lieferscheinNr !== 'Lieferschein- oder Belegnummer') document.getElementById('lsNummer').value = data.lieferscheinNr;
+                        if(data.spedition && data.spedition !== 'Spedition oder Transporteur') document.getElementById('lsSpedition').value = data.spedition;
+                        if(data.kfz && data.kfz !== 'KFZ-Kennzeichen des Fahrzeugs falls angegeben') document.getElementById('lsKfz').value = data.kfz;
+                        if(data.paletten) document.getElementById('lsPaletten').value = data.paletten;
+                        if(data.ware) document.getElementById('lsWare').value = data.ware;
+                        if(data.vermerk && data.vermerk !== 'Zustandsvermerk oder Mängel') document.getElementById('lsVermerk').value = data.vermerk;
+                        
+                        statusEl.textContent = '✅ Daten erkannt';
+                        playSuccessSound();
+                        triggerVibe();
+                        showToast('✅ Lieferschein-Daten per KI extrahiert!');
+                    } catch(jsonErr) {
+                        console.warn('JSON parsing error:', jsonErr);
+                        statusEl.textContent = 'Foto gespeichert';
+                        showToast('Foto gespeichert. Daten bitte prüfen.');
+                    }
+                } else {
+                    statusEl.textContent = 'Foto gespeichert';
+                }
+            } catch(err) {
+                console.error('Error handling lieferschein photo:', err);
+                statusEl.textContent = 'Fehler beim Laden';
+                showToast('❌ Fehler beim Verarbeiten des Fotos.');
+            } finally {
+                e.target.value = '';
+            }
+        }
+
+        function openSignatureModal() {
+            triggerVibe();
+            const modal = document.getElementById('signatureModal');
+            modal.style.display = 'flex';
+            setTimeout(initSignaturePad, 60);
+        }
+
+        function closeSignatureModal() {
+            document.getElementById('signatureModal').style.display = 'none';
+        }
+
+        function initSignaturePad() {
+            sigCanvas = document.getElementById('signatureCanvas');
+            if(!sigCanvas) return;
+            sigCtx = sigCanvas.getContext('2d');
+
+            const rect = sigCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            sigCanvas.width = rect.width * dpr;
+            sigCanvas.height = 220 * dpr;
+            sigCtx.scale(dpr, dpr);
+            sigCtx.lineWidth = 2.5;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+            sigCtx.strokeStyle = '#0f172a';
+
+            let lastX = 0, lastY = 0;
+
+            function getPos(e) {
+                const r = sigCanvas.getBoundingClientRect();
+                if(e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+                }
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            }
+
+            function start(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const pos = getPos(e);
+                lastX = pos.x;
+                lastY = pos.y;
+                hasSigned = true;
+            }
+
+            function move(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                sigCtx.beginPath();
+                sigCtx.moveTo(lastX, lastY);
+                sigCtx.lineTo(pos.x, pos.y);
+                sigCtx.stroke();
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function end(e) {
+                isDrawing = false;
+            }
+
+            sigCanvas.ontouchstart = start;
+            sigCanvas.ontouchmove = move;
+            sigCanvas.ontouchend = end;
+            sigCanvas.ontouchcancel = end;
+
+            sigCanvas.onmousedown = start;
+            sigCanvas.onmousemove = move;
+            sigCanvas.onmouseup = end;
+            sigCanvas.onmouseleave = end;
+        }
+
+        function clearSignatureCanvas() {
+            triggerVibe();
+            if(sigCanvas && sigCtx) {
+                sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+                hasSigned = false;
+            }
+        }
+
+        function saveSignatureAndClose() {
+            triggerVibe();
+            if(!sigCanvas || !hasSigned) {
+                if(!confirm('Es wurde noch keine Unterschrift gezeichnet. Trotzdem fortfahren?')) return;
+                closeSignatureModal();
+                return;
+            }
+
+            currentSignatureBase64 = sigCanvas.toDataURL('image/png');
+            document.getElementById('signatureThumb').src = currentSignatureBase64;
+            document.getElementById('signaturePreviewArea').style.display = 'block';
+            closeSignatureModal();
+            showToast('✅ Unterschrift des Lieferanten gespeichert!');
+        }
+
+        function openPrintWindow(htmlContent) {
+            try {
+                let printWin = window.open('', '_blank');
+                if (printWin) {
+                    printWin.document.write(htmlContent);
+                    printWin.document.close();
+                    setTimeout(() => {
+                        try { printWin.print(); } catch(e){}
+                    }, 350);
+                    return;
+                }
+            } catch(err) {
+                console.warn("window.open blocked, using print iframe:", err);
+            }
+
+            let printFrame = document.getElementById('retourePrintIframe');
+            if (!printFrame) {
+                printFrame = document.createElement('iframe');
+                printFrame.id = 'retourePrintIframe';
+                printFrame.style.position = 'fixed';
+                printFrame.style.right = '0';
+                printFrame.style.bottom = '0';
+                printFrame.style.width = '0';
+                printFrame.style.height = '0';
+                printFrame.style.border = '0';
+                document.body.appendChild(printFrame);
+            }
+            const frameDoc = printFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(htmlContent);
+            frameDoc.close();
+            setTimeout(() => {
+                try {
+                    printFrame.contentWindow.focus();
+                    printFrame.contentWindow.print();
+                } catch(e) {
+                    console.error("Print error:", e);
+                }
+            }, 350);
+        }
+
+        function buildRetourenLieferscheinHTML(item, data, sigUrl) {
+            const today = new Date().toLocaleDateString('de-DE');
+            const time = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            const belegNr = `RET-${item.id || Date.now()}`;
+            const lageristName = (currentUser ? currentUser.name : (item.doneBy || 'team baucenter Lagerist'));
+
+            return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Retouren-Lieferschein_${belegNr}</title>
+<style>
+    @page { size: A4 portrait; margin: 14mm; }
+    * { box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        color: #0f172a;
+        margin: 0;
+        padding: 20px;
+        font-size: 13px;
+        line-height: 1.45;
+        background: #fff;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 3px solid #2563eb;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+    .brand-title {
+        font-size: 26px;
+        font-weight: 900;
+        color: #1e3a8a;
+        letter-spacing: -0.5px;
+    }
+    .brand-title span { color: #f97316; }
+    .company-sub {
+        font-size: 11.5px;
+        color: #475569;
+        margin-top: 3px;
+    }
+    .hours-badge {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 11px;
+        text-align: right;
+        color: #334155;
+    }
+    .doc-banner {
+        background: #f1f5f9;
+        border-left: 5px solid #2563eb;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .doc-banner h1 {
+        font-size: 17px;
+        margin: 0;
+        color: #0f172a;
+        font-weight: bold;
+    }
+    .meta-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+    }
+    .meta-table th, .meta-table td {
+        border: 1px solid #cbd5e1;
+        padding: 8px 10px;
+        font-size: 12.5px;
+    }
+    .meta-table th {
+        background: #f8fafc;
+        color: #334155;
+        width: 32%;
+        font-weight: 600;
+        text-align: left;
+    }
+    .notice-box {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        font-size: 11.5px;
+        color: #334155;
+    }
+    .sig-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 15px;
+    }
+    .sig-card {
+        border: 1.5px solid #94a3b8;
+        border-radius: 6px;
+        padding: 10px;
+        min-height: 125px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .sig-card-title {
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #475569;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 4px;
+    }
+    .sig-canvas-img {
+        max-height: 65px;
+        max-width: 90%;
+        object-fit: contain;
+        margin: 4px auto;
+        display: block;
+    }
+    .sig-footer-line {
+        border-top: 1px solid #0f172a;
+        margin-top: 6px;
+        font-size: 11px;
+        text-align: center;
+        color: #334155;
+        padding-top: 4px;
+    }
+    .footer-note {
+        margin-top: 25px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 8px;
+        font-size: 10px;
+        color: #94a3b8;
+        text-align: center;
+    }
+    @media print {
+        body { padding: 0; }
+        .no-print { display: none !important; }
+    }
+</style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <div class="brand-title">team <span>baucenter</span></div>
+            <div class="company-sub">
+                <strong>Standort Stäbelow</strong><br>
+                Mühlenweg 14 • 18198 Stäbelow<br>
+                Tel.: 038207 / 67-0 • E-Mail: staebelow@team.de
+            </div>
+        </div>
+        <div class="hours-badge">
+            <strong>🕒 Öffnungszeiten:</strong><br>
+            Mo. – Fr.: 06:30 – 17:00 Uhr<br>
+            Samstag: 08:00 – 12:00 Uhr
+        </div>
+    </div>
+
+    <div class="doc-banner">
+        <div>
+            <h1>OFFIZIELLER RETOUREN-LIEFERSCHEIN & ABHOLBELEG</h1>
+            <small style="color:#64748b;">Gültiger Übergabenachweis für Frachtführer & Speditionen</small>
+        </div>
+        <div style="text-align:right;">
+            <strong style="color:#2563eb; font-size:14px;">${belegNr}</strong><br>
+            <small style="color:#64748b;">${today}, ${time} Uhr</small>
+        </div>
+    </div>
+
+    <table class="meta-table">
+        <tr>
+            <th>Lieferschein- / Frachtbrief-Nr.</th>
+            <td><strong>${data.nr || '–'}</strong></td>
+        </tr>
+        <tr>
+            <th>Spedition / Transporteur</th>
+            <td><strong>${data.spedition || item.retoureSpedition || '–'}</strong></td>
+        </tr>
+        <tr>
+            <th>KFZ-Kennzeichen</th>
+            <td>${data.kfz || '–'}</td>
+        </tr>
+        <tr>
+            <th>Lagerbereich / Auslagerungsort</th>
+            <td>${item.bereich || '–'}</td>
+        </tr>
+        <tr>
+            <th>Retourengrund / Anlass</th>
+            <td><strong style="color:#b45309;">${item.retoureGrund || 'Retoure'}</strong></td>
+        </tr>
+        <tr>
+            <th>Warenbezeichnung</th>
+            <td><strong>${data.ware || item.hinweis || 'Retourenware'}</strong></td>
+        </tr>
+        <tr>
+            <th>Paletten (Ladungsträger)</th>
+            <td><strong>${data.paletten || data.menge || '1 Europalette'}</strong></td>
+        </tr>
+        <tr>
+            <th>Zustand / Vermerke</th>
+            <td>${data.vermerk || item.hinweis || 'Ware ordnungsgemäß übergeben'}</td>
+        </tr>
+        <tr>
+            <th>Ausgabe durch Mitarbeiter</th>
+            <td>${lageristName} (${today})</td>
+        </tr>
+    </table>
+
+    <div class="notice-box">
+        <strong>Übergabeerklärung:</strong> Der unterzeichnende Fahrer/Frachtführer bestätigt hiermit ausdrücklich, dass die oben genannten Retouren-Waren vom ausgebenden Standort <strong>team baucenter Stäbelow</strong> vollständig übernommen, auf äußerliche Beschaffenheit geprüft und zur Rückführung ordnungsgemäß verladen wurden.
+    </div>
+
+    <div class="sig-section">
+        <div class="sig-card">
+            <div class="sig-card-title">1. Warenausgang (team baucenter Stäbelow)</div>
+            <div style="text-align:center; padding: 12px 0;">
+                <span style="font-size:12px; font-weight:bold; color:#1e3a8a;">team baucenter Stäbelow</span><br>
+                <small style="color:#64748b;">Ausgabe: ${lageristName}</small>
+            </div>
+            <div class="sig-footer-line">Unterschrift / Handzeichen Lagerist</div>
+        </div>
+
+        <div class="sig-card">
+            <div class="sig-card-title">2. Warenübernahme (Spedition / Frachtführer)</div>
+            <div style="text-align:center; min-height:65px; display:flex; align-items:center; justify-content:center;">
+                ${sigUrl ? `<img src="${sigUrl}" class="sig-canvas-img" alt="Fahrer-Unterschrift">` : `<span style="color:#94a3b8; font-size:12px;">(Digital erfasst)</span>`}
+            </div>
+            <div class="sig-footer-line">
+                Unterschrift Frachtführer / Spedition
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-text">
+        team baucenter Stäbelow • Mühlenweg 14 • 18198 Stäbelow • Offizieller Beleg • Vorgangs-ID: ${belegNr}
+    </div>
+</body>
+</html>`;
+        }
+
+        function generateRetourenLieferscheinPDF() {
+            if(!selectedItem) return;
+            triggerVibe();
+
+            const data = {
+                nr: document.getElementById('lsNummer').value.trim(),
+                spedition: document.getElementById('lsSpedition').value.trim(),
+                kfz: document.getElementById('lsKfz').value.trim(),
+                paletten: document.getElementById('lsPaletten').value.trim(),
+                ware: document.getElementById('lsWare').value.trim(),
+                vermerk: document.getElementById('lsVermerk').value.trim()
+            };
+
+            const html = buildRetourenLieferscheinHTML(selectedItem, data, currentSignatureBase64);
+            openPrintWindow(html);
+        }
+
+        function printStoredRetourenLieferscheinPDF() {
+            if(!selectedItem) return;
+            triggerVibe();
+
+            const stored = selectedItem.lieferscheinData || {};
+            const data = {
+                nr: stored.nr || '',
+                spedition: stored.spedition || selectedItem.retoureSpedition || '',
+                kfz: stored.kfz || '',
+                paletten: stored.paletten || stored.menge || '1 Europalette',
+                ware: stored.ware || (selectedItem.hinweis && selectedItem.hinweis !== 'Keine Anmerkungen' ? selectedItem.hinweis : 'Retourenware'),
+                vermerk: stored.vermerk || ''
+            };
+
+            const html = buildRetourenLieferscheinHTML(selectedItem, data, selectedItem.signature || null);
+            openPrintWindow(html);
+        }
+
+        function viewLieferscheinPhotoModal() {
+            if(!selectedItem || !selectedItem.lieferscheinFoto) {
+                showToast('Kein Lieferschein-Foto hinterlegt.');
+                return;
+            }
+            triggerVibe();
+            document.getElementById('lieferscheinFullViewImg').src = selectedItem.lieferscheinFoto;
+            document.getElementById('lieferscheinViewModal').style.display = 'block';
+        }
+
         function confirmRetourePickup() {
-            if(!selectedItem || !currentUser) return;
+            if(!selectedItem || !currentUser) {
+                showToast('Bitte zuerst anmelden!');
+                return;
+            }
             triggerVibe();
 
             selectedItem.status = 'Abgeholt';
             selectedItem.doneBy = currentUser.name;
             selectedItem.doneDate = new Date().toLocaleString('de-DE');
 
+            if(currentLieferscheinBase64) {
+                selectedItem.lieferscheinFoto = currentLieferscheinBase64;
+            }
+            if(currentSignatureBase64) {
+                selectedItem.signature = currentSignatureBase64;
+            }
+            selectedItem.lieferscheinData = {
+                nr: document.getElementById('lsNummer').value.trim(),
+                spedition: document.getElementById('lsSpedition').value.trim(),
+                kfz: document.getElementById('lsKfz').value.trim(),
+                paletten: document.getElementById('lsPaletten').value.trim(),
+                ware: document.getElementById('lsWare').value.trim(),
+                vermerk: document.getElementById('lsVermerk').value.trim()
+            };
+
             cloudDb.collection("bestand").doc(String(selectedItem.id)).set(selectedItem).then(() => {
                 playSuccessSound();
                 closePickupDocModal();
                 closeModal();
                 renderRetouren();
-                showToast('✅ Retoure als abgeholt markiert!');
+                showToast('✅ Retoure als abgeholt quittiert & Lieferschein archiviert!');
+            }).catch(err => {
+                console.error("Error confirming pickup:", err);
+                showToast('❌ Fehler beim Speichern der Abholung.');
             });
         }
 
@@ -2705,6 +4501,8 @@
                 document.getElementById('editATNummer').value = cleanNum;
             }
 
+            const isDone = selectedItem.status === 'Erledigt' || selectedItem.status === 'Abgeholt';
+            document.getElementById('editBereich').disabled = isDone;
             document.getElementById('editBereich').value = selectedItem.bereich;
             document.getElementById('editStatus').value = selectedItem.status;
             document.getElementById('editHinweis').value = selectedItem.hinweis;
@@ -2730,7 +4528,13 @@
                 selectedItem.atNummer = '';
             }
 
-            selectedItem.bereich = document.getElementById('editBereich').value;
+            const newBereich = document.getElementById('editBereich').value;
+            if(selectedItem.bereich !== newBereich) {
+                selectedItem.relocatedFrom = selectedItem.bereich;
+                selectedItem.relocatedBy = currentUser ? currentUser.name : 'Mitarbeiter';
+                selectedItem.relocatedDate = new Date().toLocaleString('de-DE');
+                selectedItem.bereich = newBereich;
+            }
             selectedItem.status = statusVal;
             selectedItem.hinweis = document.getElementById('editHinweis').value;
 
@@ -2780,13 +4584,71 @@
         }
 
         function changeTheme(theme) {
+            const isOwner = currentUser && (currentUser.isOwner || isSuperAdmin);
+            const OWNER_THEMES = [
+                'cozy-sunset', 'midnight-obsidian',
+                'solar-flare', 'arctic-frost', 'volcanic-magma'
+            ];
+
+            if(theme === 'galaxy') {
+                const canSee = currentUser && (currentUser.isOwner || currentUser.role === 'azubi' || isSuperAdmin);
+                if(!canSee) {
+                    showToast('Nur für Haupt-Admin & Azubi-Lutscher freigeschaltet!');
+                    return;
+                }
+            }
+            if(OWNER_THEMES.includes(theme)) {
+                if(!isOwner) {
+                    showToast('Exklusiv für den Inhaber freigeschaltet!');
+                    return;
+                }
+            }
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('app_theme', theme);
+        }
+
+        function updateThemeSelectVisibility() {
+            const canSeeGalaxy = currentUser && (currentUser.isOwner || currentUser.role === 'azubi' || isSuperAdmin);
+            const canSeeOwner = currentUser && (currentUser.isOwner || isSuperAdmin);
+
+            const optGalaxy = document.getElementById('optThemeGalaxy');
+            if(optGalaxy) optGalaxy.style.display = canSeeGalaxy ? 'block' : 'none';
+
+            const ownerThemeIds = [
+                'optThemeSunset', 'optThemeObsidian',
+                'optThemeSolar', 'optThemeArctic', 'optThemeMagma'
+            ];
+
+            ownerThemeIds.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = canSeeOwner ? 'block' : 'none';
+            });
+
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if(!canSeeGalaxy && currentTheme === 'galaxy') {
+                changeTheme('dark');
+                const sel = document.getElementById('themeSelect');
+                if(sel) sel.value = 'dark';
+            }
+            const OWNER_THEMES = [
+                'cozy-sunset', 'midnight-obsidian',
+                'solar-flare', 'arctic-frost', 'volcanic-magma'
+            ];
+            if(!canSeeOwner && OWNER_THEMES.includes(currentTheme)) {
+                changeTheme('dark');
+                const sel = document.getElementById('themeSelect');
+                if(sel) sel.value = 'dark';
+            }
         }
 
         function changeTextColor(color) {
             document.documentElement.setAttribute('data-textcolor', color);
             localStorage.setItem('app_textcolor', color);
+        }
+
+        function changeFontFamily(family) {
+            document.documentElement.setAttribute('data-fontfamily', family);
+            localStorage.setItem('app_fontfamily', family);
         }
 
         function changeFontSize(size) {
@@ -2809,5 +4671,71 @@
             localStorage.setItem('app_sound', val);
         }
     </script>
+
+    <!-- FORTNITE GALAXY EASTER EGG BADGE (Nur sichtbar im Galaxy Theme) -->
+    <div class="galaxy-easteregg-badge" onclick="showToast('🌌 VICTORY ROYALE! Fortnite Galaxy Skin & Azubi Power aktiv! 🍭✨')">
+        <!-- Stylized Fortnite Galaxy Skin Icon -->
+        <svg width="26" height="26" viewBox="0 0 32 32" style="filter:drop-shadow(0 0 6px #d946ef);">
+            <defs>
+                <linearGradient id="galaxyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#06b6d4"/>
+                    <stop offset="50%" stop-color="#d946ef"/>
+                    <stop offset="100%" stop-color="#3b0764"/>
+                </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="14" fill="url(#galaxyGrad)" stroke="#a855f7" stroke-width="1.5"/>
+            <!-- Galaxy Spiky Hair -->
+            <path d="M10 11 L13 6 L16 9 L19 5 L22 11 Z" fill="#38bdf8"/>
+            <!-- Galaxy Face Silhouette -->
+            <path d="M11 11 Q16 11 21 11 Q20 20 16 22 Q12 20 11 11 Z" fill="#1e1035"/>
+            <!-- Glowing Eyes -->
+            <circle cx="13.5" cy="14.5" r="1.5" fill="#38bdf8"/>
+            <circle cx="18.5" cy="14.5" r="1.5" fill="#38bdf8"/>
+            <circle cx="13.5" cy="14.5" r="0.6" fill="#ffffff"/>
+            <circle cx="18.5" cy="14.5" r="0.6" fill="#ffffff"/>
+            <!-- Celestial Star Particles -->
+            <circle cx="7" cy="8" r="0.9" fill="#ffffff"/>
+            <circle cx="25" cy="13" r="1" fill="#ffffff"/>
+            <circle cx="10" cy="24" r="0.8" fill="#38bdf8"/>
+            <circle cx="23" cy="22" r="0.9" fill="#d946ef"/>
+        </svg>
+        <span style="font-size:0.75rem; font-weight:900; background:linear-gradient(90deg,#f472b6,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">FORTNITE GALAXY SKIN</span>
+        <span style="font-size:0.8rem;">🍭</span>
+    </div>
+
+    <!-- COZY SUNSET EASTER EGG BADGE (Nur sichtbar im Cozy Sunset Theme) -->
+    <div class="sunset-easteregg-badge" onclick="showToast('🌅 Cozy Sunset aktiv: Ruhige Schicht, warmes Licht & pure Gemütlichkeit. ☕✨')">
+        <span style="font-size:1.1rem;">🌅</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:#fed7aa;">COZY SUNSET</span>
+        <span style="font-size:0.8rem;">🕯️</span>
+    </div>
+
+    <!-- MATRIX CODE EASTER EGG BADGE -->
+    <div class="matrix-easteregg-badge" onclick="showToast('> WAKE UP, NEO... Terminal-Zugriff gewährt! 💻🔓')">
+        <span style="font-size:1.1rem;">📟</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:#4ade80;">TERMINAL MATRIX</span>
+        <span style="font-size:0.8rem;">🟢</span>
+    </div>
+
+    <!-- SOLAR FLARE EASTER EGG BADGE -->
+    <div class="solar-easteregg-badge" onclick="showToast('☀️ Wüstensonne brennt: Maximale Energie im Lager! 🏜️')">
+        <span style="font-size:1.1rem;">☀️</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:#fde047;">SOLAR FLARE</span>
+        <span style="font-size:0.8rem;">🌵</span>
+    </div>
+
+    <!-- ARCTIC FROST EASTER EGG BADGE -->
+    <div class="arctic-easteregg-badge" onclick="showToast('❄️ Eiskalt & kristallklar: Voller Durchblick im Lager! 🧊')">
+        <span style="font-size:1.1rem;">❄️</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:#bae6fd;">ARCTIC FROST</span>
+        <span style="font-size:0.8rem;">🧊</span>
+    </div>
+
+    <!-- VOLCANIC MAGMA EASTER EGG BADGE -->
+    <div class="magma-easteregg-badge" onclick="showToast('🌋 MAGMA ERUPTION! Heißer Wareneingang auf 1000°C! 🔥')">
+        <span style="font-size:1.1rem;">🌋</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:#fca5a5;">VOLCANIC MAGMA</span>
+        <span style="font-size:0.8rem;">🔥</span>
+    </div>
 </body>
 </html>

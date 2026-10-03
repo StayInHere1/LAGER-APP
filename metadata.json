@@ -1,0 +1,7 @@
+{
+  "name": "Lagerratten-App",
+  "description": "Lagerverwaltung und Erfassung für Waren, Paletten und Retouren mit Barcode, Status und Bestandsübersicht.",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
