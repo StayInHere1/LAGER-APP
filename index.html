@@ -1555,9 +1555,9 @@
                     <hr style="margin-bottom: 15px; border-color: var(--border);">
                     <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;">
                         <label style="font-weight:bold;">✨ Google Gemini API-Key für KI-Funktionen</label>
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Server-seitig aktiv (Standard). Optional eigener Gemini API-Schlüssel:</p>
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Wird per Cloud für alle Mitarbeiter synchronisiert. Schlüssel hier einfügen:</p>
                         <div style="display:flex; gap:8px; margin-top:6px;">
-                            <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." style="min-height:42px;">
+                            <input type="password" id="geminiApiKeyInput" placeholder="AQ... oder AIzaSy..." style="min-height:42px;">
                             <button type="button" class="btn btn-sm" onclick="saveGeminiKey()" style="width:auto;">Speichern</button>
                         </div>
                     </div>
@@ -2236,6 +2236,21 @@
             }
         });
 
+        // Automatische Cloud-Synchronisation des KI-Schlüssels für alle Mitarbeiter
+        cloudDb.collection("app_config").doc("gemini").onSnapshot((doc) => {
+            if(doc.exists) {
+                const data = doc.data();
+                if(data && data.apiKey) {
+                    geminiApiKey = data.apiKey;
+                    localStorage.setItem('gemini_api_key', data.apiKey);
+                    const geminiInp = document.getElementById('geminiApiKeyInput');
+                    if(geminiInp && !geminiInp.value) {
+                        geminiInp.value = data.apiKey;
+                    }
+                }
+            }
+        });
+
         cloudDb.collection("bestand").onSnapshot((snapshot) => {
             let cloudItems = [];
             snapshot.forEach((doc) => cloudItems.push(doc.data()));
@@ -2433,7 +2448,19 @@
             triggerVibe();
             geminiApiKey = key;
             localStorage.setItem('gemini_api_key', geminiApiKey);
-            showToast('Gemini API-Key erfolgreich gespeichert!');
+            if(cloudDb) {
+                cloudDb.collection("app_config").doc("gemini").set({
+                    apiKey: key,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true }).then(() => {
+                    showToast('✔ Key gespeichert & mit allen Mitarbeitern synchronisiert!');
+                }).catch(err => {
+                    console.error("Cloud-Sync Fehler:", err);
+                    showToast('✔ Key lokal gespeichert!');
+                });
+            } else {
+                showToast('✔ Key lokal gespeichert!');
+            }
         }
 
         function send30DaysEmailNow() {
@@ -2682,7 +2709,7 @@ body { font-family: -apple-system, sans-serif; text-align: center; margin: 0; pa
         async function callGeminiDirectRest(parts) {
             const apiKey = getActiveApiKey();
             if (!apiKey) return null;
-            const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+            const models = ['gemini-3.8-flash', 'gemini-3.1-flash-lite'];
             for (const model of models) {
                 try {
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -2850,19 +2877,18 @@ body { font-family: -apple-system, sans-serif; text-align: center; margin: 0; pa
                     body: JSON.stringify({
                         prompt: promptText,
                         images: imagesArray,
-                        customApiKey: geminiApiKey || undefined
+                        customApiKey: getActiveApiKey() || undefined
                     })
                 });
                 const data = await response.json();
-                if(data.error) {
-                    console.error("Gemini Chat Fehler:", data.error);
-                    return "Fehler bei der KI-Anfrage: " + data.error;
+                if(data && !data.error && data.text) {
+                    return data.text;
                 }
-                return data.text || "Keine Antwort erhalten.";
             } catch(e) {
-                console.error("Gemini Chat Netzwerkfehler:", e);
-                return "Netzwerkfehler bei der KI-Anfrage.";
+                console.warn("Gemini Chat multimodal error, fallback to text:", e);
             }
+            // Robuster Fallback auf reinen Text-Prompt
+            return await callGeminiText(promptText);
         }
 
         async function analyzeItemPhotoWithAI(itemId, photoBase64) {

@@ -102,32 +102,45 @@ app.post('/api/gemini/text', async (req, res) => {
     if (images && Array.isArray(images) && images.length > 0) {
       const parts = [];
       for (const img of images) {
-        const raw = img.data || img;
+        let raw = '';
+        if (typeof img === 'string') {
+          raw = img;
+        } else if (img && typeof img.data === 'string') {
+          raw = img.data;
+        } else if (img && typeof img.base64 === 'string') {
+          raw = img.base64;
+        }
+        if (!raw) continue;
         const clean = raw.includes(',') ? raw.split(',')[1] : raw;
+        if (!clean || clean.length < 10) continue;
         parts.push({
           inlineData: {
-            mimeType: img.mimeType || 'image/jpeg',
+            mimeType: (img && img.mimeType) || 'image/jpeg',
             data: clean,
           },
         });
       }
       parts.push({ text: prompt });
 
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
-          contents: { parts },
-          config: {
-            thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
-          },
-        });
-        return res.json({ text: response.text || '' });
-      } catch (err) {
-        console.warn('Multimodal chat failed on gemini-3.8-flash, falling back to text prompt:', err.message);
-        // Fallback to text if multimodal temporarily saturated
-        const text = await generateTextFast(ai, prompt);
-        return res.json({ text: text || '' });
+      if (parts.length > 1) {
+        try {
+          const response = await ai.models.generateContent({
+            model: 'gemini-3.8-flash',
+            contents: { parts },
+            config: {
+              thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+            },
+          });
+          if (response && response.text) {
+            return res.json({ text: response.text });
+          }
+        } catch (err) {
+          console.warn('Multimodal chat failed on gemini-3.8-flash, falling back to text prompt:', err.message);
+        }
       }
+      // Fallback to text prompt if multimodal failed or no valid images
+      const text = await generateTextFast(ai, prompt);
+      return res.json({ text: text || '' });
     }
 
     const text = await generateTextFast(ai, prompt);
