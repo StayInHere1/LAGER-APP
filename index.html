@@ -2203,19 +2203,25 @@
                 let cloudUsers = [];
                 snapshot.forEach(doc => {
                     const u = doc.data();
-                    if(u.name && (u.name.includes('Manny') || u.name.includes('Hoppert') || u.id === 4)) {
-                        u.name = 'Manni Huppert';
-                        cloudDb.collection("users").doc(String(u.id)).update({ name: 'Manni Huppert' });
+                    // Korrektur: PIN 21204 ist Tommy Böckenhauer (ID 5)
+                    if(u.pin === '21204' || u.id === 5) {
+                        if(u.name !== 'Tommy Böckenhauer' || u.pin !== '21204') {
+                            u.name = 'Tommy Böckenhauer';
+                            u.pin = '21204';
+                            cloudDb.collection("users").doc(String(u.id)).update({ name: 'Tommy Böckenhauer', pin: '21204' });
+                        }
+                    }
+                    // Manni Huppert ist PIN 21203 (ID 4)
+                    if(u.id === 4 || (u.name && (u.name.includes('Manny') || u.name.includes('Hoppert') || u.name === 'Manni Huppert'))) {
+                        if(u.name !== 'Manni Huppert' || u.pin !== '21203') {
+                            u.name = 'Manni Huppert';
+                            u.pin = '21203';
+                            cloudDb.collection("users").doc(String(u.id)).update({ name: 'Manni Huppert', pin: '21203' });
+                        }
                     }
                     cloudUsers.push(u);
                 });
                 users = cloudUsers;
-                updateThemeSelectVisibility();
-                
-                if(isSuperAdmin) {
-                    renderUserRoleList();
-                    renderAdminStats();
-                }
                 
                 const savedId = localStorage.getItem('logged_user_id');
                 if(savedId) {
@@ -2232,6 +2238,13 @@
                     }
                 } else {
                     document.getElementById('lockScreenOverlay').style.display = 'flex';
+                }
+
+                updateThemeSelectVisibility();
+
+                if(isSuperAdmin) {
+                    renderUserRoleList();
+                    renderAdminStats();
                 }
             }
         });
@@ -2343,6 +2356,12 @@
                 document.getElementById('lockScreenOverlay').style.display = 'none';
                 document.getElementById('lockPinInput').value = '';
                 document.getElementById('lockPasswordInput').value = '';
+                
+                // Persönliches Theme des Nutzers wiederherstellen
+                const userTheme = localStorage.getItem('user_theme_' + user.id);
+                if(userTheme) {
+                    changeTheme(userTheme);
+                }
                 updateLoginUI();
             } else {
                 errDiv.textContent = '❌ Falsches Passwort oder Einmal-Passwort verfallen.';
@@ -4631,6 +4650,9 @@ Antworte AUSSCHLIESSLICH im folgenden JSON-Format ohne Markdown und ohne Erklär
             }
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('app_theme', theme);
+            if(currentUser) {
+                localStorage.setItem('user_theme_' + currentUser.id, theme);
+            }
         }
 
         function updateThemeSelectVisibility() {
@@ -4650,21 +4672,30 @@ Antworte AUSSCHLIESSLICH im folgenden JSON-Format ohne Markdown und ohne Erklär
                 if(el) el.style.display = canSeeOwner ? 'block' : 'none';
             });
 
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            if(!canSeeGalaxy && currentTheme === 'galaxy') {
-                changeTheme('dark');
-                const sel = document.getElementById('themeSelect');
-                if(sel) sel.value = 'dark';
+            // Wenn noch kein Nutzer angemeldet ist (z. B. auf dem Sperrbildschirm),
+            // darf das gespeicherte Theme niemals auf Standard zurückgesetzt werden!
+            if(!currentUser) {
+                return;
             }
+
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const savedTheme = localStorage.getItem('user_theme_' + currentUser.id) || localStorage.getItem('app_theme') || currentTheme;
             const OWNER_THEMES = [
                 'cozy-sunset', 'midnight-obsidian',
                 'solar-flare', 'arctic-frost', 'volcanic-magma'
             ];
-            if(!canSeeOwner && OWNER_THEMES.includes(currentTheme)) {
-                changeTheme('dark');
-                const sel = document.getElementById('themeSelect');
-                if(sel) sel.value = 'dark';
+
+            let finalTheme = savedTheme;
+            if(!canSeeGalaxy && savedTheme === 'galaxy') {
+                finalTheme = 'dark';
+            } else if(!canSeeOwner && OWNER_THEMES.includes(savedTheme)) {
+                finalTheme = 'dark';
             }
+
+            document.documentElement.setAttribute('data-theme', finalTheme);
+            localStorage.setItem('app_theme', finalTheme);
+            const sel = document.getElementById('themeSelect');
+            if(sel) sel.value = finalTheme;
         }
 
         function changeTextColor(color) {
